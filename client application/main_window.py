@@ -20,11 +20,19 @@ class MainWindow(QMainWindow):
         grid.setContentsMargins(0, 0, 0, 0)
         grid.setSpacing(0)
         self.setCentralWidget(widget)
+        self.titlebar = QWidget()
+        self.titlebar.setFixedHeight(56)
+        self.titlebar.setStyleSheet("background:green")
+        self.navbar = QWidget()
+        self.navbar.setStyleSheet("background:red")
+        self.navbar.setFixedWidth(148)
         if self.is_dark:
             self.setDarkMode()
         else:
             self.setLightMode()
-        grid.addWidget(self.mainTabWidget)
+        grid.addWidget(self.titlebar, 0, 1)
+        grid.addWidget(self.navbar, 0, 0, 2, 1)
+        grid.addWidget(self.mainTabWidget, 1, 1, 1, 1)
 
     def toggleDarkmode(self):
         if not self.is_dark:
