@@ -12,3 +12,7 @@ class MainTabWidget(QTabWidget):
         super().__init__()
         self.setContentsMargins(0, 0, 0, 0)
         self.addTab(Tab(), "Tasks")
+        self.addTab(Tab(), "Activity")
+        self.addTab(Tab(), "Calendar")
+        self.addTab(Tab(), "Friends")
+        self.addTab(Tab(), "Settings")
