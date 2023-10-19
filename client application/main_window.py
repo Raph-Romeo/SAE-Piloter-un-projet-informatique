@@ -23,7 +23,6 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(widget)
         self.titlebar = QWidget()
         self.titlebar.setFixedHeight(56)
-        self.titlebar.setStyleSheet("background:green")
         self.__navbar = MainNavbar(self.mainTabWidget, self)
         self.__navbar.setFixedWidth(148)
         if self.is_dark:

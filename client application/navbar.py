@@ -16,4 +16,17 @@ class MainNavbar(QMainWindow):
         layout = QGridLayout(content)
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(0)
-        self.setStyleSheet("background:red")
+        iconSize = QSize()
+        iconSize.setWidth(22)
+        iconSize.setHeight(22)
+
+        self.tasksButton = QToolButton()
+        self.tasksButton.setToolButtonStyle(Qt.Qt.ToolButtonTextUnderIcon)
+        self.tasksButton.iconPath = 'icons/58477.png'
+        self.tasksButton.setIcon(QIcon(self.tasksButton.iconPath))
+        self.tasksButton.setIconSize(iconSize)
+        self.tasksButton.setFocusPolicy(QtCore.Qt.NoFocus)
+        self.tasksButton.setFixedWidth(128)
+        self.tasksButton.setText('  Tasks')
+
+        layout.addWidget(self.tasksButton)
