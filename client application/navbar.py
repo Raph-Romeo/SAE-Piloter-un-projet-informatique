@@ -7,7 +7,7 @@ from PyQt5.QtCore import QSize
 
 class MainNavbar(QMainWindow):
 
-    def __init__(self, mainTabWidget, parent):
+    def __init__(self, mainTabWidget, parent, *args, **kwargs):
         super().__init__()
         content = QWidget(self)
         self.setCentralWidget(content)
@@ -16,6 +16,8 @@ class MainNavbar(QMainWindow):
         layout = QGridLayout(content)
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(0)
+        layout.setAlignment(Qt.Qt.AlignLeft)
+        layout.setRowStretch(4, 2)
         iconSize = QSize()
         iconSize.setWidth(22)
         iconSize.setHeight(22)
@@ -30,8 +32,9 @@ class MainNavbar(QMainWindow):
         self.tasksButton.setToolTip('View all tasks')
         self.tasksButton.setFocusPolicy(QtCore.Qt.NoFocus)
         self.tasksButton.setFixedWidth(128)
-        self.tasksButton.setFixedHeight(60)
+        self.tasksButton.setFixedHeight(90)
         self.tasksButton.setText('  Tasks')
+        self.tasksButton.setProperty("firstButton", True)
         self.buttons.append(self.tasksButton)
 
         self.activityButton = QToolButton()
@@ -82,8 +85,9 @@ class MainNavbar(QMainWindow):
         self.settingsButton.setToolTip('Edit settings')
         self.settingsButton.setFocusPolicy(QtCore.Qt.NoFocus)
         self.settingsButton.setFixedWidth(128)
-        self.settingsButton.setFixedHeight(60)
+        self.settingsButton.setFixedHeight(90)
         self.settingsButton.setText('  Settings')
+        self.settingsButton.setProperty("lastButton", True)
         self.buttons.append(self.settingsButton)
 
         layout.addWidget(self.tasksButton, 1, 0, alignment=Qt.Qt.AlignTop)
