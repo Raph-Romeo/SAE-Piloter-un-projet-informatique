@@ -2,6 +2,7 @@ import sys
 from PyQt5.QtWidgets import QWidget, QMainWindow, QTabWidget, QGridLayout, QMessageBox, QPushButton
 from PyQt5.QtGui import QIcon
 from stylesheets import dark_style_sheet, light_style_sheet
+from navbar import MainNavbar
 from tab_widgets import MainTabWidget
 
 
@@ -23,15 +24,14 @@ class MainWindow(QMainWindow):
         self.titlebar = QWidget()
         self.titlebar.setFixedHeight(56)
         self.titlebar.setStyleSheet("background:green")
-        self.navbar = QWidget()
-        self.navbar.setStyleSheet("background:red")
-        self.navbar.setFixedWidth(148)
+        self.__navbar = MainNavbar(self.mainTabWidget, self)
+        self.__navbar.setFixedWidth(148)
         if self.is_dark:
             self.setDarkMode()
         else:
             self.setLightMode()
         grid.addWidget(self.titlebar, 0, 1)
-        grid.addWidget(self.navbar, 0, 0, 2, 1)
+        grid.addWidget(self.__navbar, 0, 0, 2, 1)
         grid.addWidget(self.mainTabWidget, 1, 1, 1, 1)
 
     def toggleDarkmode(self):
