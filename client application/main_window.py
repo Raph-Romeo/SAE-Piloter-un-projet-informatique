@@ -9,6 +9,7 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Taskmaster PRO")
+        self.setWindowIcon(QIcon('icons/taskmasterpro.png'))
         self.resize(780, 500)
         self.setMinimumSize(520, 240)
         self.is_dark = False
@@ -24,12 +25,6 @@ class MainWindow(QMainWindow):
         else:
             self.setLightMode()
         grid.addWidget(self.mainTabWidget)
-
-        # Experimental button for dark mode:
-        self.button = QPushButton()
-        self.button.setText("toggle dark mode")
-        self.button.clicked.connect(self.toggleDarkmode)
-        grid.addWidget(self.button)
 
     def toggleDarkmode(self):
         if not self.is_dark:
