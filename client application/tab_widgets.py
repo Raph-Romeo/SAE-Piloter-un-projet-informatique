@@ -16,3 +16,4 @@ class MainTabWidget(QTabWidget):
         self.addTab(Tab(), "Calendar")
         self.addTab(Tab(), "Friends")
         self.addTab(Tab(), "Settings")
+        self.tabBar().hide()
