@@ -1,6 +1,7 @@
 import sys
 from PyQt5.QtWidgets import QWidget, QMainWindow, QTabWidget, QGridLayout, QMessageBox, QPushButton
 from PyQt5.QtGui import QIcon
+from stylesheets import dark_style_sheet, light_style_sheet
 from tab_widgets import MainTabWidget
 
 
@@ -10,6 +11,7 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("Taskmaster PRO")
         self.resize(780, 500)
         self.setMinimumSize(520, 240)
+        self.is_dark = False
         self.mainTabWidget = MainTabWidget()
         grid = QGridLayout()
         widget = QWidget()
@@ -17,19 +19,34 @@ class MainWindow(QMainWindow):
         grid.setContentsMargins(0, 0, 0, 0)
         grid.setSpacing(0)
         self.setCentralWidget(widget)
+        if self.is_dark:
+            self.setDarkMode()
+        else:
+            self.setLightMode()
         grid.addWidget(self.mainTabWidget)
-        self.setStyleSheet("""
-    QWidget{background:transparent}
-    QMainWindow{background-color: qlineargradient(y1: 0, y2: 1, stop: 0 #f8f4f4, stop: 1 #e4e0e0)}
-    QTabWidget::pane {border:0px;background:transparent;} 
-    QTabBar::tab {background: rgb(10,10,10);border:none;padding:12px;color:#AAA;}
-    QTabBar::tab:hover {background:rgb(10,10,10);color:white;}
-    QTabBar::tab:selected {background:rgb(23,23,23);color:white;}
-    QScrollArea{border:none;}
-    QToolButton{background:transparent;border:none;font-family:verdana;font-weight:999;text-align:left;color:#000;font-size:12px;padding-left:15px;margin-top:14px;margin-bottom:14px}
 
-    QLabel{color:white;font-family:Consolas;font-size:15px;border:0px solid black;background-color:transparent;padding:0px;padding-left:10px;padding-right:10px;margin:0px;text-indent:0px;}
-    QLineEdit{border:0px solid black;margin:0px;padding:0px;font-family:Consolas;color:white;font-size:15px;padding-bottom:10px;text-indent:0px;margin-left:-2px;margin-top:-1px;}
-    
-    QLabel[title="true"]{color:black;margin-left:10px;font-size:20px;font-weight:1;font-family:verdana}
-""")
+        # Experimental button for dark mode:
+        self.button = QPushButton()
+        self.button.setText("toggle dark mode")
+        self.button.clicked.connect(self.toggleDarkmode)
+        grid.addWidget(self.button)
+
+    def toggleDarkmode(self):
+        if not self.is_dark:
+            self.setDarkMode()
+        else:
+            self.setLightMode()
+
+    def setDarkMode(self):
+        if sys.platform == "win32":
+            import pywinstyles
+            pywinstyles.apply_style(self, "dark")
+        self.setStyleSheet(dark_style_sheet)
+        self.is_dark = True
+
+    def setLightMode(self):
+        if sys.platform == "win32":
+            import pywinstyles
+            pywinstyles.apply_style(self, "light")
+        self.setStyleSheet(light_style_sheet)
+        self.is_dark = False
