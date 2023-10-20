@@ -4,6 +4,7 @@ from PyQt5.QtGui import QIcon
 from stylesheets import dark_style_sheet, light_style_sheet
 from navbar import MainNavbar
 from tab_widgets import MainTabWidget
+from titlebar import TitleBar
 
 
 class MainWindow(QMainWindow):
@@ -21,8 +22,8 @@ class MainWindow(QMainWindow):
         grid.setContentsMargins(0, 0, 0, 0)
         grid.setSpacing(0)
         self.setCentralWidget(widget)
-        self.titlebar = QWidget()
-        self.titlebar.setFixedHeight(56)
+        self.titlebar = TitleBar()
+        self.titlebar.setFixedHeight(46)
         self.__navbar = MainNavbar(self.mainTabWidget, self)
         self.__navbar.setFixedWidth(148)
         if self.is_dark:
