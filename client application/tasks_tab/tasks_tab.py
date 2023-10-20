@@ -1,5 +1,6 @@
-from PyQt5.QtWidgets import QTabWidget, QMainWindow, QWidget, QGridLayout, QPushButton, QGraphicsDropShadowEffect
+from PyQt5.QtWidgets import QTabWidget, QWidget, QGridLayout, QPushButton, QGraphicsDropShadowEffect
 from PyQt5.QtGui import QColor
+from .top_menu import TopMenu
 
 
 class TasksTab(QWidget):
@@ -9,10 +10,33 @@ class TasksTab(QWidget):
         self.grid = QGridLayout(self)
         self.button = QPushButton()
 
-        self.topMenu = QMainWindow()
-        self.topMenu.setProperty("tasksTopMenu", True)
+        self.topMenu = TopMenu()
         self.grid.addWidget(self.topMenu)
 
-        self.contentWindow = QMainWindow()
+        self.contentWindow = QWidget()
         self.contentWindow.setProperty("tasksContentWindow", True)
         self.grid.addWidget(self.contentWindow)
+
+    def darkBoxShadows(self):
+        boxShadow = QGraphicsDropShadowEffect()
+        boxShadow.setBlurRadius(20)
+        boxShadow.setOffset(0)
+        boxShadow.setColor(QColor(20, 20, 20))
+        self.topMenu.setGraphicsEffect(boxShadow)
+        boxShadow = QGraphicsDropShadowEffect()
+        boxShadow.setBlurRadius(20)
+        boxShadow.setOffset(0)
+        boxShadow.setColor(QColor(20, 20, 20))
+        self.contentWindow.setGraphicsEffect(boxShadow)
+
+    def lightBoxShadows(self):
+        boxShadow = QGraphicsDropShadowEffect()
+        boxShadow.setBlurRadius(20)
+        boxShadow.setOffset(0)
+        boxShadow.setColor(QColor(160, 160, 160))
+        self.topMenu.setGraphicsEffect(boxShadow)
+        boxShadow = QGraphicsDropShadowEffect()
+        boxShadow.setBlurRadius(20)
+        boxShadow.setOffset(0)
+        boxShadow.setColor(QColor(160, 160, 160))
+        self.contentWindow.setGraphicsEffect(boxShadow)

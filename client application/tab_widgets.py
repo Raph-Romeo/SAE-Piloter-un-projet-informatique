@@ -21,3 +21,9 @@ class MainTabWidget(QTabWidget):
         self.addTab(Tab(), "Friends")
         self.addTab(SettingsTab(parent), "Settings")
         self.tabBar().hide()
+
+    def darkTabs(self):
+        self.tasksTab.darkBoxShadows()
+
+    def lightTabs(self):
+        self.tasksTab.lightBoxShadows()
