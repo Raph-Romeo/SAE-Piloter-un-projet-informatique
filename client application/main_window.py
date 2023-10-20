@@ -45,6 +45,7 @@ class MainWindow(QMainWindow):
             pywinstyles.apply_style(self, "dark")
         self.setStyleSheet(dark_style_sheet)
         self.is_dark = True
+        self.__navbar.darkModeIcons()
 
     def setLightMode(self):
         if sys.platform == "win32":
@@ -52,3 +53,4 @@ class MainWindow(QMainWindow):
             pywinstyles.apply_style(self, "light")
         self.setStyleSheet(light_style_sheet)
         self.is_dark = False
+        self.__navbar.lightModeIcons()

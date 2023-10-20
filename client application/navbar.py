@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import QWidget, QMainWindow, QGridLayout, QToolButton, QLabel, QLineEdit, QPushButton, QComboBox, QMenu, QDialog, QTabWidget, QVBoxLayout, QMessageBox, QDialogButtonBox, QTableWidget, QTableView, QScrollArea, QTableWidgetItem, QAbstractItemView, QHeaderView
-from PyQt5.QtGui import QCursor, QIcon
+from PyQt5.QtGui import QCursor, QIcon, QColor, QPixmap, QPainter
 from PyQt5 import Qt
 from PyQt5 import QtCore
 from PyQt5.QtCore import QSize
@@ -27,7 +27,6 @@ class MainNavbar(QScrollArea):
         self.tasksButton = QToolButton()
         self.tasksButton.setToolButtonStyle(Qt.Qt.ToolButtonTextBesideIcon)
         self.tasksButton.iconPath = 'icons/58477.png'
-        self.tasksButton.setIcon(QIcon(self.tasksButton.iconPath))
         self.tasksButton.setIconSize(iconSize)
         self.tasksButton.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
         self.tasksButton.setToolTip('View all tasks')
@@ -43,7 +42,6 @@ class MainNavbar(QScrollArea):
         self.activityButton = QToolButton()
         self.activityButton.setToolButtonStyle(Qt.Qt.ToolButtonTextBesideIcon)
         self.activityButton.iconPath = 'icons/activity.png'
-        self.activityButton.setIcon(QIcon(self.activityButton.iconPath))
         self.activityButton.setIconSize(iconSize)
         self.activityButton.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
         self.activityButton.setToolTip('View recent activity')
@@ -58,7 +56,6 @@ class MainNavbar(QScrollArea):
         self.calendarButton = QToolButton()
         self.calendarButton.setToolButtonStyle(Qt.Qt.ToolButtonTextBesideIcon)
         self.calendarButton.iconPath = 'icons/calendrier.png'
-        self.calendarButton.setIcon(QIcon(self.calendarButton.iconPath))
         self.calendarButton.setIconSize(iconSize)
         self.calendarButton.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
         self.calendarButton.setToolTip('View task calendar')
@@ -73,7 +70,6 @@ class MainNavbar(QScrollArea):
         self.friendsButton = QToolButton()
         self.friendsButton.setToolButtonStyle(Qt.Qt.ToolButtonTextBesideIcon)
         self.friendsButton.iconPath = 'icons/gens.png'
-        self.friendsButton.setIcon(QIcon(self.friendsButton.iconPath))
         self.friendsButton.setIconSize(iconSize)
         self.friendsButton.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
         self.friendsButton.setToolTip('View friend list')
@@ -88,7 +84,6 @@ class MainNavbar(QScrollArea):
         self.settingsButton = QToolButton()
         self.settingsButton.setToolButtonStyle(Qt.Qt.ToolButtonTextBesideIcon)
         self.settingsButton.iconPath = 'icons/126472.png'
-        self.settingsButton.setIcon(QIcon(self.settingsButton.iconPath))
         self.settingsButton.setIconSize(iconSize)
         self.settingsButton.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
         self.settingsButton.setToolTip('Edit settings')
@@ -109,6 +104,11 @@ class MainNavbar(QScrollArea):
 
         self.setTab(0, True)
 
+        if self.parent.is_dark:
+            self.darkModeIcons()
+        else:
+            self.lightModeIcons()
+
     def setTab(self, index, force=False):
         if self.__tabWidget.currentIndex() is index and not force:
             return
@@ -116,7 +116,70 @@ class MainNavbar(QScrollArea):
             if i.property("selected"):
                 i.setProperty("selected", False)
                 i.setStyleSheet("")
+                if self.parent.is_dark:
+                    color = QColor(255, 255, 255)
+                    pixmap = QPixmap(i.iconPath)
+                    painter = QPainter(pixmap)
+                    painter.setCompositionMode(QPainter.CompositionMode_SourceIn)
+                    painter.fillRect(pixmap.rect(), color)
+                    painter.end()
+                    icon = QIcon(pixmap)
+                    i.setIcon(icon)
+                else:
+                    i.setIcon(QIcon(i.iconPath))
         self.__tabWidget.setCurrentIndex(index)
         self.buttons[index].setProperty("selected", True)
         self.buttons[index].setStyleSheet("")
+        if not self.parent.is_dark:
+            color = QColor(184, 4, 253)
+            pixmap = QPixmap(self.buttons[index].iconPath)
+            painter = QPainter(pixmap)
+            painter.setCompositionMode(QPainter.CompositionMode_SourceIn)
+            painter.fillRect(pixmap.rect(), color)
+            painter.end()
+            icon = QIcon(pixmap)
+            self.buttons[index].setIcon(icon)
+        else:
+            color = QColor(145, 110, 236)
+            pixmap = QPixmap(self.buttons[index].iconPath)
+            painter = QPainter(pixmap)
+            painter.setCompositionMode(QPainter.CompositionMode_SourceIn)
+            painter.fillRect(pixmap.rect(), color)
+            painter.end()
+            icon = QIcon(pixmap)
+            self.buttons[index].setIcon(icon)
 
+    def darkModeIcons(self):
+        for i in self.buttons:
+            if not i.property("selected"):
+                color = QColor(255, 255, 255)
+                pixmap = QPixmap(i.iconPath)
+                painter = QPainter(pixmap)
+                painter.setCompositionMode(QPainter.CompositionMode_SourceIn)
+                painter.fillRect(pixmap.rect(), color)
+                painter.end()
+                icon = QIcon(pixmap)
+                i.setIcon(icon)
+            else:
+                color = QColor(145, 110, 236)
+                pixmap = QPixmap(i.iconPath)
+                painter = QPainter(pixmap)
+                painter.setCompositionMode(QPainter.CompositionMode_SourceIn)
+                painter.fillRect(pixmap.rect(), color)
+                painter.end()
+                icon = QIcon(pixmap)
+                i.setIcon(icon)
+
+    def lightModeIcons(self):
+        for i in self.buttons:
+            if not i.property("selected"):
+                i.setIcon(QIcon(i.iconPath))
+            else:
+                color = QColor(184, 4, 253)
+                pixmap = QPixmap(i.iconPath)
+                painter = QPainter(pixmap)
+                painter.setCompositionMode(QPainter.CompositionMode_SourceIn)
+                painter.fillRect(pixmap.rect(), color)
+                painter.end()
+                icon = QIcon(pixmap)
+                i.setIcon(icon)
