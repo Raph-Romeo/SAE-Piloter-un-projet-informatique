@@ -6,10 +6,12 @@ light_style_sheet = """
     QTabBar::tab:hover {background:rgb(10,10,10);color:white;}
     QTabBar::tab:selected {background:rgb(23,23,23);color:white;}
     QScrollArea{border:none;}
-    QToolButton{background:transparent;border:none;font-family:verdana;font-weight:999;text-align:left;color:#000;font-size:12px;padding-left:15px;margin-top:14px;margin-bottom:14px}
+    QToolButton{background:transparent;border:none;font-family:verdana;font-weight:999;text-align:left;color:#777;font-size:12px;padding-left:15px;margin-top:14px;margin-bottom:14px}
     QToolButton[lastButton="true"]{margin-bottom:44px;margin-top:14px}
     QToolButton[firstButton="true"]{margin-top:44px;margin-bottom:14px}
     QToolButton[selected="true"]{border-left:3px solid #b804fd;padding-left:12px;color:#b804fd}
+    QToolButton:hover[selected="false"]{color:#333}
+    QToolButton:pressed[selected="false"]{border-left:1px solid #666;padding-left:13px;color:#000}
     
     QScrollBar:vertical{background-color: rgb(194,194,194);width: 15px;margin: 15px 3px 15px 3px;border: 1px transparent #2A2929;border-radius: 4px;}
     QScrollBar::handle:vertical{background-color: #999;min-height: 5px;border-radius: 4px;}
@@ -34,10 +36,12 @@ dark_style_sheet = """
     QTabBar::tab:hover {background:rgb(10,10,10);color:white;}
     QTabBar::tab:selected {background:rgb(23,23,23);color:white;}
     QScrollArea{border:none;}
-    QToolButton{background:transparent;border:none;font-family:verdana;font-weight:999;text-align:left;color:#fff;font-size:12px;padding-left:15px;margin-top:14px;margin-bottom:14px}
+    QToolButton{background:transparent;border:none;font-family:verdana;font-weight:999;text-align:left;color:#ddd;font-size:12px;padding-left:15px;margin-top:14px;margin-bottom:14px}
     QToolButton[lastButton="true"]{margin-bottom:44px;margin-top:14px}
     QToolButton[firstButton="true"]{margin-top:44px;margin-bottom:14px}
     QToolButton[selected="true"]{border-left:3px solid #916cee;padding-left:12px;color:#916cee}
+    QToolButton:hover[selected="false"]{color:#fff}
+    QToolButton:pressed[selected="false"]{border-left:1px solid #777;padding-left:13px;color:#fff}
     
     QScrollBar:vertical{background-color: rgb(12,12,12);width: 15px;margin: 15px 3px 15px 3px;border: 1px transparent #2A2929;border-radius: 4px;}
     QScrollBar::handle:vertical{background-color: #333;min-height: 5px;border-radius: 4px;}
