@@ -14,14 +14,30 @@ class TopMenu(QMainWindow):
         self.setCentralWidget(self.widget)
         self.buttons = []
 
-        layout = QGridLayout(self.widget)
+        topLayout = QGridLayout(self.widget)
+        self.leftWrapper = QWidget()
+        self.leftWrapper.setFixedHeight(58)
+        self.leftWrapper.setContentsMargins(0, 0, 0, 0)
+        self.leftWrapper.setMinimumWidth(420)
+        topLayout.addWidget(self.leftWrapper, 0, 0)
+
+        self.addTaskButton = QPushButton()
+        self.addTaskButton.setProperty("addTaskButton", True)
+        self.addTaskButton.setText("＋")
+        self.addTaskButton.setFixedWidth(58)
+        self.addTaskButton.setFixedHeight(28)
+        self.addTaskButton.setCursor(QCursor(Qt.PointingHandCursor))
+        self.addTaskButton.setToolTip("Create new task")
+        topLayout.addWidget(self.addTaskButton, 0, 1)
+
+        layout = QGridLayout(self.leftWrapper)
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(0)
         layout.setRowStretch(4, 2)
 
         self.__add_button("All tasks (0)")
-        self.__add_button("Button 2")
-        self.__add_button("Button 3")
+        self.__add_button("Expiring soon")
+        self.__add_button("Incomplete")
         self.__add_button("Completed")
 
         self.buttons[0].setProperty("selected", True)
@@ -34,15 +50,6 @@ class TopMenu(QMainWindow):
         spacer_right = QSpacerItem(1, 1, QSizePolicy.Expanding, QSizePolicy.Expanding)
         layout.addItem(spacer_left, 0, 0)
         layout.addItem(spacer_right, 0, len(self.buttons)+1)
-
-        self.addTaskButton = QPushButton()
-        self.addTaskButton.setProperty("addTaskButton", True)
-        self.addTaskButton.setText("+")
-        self.addTaskButton.setFixedWidth(30)
-        self.addTaskButton.setFixedHeight(30)
-        self.addTaskButton.setCursor(QCursor(Qt.PointingHandCursor))
-        self.addTaskButton.setToolTip("Create new task")
-        layout.addWidget(self.addTaskButton, 0, len(self.buttons)+2)
 
     def __add_button(self, text: str, h: int = 58, w: int = 120, function=None):
         button = QPushButton()

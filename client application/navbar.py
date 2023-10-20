@@ -55,7 +55,7 @@ class MainNavbar(QScrollArea):
         self.buttons[index].setStyleSheet("")
         self.parent.titlebar.setTitle(self.buttons[index].text())
         if not self.parent.is_dark:
-            self.buttons[index].setIcon(color_icon(self.buttons[index].iconPath, QColor(184, 4, 253)))
+            self.buttons[index].setIcon(color_icon(self.buttons[index].iconPath, QColor(91, 46, 252)))
         else:
             self.buttons[index].setIcon(color_icon(self.buttons[index].iconPath, QColor(145, 110, 236)))
 
@@ -71,7 +71,7 @@ class MainNavbar(QScrollArea):
             if not i.property("selected"):
                 i.setIcon(QIcon(i.iconPath))
             else:
-                i.setIcon(color_icon(i.iconPath, QColor(184, 4, 253)))
+                i.setIcon(color_icon(i.iconPath, QColor(91, 46, 252)))
 
     def __add_button(self, text, toolTip, icon_path, index, custom_property=None):
         iconSize = QSize()

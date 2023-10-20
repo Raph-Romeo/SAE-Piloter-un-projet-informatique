@@ -1,6 +1,7 @@
 from PyQt5.QtWidgets import QTabWidget, QWidget, QGridLayout, QPushButton, QGraphicsDropShadowEffect
 from PyQt5.QtGui import QColor
 from .top_menu import TopMenu
+from .bottom_menu import BottomMenu
 
 
 class TasksTab(QWidget):
@@ -8,12 +9,11 @@ class TasksTab(QWidget):
         super().__init__()
         self.setContentsMargins(0, 0, 0, 0)
         self.grid = QGridLayout(self)
-        self.button = QPushButton()
 
         self.topMenu = TopMenu()
         self.grid.addWidget(self.topMenu)
 
-        self.contentWindow = QWidget()
+        self.contentWindow = BottomMenu()
         self.contentWindow.setProperty("tasksContentWindow", True)
         self.grid.addWidget(self.contentWindow)
 
