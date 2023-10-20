@@ -130,6 +130,7 @@ class MainNavbar(QScrollArea):
         self.__tabWidget.setCurrentIndex(index)
         self.buttons[index].setProperty("selected", True)
         self.buttons[index].setStyleSheet("")
+        self.parent.titlebar.setTitle(self.buttons[index].text())
         if not self.parent.is_dark:
             color = QColor(184, 4, 253)
             pixmap = QPixmap(self.buttons[index].iconPath)

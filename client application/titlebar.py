@@ -5,7 +5,7 @@ class TitleBar(QWidget):
     def __init__(self):
         super().__init__()
         self.title = QLabel()
-        self.title.setText("Tab title")
+        self.title.setText("Tasks")
         self.title.setProperty("title", True)
         grid = QGridLayout(self)
         grid.addWidget(self.title, 0, 0)
