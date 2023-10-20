@@ -15,7 +15,7 @@ class MainWindow(QMainWindow):
         self.resize(780, 500)
         self.setMinimumSize(520, 240)
         self.is_dark = False
-        self.mainTabWidget = MainTabWidget()
+        self.mainTabWidget = MainTabWidget(self)
         grid = QGridLayout()
         widget = QWidget()
         widget.setLayout(grid)

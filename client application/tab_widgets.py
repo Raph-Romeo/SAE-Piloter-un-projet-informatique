@@ -9,12 +9,12 @@ class Tab(QWidget):
 
 
 class MainTabWidget(QTabWidget):
-    def __init__(self):
+    def __init__(self, parent):
         super().__init__()
         self.setContentsMargins(0, 0, 0, 0)
         self.addTab(Tab(), "Tasks")
         self.addTab(Tab(), "Activity")
         self.addTab(Tab(), "Calendar")
         self.addTab(Tab(), "Friends")
-        self.addTab(SettingsTab(), "Settings")
+        self.addTab(SettingsTab(parent), "Settings")
         self.tabBar().hide()
