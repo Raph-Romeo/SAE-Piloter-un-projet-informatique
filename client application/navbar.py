@@ -35,6 +35,7 @@ class MainNavbar(QScrollArea):
         self.tasksButton.setFixedWidth(128)
         self.tasksButton.setFixedHeight(90)
         self.tasksButton.setText('  Tasks')
+        self.tasksButton.clicked.connect(lambda: self.setTab(0))
         self.tasksButton.setProperty("firstButton", True)
         self.buttons.append(self.tasksButton)
 
@@ -49,6 +50,7 @@ class MainNavbar(QScrollArea):
         self.activityButton.setFixedWidth(128)
         self.activityButton.setFixedHeight(60)
         self.activityButton.setText('  Activity')
+        self.activityButton.clicked.connect(lambda: self.setTab(1))
         self.buttons.append(self.activityButton)
 
         self.calendarButton = QToolButton()
@@ -62,6 +64,7 @@ class MainNavbar(QScrollArea):
         self.calendarButton.setFixedWidth(128)
         self.calendarButton.setFixedHeight(60)
         self.calendarButton.setText('  Calendar')
+        self.calendarButton.clicked.connect(lambda: self.setTab(2))
         self.buttons.append(self.calendarButton)
 
         self.friendsButton = QToolButton()
@@ -75,6 +78,7 @@ class MainNavbar(QScrollArea):
         self.friendsButton.setFixedWidth(128)
         self.friendsButton.setFixedHeight(60)
         self.friendsButton.setText('  Friends')
+        self.friendsButton.clicked.connect(lambda: self.setTab(3))
         self.buttons.append(self.friendsButton)
 
         self.settingsButton = QToolButton()
@@ -88,6 +92,7 @@ class MainNavbar(QScrollArea):
         self.settingsButton.setFixedWidth(128)
         self.settingsButton.setFixedHeight(90)
         self.settingsButton.setText('  Settings')
+        self.settingsButton.clicked.connect(lambda: self.setTab(4))
         self.settingsButton.setProperty("lastButton", True)
         self.buttons.append(self.settingsButton)
 
@@ -96,3 +101,11 @@ class MainNavbar(QScrollArea):
         layout.addWidget(self.calendarButton, 3, 0, alignment=Qt.Qt.AlignTop)
         layout.addWidget(self.friendsButton, 4, 0, alignment=Qt.Qt.AlignTop)
         layout.addWidget(self.settingsButton, 5, 0, alignment=Qt.Qt.AlignTop)
+
+        self.setTab(0, True)
+
+    def setTab(self, index, force=False):
+        if self.__tabWidget.currentIndex() is index and not force:
+            return
+        self.__tabWidget.setCurrentIndex(index)
+
