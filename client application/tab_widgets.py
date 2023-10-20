@@ -1,4 +1,5 @@
 from PyQt5.QtWidgets import QTabWidget, QWidget, QGridLayout, QPushButton
+from settings_tab import SettingsTab
 
 # Test
 class Tab(QWidget):
@@ -15,5 +16,5 @@ class MainTabWidget(QTabWidget):
         self.addTab(Tab(), "Activity")
         self.addTab(Tab(), "Calendar")
         self.addTab(Tab(), "Friends")
-        self.addTab(Tab(), "Settings")
+        self.addTab(SettingsTab(), "Settings")
         self.tabBar().hide()
