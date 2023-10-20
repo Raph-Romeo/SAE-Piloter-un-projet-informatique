@@ -28,7 +28,7 @@ light_style_sheet = """
     QMainWindow[tasksTopMenu="true"]{background:#FFF;border-radius:10px;margin-right:20px;}
     QWidget[tasksContentWindow="true"]{background:#FFF;border-radius:10px;margin-right:20px;margin-top:5px;margin-bottom:30px}
     
-    QPushButton[topMenuButton="true"]{color:#b804fd;border:none;border-bottom:3px solid #b804fd;margin-bottom:9px;font-size:12px;font-family:verdana;}
+    QPushButton[topMenuButton="true"]{color:#b804fd;border:none;border-bottom:3px solid #b804fd;margin-top:3px;font-size:12px;font-family:verdana;margin-left:8px;margin-right:8px}
     
     QLabel[title="true"]{color:black;margin-left:10px;font-size:20px;font-weight:1;font-family:verdana}
 """
@@ -64,7 +64,7 @@ dark_style_sheet = """
     QWidget[tasksContentWindow="true"]{background:#252525;border-radius:10px;margin-right:20px;margin-top:5px;margin-bottom:30px}
 
     QPushButton{color:white;}
-    QPushButton[topMenuButton="true"]{color:#916cee;border:none;border-bottom:3px solid #916cee;margin-bottom:9px;font-size:12px;font-family:verdana;}
+    QPushButton[topMenuButton="true"]{color:#916cee;border:none;border-bottom:3px solid #916cee;margin-top:3px;font-size:12px;font-family:verdana;margin-left:8px;margin-right:8px}
     
     QLabel[title="true"]{color:white;margin-left:10px;font-size:20px;font-weight:1;font-family:verdana}
 """
