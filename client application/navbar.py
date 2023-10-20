@@ -1,5 +1,6 @@
-from PyQt5.QtWidgets import QWidget, QMainWindow, QGridLayout, QToolButton, QLabel, QLineEdit, QPushButton, QComboBox, QMenu, QDialog, QTabWidget, QVBoxLayout, QMessageBox, QDialogButtonBox, QTableWidget, QTableView, QScrollArea, QTableWidgetItem, QAbstractItemView, QHeaderView
-from PyQt5.QtGui import QCursor, QIcon, QColor, QPixmap, QPainter
+from PyQt5.QtWidgets import QWidget, QGridLayout, QToolButton, QScrollArea
+from PyQt5.QtGui import QCursor, QIcon, QColor
+from color_icon import color_icon
 from PyQt5 import Qt
 from PyQt5 import QtCore
 from PyQt5.QtCore import QSize
@@ -109,6 +110,7 @@ class MainNavbar(QScrollArea):
         else:
             self.lightModeIcons()
 
+
     def setTab(self, index, force=False):
         if self.__tabWidget.currentIndex() is index and not force:
             return
@@ -117,14 +119,7 @@ class MainNavbar(QScrollArea):
                 i.setProperty("selected", False)
                 i.setStyleSheet("")
                 if self.parent.is_dark:
-                    color = QColor(255, 255, 255)
-                    pixmap = QPixmap(i.iconPath)
-                    painter = QPainter(pixmap)
-                    painter.setCompositionMode(QPainter.CompositionMode_SourceIn)
-                    painter.fillRect(pixmap.rect(), color)
-                    painter.end()
-                    icon = QIcon(pixmap)
-                    i.setIcon(icon)
+                    i.setIcon(color_icon(i.iconPath, QColor(255, 255, 255)))
                 else:
                     i.setIcon(QIcon(i.iconPath))
         self.__tabWidget.setCurrentIndex(index)
@@ -132,55 +127,20 @@ class MainNavbar(QScrollArea):
         self.buttons[index].setStyleSheet("")
         self.parent.titlebar.setTitle(self.buttons[index].text())
         if not self.parent.is_dark:
-            color = QColor(184, 4, 253)
-            pixmap = QPixmap(self.buttons[index].iconPath)
-            painter = QPainter(pixmap)
-            painter.setCompositionMode(QPainter.CompositionMode_SourceIn)
-            painter.fillRect(pixmap.rect(), color)
-            painter.end()
-            icon = QIcon(pixmap)
-            self.buttons[index].setIcon(icon)
+            self.buttons[index].setIcon(color_icon(self.buttons[index].iconPath, QColor(184, 4, 253)))
         else:
-            color = QColor(145, 110, 236)
-            pixmap = QPixmap(self.buttons[index].iconPath)
-            painter = QPainter(pixmap)
-            painter.setCompositionMode(QPainter.CompositionMode_SourceIn)
-            painter.fillRect(pixmap.rect(), color)
-            painter.end()
-            icon = QIcon(pixmap)
-            self.buttons[index].setIcon(icon)
+            self.buttons[index].setIcon(color_icon(self.buttons[index].iconPath, QColor(145, 110, 236)))
 
     def darkModeIcons(self):
         for i in self.buttons:
             if not i.property("selected"):
-                color = QColor(255, 255, 255)
-                pixmap = QPixmap(i.iconPath)
-                painter = QPainter(pixmap)
-                painter.setCompositionMode(QPainter.CompositionMode_SourceIn)
-                painter.fillRect(pixmap.rect(), color)
-                painter.end()
-                icon = QIcon(pixmap)
-                i.setIcon(icon)
+                i.setIcon(color_icon(i.iconPath, QColor(255, 255, 255)))
             else:
-                color = QColor(145, 110, 236)
-                pixmap = QPixmap(i.iconPath)
-                painter = QPainter(pixmap)
-                painter.setCompositionMode(QPainter.CompositionMode_SourceIn)
-                painter.fillRect(pixmap.rect(), color)
-                painter.end()
-                icon = QIcon(pixmap)
-                i.setIcon(icon)
+                i.setIcon(color_icon(i.iconPath, QColor(145, 110, 236)))
 
     def lightModeIcons(self):
         for i in self.buttons:
             if not i.property("selected"):
                 i.setIcon(QIcon(i.iconPath))
             else:
-                color = QColor(184, 4, 253)
-                pixmap = QPixmap(i.iconPath)
-                painter = QPainter(pixmap)
-                painter.setCompositionMode(QPainter.CompositionMode_SourceIn)
-                painter.fillRect(pixmap.rect(), color)
-                painter.end()
-                icon = QIcon(pixmap)
-                i.setIcon(icon)
+                i.setIcon(color_icon(i.iconPath, QColor(184, 4, 253)))
