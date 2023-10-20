@@ -5,12 +5,13 @@ from PyQt5 import QtCore
 from PyQt5.QtCore import QSize
 
 
-class MainNavbar(QMainWindow):
+class MainNavbar(QScrollArea):
 
     def __init__(self, mainTabWidget, parent, *args, **kwargs):
-        super().__init__()
+        QScrollArea.__init__(self, *args, **kwargs)
+        self.setWidgetResizable(True)
         content = QWidget(self)
-        self.setCentralWidget(content)
+        self.setWidget(content)
         self.__tabWidget = mainTabWidget
         self.parent = parent
         layout = QGridLayout(content)
