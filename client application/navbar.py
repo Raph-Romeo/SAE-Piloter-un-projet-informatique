@@ -37,6 +37,7 @@ class MainNavbar(QScrollArea):
         self.tasksButton.setText('  Tasks')
         self.tasksButton.clicked.connect(lambda: self.setTab(0))
         self.tasksButton.setProperty("firstButton", True)
+        self.tasksButton.setProperty("selected", False)
         self.buttons.append(self.tasksButton)
 
         self.activityButton = QToolButton()
@@ -51,6 +52,7 @@ class MainNavbar(QScrollArea):
         self.activityButton.setFixedHeight(60)
         self.activityButton.setText('  Activity')
         self.activityButton.clicked.connect(lambda: self.setTab(1))
+        self.activityButton.setProperty("selected", False)
         self.buttons.append(self.activityButton)
 
         self.calendarButton = QToolButton()
@@ -65,6 +67,7 @@ class MainNavbar(QScrollArea):
         self.calendarButton.setFixedHeight(60)
         self.calendarButton.setText('  Calendar')
         self.calendarButton.clicked.connect(lambda: self.setTab(2))
+        self.calendarButton.setProperty("selected", False)
         self.buttons.append(self.calendarButton)
 
         self.friendsButton = QToolButton()
@@ -79,6 +82,7 @@ class MainNavbar(QScrollArea):
         self.friendsButton.setFixedHeight(60)
         self.friendsButton.setText('  Friends')
         self.friendsButton.clicked.connect(lambda: self.setTab(3))
+        self.friendsButton.setProperty("selected", False)
         self.buttons.append(self.friendsButton)
 
         self.settingsButton = QToolButton()
@@ -94,6 +98,7 @@ class MainNavbar(QScrollArea):
         self.settingsButton.setText('  Settings')
         self.settingsButton.clicked.connect(lambda: self.setTab(4))
         self.settingsButton.setProperty("lastButton", True)
+        self.settingsButton.setProperty("selected", False)
         self.buttons.append(self.settingsButton)
 
         layout.addWidget(self.tasksButton, 1, 0, alignment=Qt.Qt.AlignTop)
@@ -107,5 +112,11 @@ class MainNavbar(QScrollArea):
     def setTab(self, index, force=False):
         if self.__tabWidget.currentIndex() is index and not force:
             return
+        for i in self.buttons:
+            if i.property("selected"):
+                i.setProperty("selected", False)
+                i.setStyleSheet("")
         self.__tabWidget.setCurrentIndex(index)
+        self.buttons[index].setProperty("selected", True)
+        self.buttons[index].setStyleSheet("")
 
