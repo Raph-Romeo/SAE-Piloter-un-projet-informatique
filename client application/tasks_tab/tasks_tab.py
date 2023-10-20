@@ -5,7 +5,7 @@ from .bottom_menu import BottomMenu
 
 
 class TasksTab(QWidget):
-    def __init__(self):
+    def __init__(self, parent):
         super().__init__()
         self.setContentsMargins(0, 0, 0, 0)
         self.grid = QGridLayout(self)
@@ -13,7 +13,7 @@ class TasksTab(QWidget):
         self.topMenu = TopMenu()
         self.grid.addWidget(self.topMenu)
 
-        self.contentWindow = BottomMenu()
+        self.contentWindow = BottomMenu(parent)
         self.contentWindow.setProperty("tasksContentWindow", True)
         self.grid.addWidget(self.contentWindow)
 

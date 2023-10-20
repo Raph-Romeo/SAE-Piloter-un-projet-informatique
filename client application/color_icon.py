@@ -9,3 +9,12 @@ def color_icon(icon, color):
     painter.end()
     icon = QIcon(pixmap)
     return icon
+
+
+def color_pixmap(icon, color):
+    pixmap = QPixmap(icon)
+    painter = QPainter(pixmap)
+    painter.setCompositionMode(QPainter.CompositionMode_SourceIn)
+    painter.fillRect(pixmap.rect(), color)
+    painter.end()
+    return pixmap

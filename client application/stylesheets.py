@@ -38,6 +38,10 @@ light_style_sheet = """
     QPushButton[addTaskButton="true"]:pressed{background:#3b0edc;color:#ddd}
 
     QLabel[title="true"]{color:black;margin-left:10px;font-size:20px;font-weight:1;font-family:verdana}
+    QWidget[searchBar="true"]{border:1px solid #EEE;margin-top:5px;margin-right:20px;border-radius:17px}
+    QWidget[searchBar="true"][focused="true"]{border:1px solid #222;}
+    
+    QLineEdit{color:#222;font-family:verdana;font-size:14px;margin-right:30px}
 """
 
 dark_style_sheet = """
@@ -80,4 +84,8 @@ dark_style_sheet = """
     QPushButton[addTaskButton="true"]:pressed{background:#714cce;color:#000}
     
     QLabel[title="true"]{color:white;margin-left:10px;font-size:20px;font-weight:1;font-family:verdana}
+    QWidget[searchBar="true"]{border:1px solid #333;margin-top:5px;margin-right:20px;border-radius:17px}
+    QWidget[searchBar="true"][focused="true"]{border:1px solid #C8C8C8;}
+    
+    QLineEdit{color:white;font-family:verdana;font-size:14px;margin-right:30px}
 """

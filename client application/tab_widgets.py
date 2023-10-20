@@ -13,7 +13,7 @@ class MainTabWidget(QTabWidget):
     def __init__(self, parent):
         super().__init__()
         self.setContentsMargins(0, 0, 0, 0)
-        self.tasksTab = TasksTab()
+        self.tasksTab = TasksTab(parent)
         self.addTab(self.tasksTab, "Tasks")
 
         self.addTab(Tab(), "Activity")
