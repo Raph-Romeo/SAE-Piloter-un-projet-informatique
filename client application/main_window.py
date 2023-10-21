@@ -22,7 +22,7 @@ class MainWindow(FramelessWindow):
         self.is_dark = False
         self.mainTabWidget = MainTabWidget(self)
         grid = QGridLayout()
-        grid.setContentsMargins(1, 28, 0, 0)
+        grid.setContentsMargins(0, 28, 0, 0)
         grid.setSpacing(0)
         self.setLayout(grid)
         self.titlebar = TitleBar()
@@ -36,6 +36,11 @@ class MainWindow(FramelessWindow):
         grid.addWidget(self.titlebar, 0, 1)
         grid.addWidget(self.__navbar, 0, 0, 2, 1)
         grid.addWidget(self.mainTabWidget, 1, 1, 1, 1)
+
+        self.login_page = QWidget()
+        self.login_page.setStyleSheet("background:green;margin-top:4px")
+        grid.addWidget(self.login_page, 0, 0, 2, 2)
+
         self.titleBar.raise_()
 
     def toggleDarkmode(self):

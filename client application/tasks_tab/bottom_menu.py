@@ -5,24 +5,19 @@ from PyQt5.QtCore import Qt, QSize
 import random
 
 
-class Task(QWidget):
-    def __init__(self, name, tag=""):
+class User(QTableWidgetItem):
+    def __init__(self, name, profile_picture="icons/default.png"):
         super().__init__()
-        self.setProperty("task", True)
-        self.setFixedHeight(48)
-        self.name = QLabel()
-        self.name.setText(name)
-        self.name.setFixedWidth(100)
-        self.tag = QLabel()
-        self.tag.setText(tag)
-        self.tag.setStyleSheet("color:orange")
-        self.tag.setFixedWidth(120)
-        self.expirationDate = QLabel()
-        self.expirationDate.setText("1/1/1966")
-        self.grid = QGridLayout(self)
-        self.grid.addWidget(self.name, 0, 0)
-        self.grid.addWidget(self.tag, 0, 1)
-        self.grid.addWidget(self.expirationDate, 0, 2)
+        pixmap = QPixmap(profile_picture)
+        self.setText(name)
+        self.setIcon(QIcon(pixmap))
+
+
+class Status(QTableWidgetItem):
+    def __init__(self, name):
+        super().__init__()
+        self.picture = QLabel()
+        self.setText(name)
 
 
 class searchBarQLineEdit(QLineEdit):
@@ -106,7 +101,7 @@ class BottomMenu(QMainWindow):
         self.tasksTableWidget.setRowCount(self.tasksTableWidget.rowCount() + 1)
         self.tasksTableWidget.setItem(self.tasksTableWidget.rowCount()-1, 0, QTableWidgetItem(name))
         self.tasksTableWidget.setItem(self.tasksTableWidget.rowCount()-1, 1, QTableWidgetItem(tag))
-        self.tasksTableWidget.setItem(self.tasksTableWidget.rowCount() - 1, 2, QTableWidgetItem("Raphael"))
+        self.tasksTableWidget.setItem(self.tasksTableWidget.rowCount() - 1, 2, User("Raphael"))
         self.tasksTableWidget.setItem(self.tasksTableWidget.rowCount() - 1, 3, QTableWidgetItem("Incomplete"))
         self.tasksTableWidget.setItem(self.tasksTableWidget.rowCount() - 1, 4, QTableWidgetItem("52 days"))
         self.tasksTableWidget.setItem(self.tasksTableWidget.rowCount() - 1, 5, QTableWidgetItem("20%"))
