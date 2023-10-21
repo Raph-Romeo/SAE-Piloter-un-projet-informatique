@@ -59,6 +59,11 @@ light_style_sheet = """
     
     QPushButton[settings="true"]{color:black;font-size:16px;border:1px solid #ddd;border-radius:10px;background:white;padding:12px;}
     
+    QTableWidget{border:0px solid}
+    QTableWidget::item{border-top:1px solid #eee;font-family:verdana;}
+    QTableView::item:selected {background-color: #7b4eff;color:white;}
+    QHeaderView::section{background:white;border:none;border-right:1px solid #eee;margin-bottom:5px;font-weight:normal;}
+    QHeaderView::section:active{font-weight:normal}
 """
 
 dark_style_sheet = """
@@ -122,4 +127,10 @@ dark_style_sheet = """
     QLineEdit{color:white;font-family:verdana;font-size:14px;margin-right:30px}
     
     QPushButton[settings="true"]{color:white;font-size:16px;border:1px solid #111;border-radius:10px;background:#252525;padding:12px}
+    
+    QTableWidget{border:0px solid}
+    QTableWidget::item{border-top:1px solid #333;font-family:verdana;font-weight:bold;color:white;}
+    QTableView::item:selected {background-color: #5b2efc;color:white;}
+    QHeaderView::section{background:transparent;border:none;border-right:1px solid #333;margin-bottom:5px;font-weight:normal;color:white;}
+    QHeaderView::section:active{font-weight:normal}
 """

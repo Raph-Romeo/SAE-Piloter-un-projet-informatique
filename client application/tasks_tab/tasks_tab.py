@@ -13,7 +13,7 @@ class TasksTab(QWidget):
         self.topMenu = TopMenu(self)
         self.grid.addWidget(self.topMenu)
 
-        self.contentWindow = BottomMenu(parent)
+        self.contentWindow = BottomMenu(parent, self)
         self.contentWindow.setProperty("tasksContentWindow", True)
         self.grid.addWidget(self.contentWindow)
 

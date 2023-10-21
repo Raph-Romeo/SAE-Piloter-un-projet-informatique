@@ -6,7 +6,7 @@ from PyQt5.QtCore import Qt
 class TopMenu(QMainWindow):
     def __init__(self, tasksTab):
         super().__init__()
-        self.setContentsMargins(0, 0, 0, 0)
+        self.setContentsMargins(0, 0, 20, 0)
         self.setFixedHeight(58)
         self.setProperty("tasksTopMenu", True)
         self.widget = QWidget()
@@ -43,9 +43,9 @@ class TopMenu(QMainWindow):
         layout.setRowStretch(4, 2)
 
         self.__add_button("All tasks (0)", index=0)
-        self.__add_button("Expiring soon", index=1)
-        self.__add_button("Incomplete", index=2)
-        self.__add_button("Completed", index=3)
+        self.__add_button("My tasks", index=1)
+        self.__add_button("Completed", index=2)
+        self.__add_button("Friend tasks", index=3)
 
         self.buttons[0].setProperty("selected", True)
 
@@ -83,7 +83,7 @@ class TopMenu(QMainWindow):
                 self.leftWrapper.horizontalScrollBar().hide()
                 self.leftWrapper.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         else:
-            self.innerLeft.setFixedWidth(460)
+            self.innerLeft.setFixedWidth(480)
             if self.leftWrapper.horizontalScrollBar().isHidden():
                 self.leftWrapper.horizontalScrollBar().show()
                 self.leftWrapper.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
@@ -97,7 +97,7 @@ class TopMenu(QMainWindow):
                     button.setStyleSheet("")
             self.buttons[index].setProperty("selected", True)
             self.buttons[index].setStyleSheet("")
-            self.tasksTab.contentWindow.searchBarQlineEdit.setText("")
-            # Do the stuff
+            if self.tasksTab.contentWindow.searchBarQlineEdit.text() != "":
+                self.tasksTab.contentWindow.searchBarQlineEdit.setText("")
         else:
             return False
