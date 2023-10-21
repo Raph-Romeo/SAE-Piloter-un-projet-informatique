@@ -1,4 +1,5 @@
 light_style_sheet = """
+    
     QWidget{background:transparent}
     QMainWindow{background-color: qlineargradient(y1: 0, y2: 1, stop: 0 #f8f4f4, stop: 1 #e4e0e0)}
     QTabWidget::pane {border:0px;background:transparent;} 
@@ -21,6 +22,15 @@ light_style_sheet = """
     QScrollBar::add-line:vertical:hover, QScrollBar::add-line:vertical:on{height: 0px;width: 0px;subcontrol-position: bottom;subcontrol-origin: margin;}
     QScrollBar::up-arrow:vertical, QScrollBar::down-arrow:vertical{background: none;opacity: 0%;height: 0px;width:0px;}
     QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical{background: none;opacity: 0%;height: 0px;width:0px;}
+    
+    QScrollBar:horizontal{background-color: rgba(194,194,194,80);height: 10px;margin:2px;border: 1px transparent #2A2929;border-radius: 3px;}
+    QScrollBar::handle:horizontal{background-color: #999;min-height: 5px;width:5px;border-radius: 3px;}
+    QScrollBar::sub-line:horizontal{margin: 3px 0px 3px 0px;height: 5px;width: 0px;subcontrol-position: top;subcontrol-origin: margin;}
+    QScrollBar::add-line:horizontal{margin: 3px 0px 3px 0px;height: 5px;width: 0px;subcontrol-position: bottom;subcontrol-origin: margin;}
+    QScrollBar::sub-line:horizontal:hover,QScrollBar::sub-line:horizontal:on{height: 4px;width: 0px;subcontrol-position: top;subcontrol-origin: margin;}
+    QScrollBar::add-line:horizontal:hover, QScrollBar::add-line:horizontal:on{height: 4px;width: 0px;subcontrol-position: bottom;subcontrol-origin: margin;}
+    QScrollBar::up-arrow:horizontal, QScrollBar::down-arrow:horizontal{background: none;opacity: 0%;height: 4px;width:0px;}
+    QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal{background: none;opacity: 0%;height: 4px;width:0px;}
 
     QLabel{color:black;font-family:Consolas;font-size:15px;border:0px solid black;background-color:transparent;padding:0px;padding-left:10px;padding-right:10px;margin:0px;text-indent:0px;}
     QLineEdit{border:0px solid black;margin:0px;padding:0px;font-family:Consolas;color:white;font-size:15px;padding-bottom:10px;text-indent:0px;margin-left:-2px;margin-top:-1px;}
@@ -42,6 +52,8 @@ light_style_sheet = """
     QWidget[searchBar="true"][focused="true"]{border:1px solid #222;}
     
     QLineEdit{color:#222;font-family:verdana;font-size:14px;margin-right:30px}
+    
+    QPushButton[settings="true"]{color:black;font-size:16px;border:1px solid #ddd;border-radius:10px;background:white;padding:12px;}
 """
 
 dark_style_sheet = """
@@ -68,6 +80,16 @@ dark_style_sheet = """
     QScrollBar::up-arrow:vertical, QScrollBar::down-arrow:vertical{background: none;opacity: 0%;height: 0px;width:0px;}
     QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical{background: none;opacity: 0%;height: 0px;width:0px;}
     
+    QScrollBar:horizontal{background-color: rgba(12,12,12);height: 10px;margin:2px;border: 1px transparent #2A2929;border-radius: 3px;}
+    QScrollBar::handle:horizontal{background-color: #333;min-height: 5px;width:5px;border-radius: 3px;}
+    QScrollBar::sub-line:horizontal{margin: 3px 0px 3px 0px;height: 5px;width: 0px;subcontrol-position: top;subcontrol-origin: margin;}
+    QScrollBar::add-line:horizontal{margin: 3px 0px 3px 0px;height: 5px;width: 0px;subcontrol-position: bottom;subcontrol-origin: margin;}
+    QScrollBar::sub-line:horizontal:hover,QScrollBar::sub-line:horizontal:on{height: 4px;width: 0px;subcontrol-position: top;subcontrol-origin: margin;}
+    QScrollBar::add-line:horizontal:hover, QScrollBar::add-line:horizontal:on{height: 4px;width: 0px;subcontrol-position: bottom;subcontrol-origin: margin;}
+    QScrollBar::up-arrow:horizontal, QScrollBar::down-arrow:horizontal{background: none;opacity: 0%;height: 4px;width:0px;}
+    QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal{background: none;opacity: 0%;height: 4px;width:0px;}
+
+    
     QLabel{color:white;font-family:Consolas;font-size:15px;border:0px solid black;background-color:transparent;padding:0px;padding-left:10px;padding-right:10px;margin:0px;text-indent:0px;}
     QLineEdit{border:0px solid black;margin:0px;padding:0px;font-family:Consolas;color:white;font-size:15px;padding-bottom:10px;text-indent:0px;margin-left:-2px;margin-top:-1px;}
 
@@ -88,4 +110,6 @@ dark_style_sheet = """
     QWidget[searchBar="true"][focused="true"]{border:1px solid #C8C8C8;}
     
     QLineEdit{color:white;font-family:verdana;font-size:14px;margin-right:30px}
+    
+    QPushButton[settings="true"]{color:white;font-size:16px;border:1px solid #111;border-radius:10px;background:#252525;padding:12px}
 """

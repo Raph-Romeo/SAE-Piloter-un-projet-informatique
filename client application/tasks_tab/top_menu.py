@@ -1,10 +1,10 @@
-from PyQt5.QtWidgets import QWidget, QGridLayout, QPushButton, QMainWindow, QSpacerItem, QSizePolicy
+from PyQt5.QtWidgets import QWidget, QGridLayout, QPushButton, QMainWindow, QSpacerItem, QSizePolicy, QScrollArea
 from PyQt5.QtGui import QCursor
 from PyQt5.QtCore import Qt
 
 
 class TopMenu(QMainWindow):
-    def __init__(self):
+    def __init__(self, tasksTab):
         super().__init__()
         self.setContentsMargins(0, 0, 0, 0)
         self.setFixedHeight(58)
@@ -13,12 +13,19 @@ class TopMenu(QMainWindow):
         self.widget.setContentsMargins(0, 0, 0, 0)
         self.setCentralWidget(self.widget)
         self.buttons = []
+        self.tasksTab = tasksTab
+        self.currentIndex = 0
 
         topLayout = QGridLayout(self.widget)
-        self.leftWrapper = QWidget()
-        self.leftWrapper.setFixedHeight(58)
+        self.leftWrapper = QScrollArea()
+        self.leftWrapper.setFixedHeight(50)
         self.leftWrapper.setContentsMargins(0, 0, 0, 0)
-        self.leftWrapper.setMinimumWidth(420)
+        self.innerLeft = QWidget()
+        self.leftWrapper.verticalScrollBar().hide()
+        self.leftWrapper.verticalScrollBar().setEnabled(False)
+        self.leftWrapper.setWidget(self.innerLeft)
+        self.innerLeft.setFixedHeight(58)
+        self.innerLeft.setContentsMargins(0, 0, 0, 0)
         topLayout.addWidget(self.leftWrapper, 0, 0)
 
         self.addTaskButton = QPushButton()
@@ -30,15 +37,15 @@ class TopMenu(QMainWindow):
         self.addTaskButton.setToolTip("Create new task")
         topLayout.addWidget(self.addTaskButton, 0, 1)
 
-        layout = QGridLayout(self.leftWrapper)
+        layout = QGridLayout(self.innerLeft)
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(0)
         layout.setRowStretch(4, 2)
 
-        self.__add_button("All tasks (0)")
-        self.__add_button("Expiring soon")
-        self.__add_button("Incomplete")
-        self.__add_button("Completed")
+        self.__add_button("All tasks (0)", index=0)
+        self.__add_button("Expiring soon", index=1)
+        self.__add_button("Incomplete", index=2)
+        self.__add_button("Completed", index=3)
 
         self.buttons[0].setProperty("selected", True)
 
@@ -51,15 +58,15 @@ class TopMenu(QMainWindow):
         layout.addItem(spacer_left, 0, 0)
         layout.addItem(spacer_right, 0, len(self.buttons)+1)
 
-    def __add_button(self, text: str, h: int = 58, w: int = 120, function=None):
+    def __add_button(self, text: str, h: int = 58, w: int = 120, index=None):
         button = QPushButton()
         button.setText(text)
         button.setFixedHeight(h)
         button.setFixedWidth(w)
         button.setProperty("topMenuButton", True)
         button.setCursor(QCursor(Qt.PointingHandCursor))
-        if function is not None:
-            button.clicked.connect(function)
+        if index is not None:
+            button.clicked.connect(lambda: self.setTab(index))
         self.buttons.append(button)
 
     def setTaskNumber(self, num: int):
@@ -67,3 +74,30 @@ class TopMenu(QMainWindow):
             self.buttons[0].setText("All tasks (+99)")
         else:
             self.buttons[0].setText(f"All tasks ({str(num)})")
+
+    def resizeEvent(self, event):
+        super().resizeEvent(event)
+        if self.widget.width() >= 560:
+            self.innerLeft.setFixedWidth(self.leftWrapper.width() - 15)
+            if not self.leftWrapper.horizontalScrollBar().isHidden():
+                self.leftWrapper.horizontalScrollBar().hide()
+                self.leftWrapper.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        else:
+            self.innerLeft.setFixedWidth(460)
+            if self.leftWrapper.horizontalScrollBar().isHidden():
+                self.leftWrapper.horizontalScrollBar().show()
+                self.leftWrapper.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
+
+    def setTab(self, index: int):
+        if self.currentIndex is not index:
+            self.currentIndex = index
+            for button in self.buttons:
+                if button.property("selected"):
+                    button.setProperty("selected", False)
+                    button.setStyleSheet("")
+            self.buttons[index].setProperty("selected", True)
+            self.buttons[index].setStyleSheet("")
+            self.tasksTab.contentWindow.searchBarQlineEdit.setText("")
+            # Do the stuff
+        else:
+            return False

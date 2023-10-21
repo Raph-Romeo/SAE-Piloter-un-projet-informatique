@@ -42,8 +42,9 @@ class BottomMenu(QMainWindow):
         self.searchBar = QWidget()
         self.searchBar.setProperty("searchBar", True)
         self.searchBar.setFixedHeight(40)
-        self.searchBar.setToolTip("Search task")
+        self.searchBar.setToolTip("Search tasks")
         self.searchBarQlineEdit = searchBarQLineEdit(self, parent)
+        self.searchBarQlineEdit.setPlaceholderText("Search tasks")
         self.searchBar.mousePressEvent = self.__focus_search
         self.searchBarQlineEdit.setFixedHeight(40)
         searchBarLayout = QGridLayout()

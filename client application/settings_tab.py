@@ -8,15 +8,16 @@ class SettingsTab(QWidget):
         self.button = QPushButton()
         self.parent = parent
         if self.parent.is_dark:
-            self.button.setText("Light mode")
+            self.button.setText("Set theme to Light mode")
         else:
-            self.button.setText("Dark mode")
+            self.button.setText("Set theme to Dark mode")
         self.button.clicked.connect(self.toggleDarkmode)
+        self.button.setProperty("settings", True)
         self.grid.addWidget(self.button)
 
     def toggleDarkmode(self):
         self.parent.toggleDarkmode()
         if self.parent.is_dark:
-            self.button.setText("Light mode")
+            self.button.setText("Set theme to Light mode")
         else:
-            self.button.setText("Dark mode")
+            self.button.setText("Set theme to Dark mode")

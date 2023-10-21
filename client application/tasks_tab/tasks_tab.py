@@ -10,7 +10,7 @@ class TasksTab(QWidget):
         self.setContentsMargins(0, 0, 0, 0)
         self.grid = QGridLayout(self)
 
-        self.topMenu = TopMenu()
+        self.topMenu = TopMenu(self)
         self.grid.addWidget(self.topMenu)
 
         self.contentWindow = BottomMenu(parent)
