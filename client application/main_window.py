@@ -1,27 +1,30 @@
 import sys
 from PyQt5.QtWidgets import QWidget, QMainWindow, QTabWidget, QGridLayout, QMessageBox, QPushButton
-from PyQt5.QtGui import QIcon
+from PyQt5.QtGui import QIcon, QColor
 from stylesheets import dark_style_sheet, light_style_sheet
 from navbar import MainNavbar
 from tab_widgets import MainTabWidget
 from titlebar import TitleBar
+from qframelesswindow import FramelessWindow, StandardTitleBar
 
 
-class MainWindow(QMainWindow):
+class MainWindow(FramelessWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Taskmaster PRO")
-        self.setWindowIcon(QIcon('icons/taskmasterpro.png'))
-        self.resize(780, 500)
-        self.setMinimumSize(520, 240)
+        self.stb = StandardTitleBar(self)
+        self.stb.setTitle("Taskmaster PRO")
+        self.stb.setIcon(QIcon('icons/taskmasterpro.png'))
+        self.stb.iconLabel.setStyleSheet("margin:0;padding:0")
+        self.setTitleBar(self.stb)
+        self.setProperty("MainWindow", True)
+        self.resize(820, 534)
+        self.setMinimumSize(520, 274)
         self.is_dark = False
         self.mainTabWidget = MainTabWidget(self)
         grid = QGridLayout()
-        widget = QWidget()
-        widget.setLayout(grid)
-        grid.setContentsMargins(0, 0, 0, 0)
+        grid.setContentsMargins(1, 28, 0, 0)
         grid.setSpacing(0)
-        self.setCentralWidget(widget)
+        self.setLayout(grid)
         self.titlebar = TitleBar()
         self.titlebar.setFixedHeight(46)
         self.__navbar = MainNavbar(self.mainTabWidget, self)
@@ -33,6 +36,7 @@ class MainWindow(QMainWindow):
         grid.addWidget(self.titlebar, 0, 1)
         grid.addWidget(self.__navbar, 0, 0, 2, 1)
         grid.addWidget(self.mainTabWidget, 1, 1, 1, 1)
+        self.titleBar.raise_()
 
     def toggleDarkmode(self):
         if not self.is_dark:
@@ -41,19 +45,21 @@ class MainWindow(QMainWindow):
             self.setLightMode()
 
     def setDarkMode(self):
-        if sys.platform == "win32":
-            import pywinstyles
-            pywinstyles.apply_style(self, "dark")
         self.setStyleSheet(dark_style_sheet)
         self.is_dark = True
         self.mainTabWidget.darkTabs()
         self.__navbar.darkModeIcons()
+        self.stb.closeBtn.setHoverColor(QColor(255, 255, 255))
+        self.stb.closeBtn.setPressedColor(QColor(255, 255, 255))
+        self.stb.closeBtn.setHoverBackgroundColor(QColor(232, 17, 35))
+        self.stb.closeBtn.setPressedBackgroundColor(QColor(241, 112, 122))
 
     def setLightMode(self):
-        if sys.platform == "win32":
-            import pywinstyles
-            pywinstyles.apply_style(self, "light")
         self.setStyleSheet(light_style_sheet)
         self.is_dark = False
         self.mainTabWidget.lightTabs()
         self.__navbar.lightModeIcons()
+        self.stb.closeBtn.setHoverColor(QColor(255, 255, 255))
+        self.stb.closeBtn.setPressedColor(QColor(255, 255, 255))
+        self.stb.closeBtn.setHoverBackgroundColor(QColor(232, 17, 35))
+        self.stb.closeBtn.setPressedBackgroundColor(QColor(241, 112, 122))

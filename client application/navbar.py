@@ -16,17 +16,17 @@ class MainNavbar(QScrollArea):
         self.__tabWidget = mainTabWidget
         self.parent = parent
         layout = QGridLayout(content)
-        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setContentsMargins(0, 52, 0, 32)
         layout.setSpacing(0)
         layout.setAlignment(Qt.Qt.AlignLeft)
         layout.setRowStretch(3, 2)
         self.buttons = []
 
-        self.__add_button(text='  Tasks', toolTip="View tasks", icon_path='icons/58477.png', index=0, custom_property="firstButton")
+        self.__add_button(text='  Tasks', toolTip="View tasks", icon_path='icons/58477.png', index=0)
         self.__add_button(text='  Activity', toolTip="View recent activity", icon_path='icons/activity.png', index=1)
         self.__add_button(text='  Calendar', toolTip="View task calendar", icon_path='icons/calendrier.png', index=2)
         self.__add_button(text='  Friends', toolTip="View friends list", icon_path='icons/gens.png', index=3)
-        self.__add_button(text='  Settings', toolTip="Edit settings", icon_path='icons/126472.png', index=4, custom_property="lastButton")
+        self.__add_button(text='  Settings', toolTip="Edit settings", icon_path='icons/126472.png', index=4)
 
         for button in self.buttons:
             layout.addWidget(button, self.buttons.index(button), 0, alignment=Qt.Qt.AlignTop)
@@ -73,7 +73,7 @@ class MainNavbar(QScrollArea):
             else:
                 i.setIcon(color_icon(i.iconPath, QColor(91, 46, 252)))
 
-    def __add_button(self, text, toolTip, icon_path, index, custom_property=None):
+    def __add_button(self, text, toolTip, icon_path, index):
         iconSize = QSize()
         iconSize.setWidth(22)
         iconSize.setHeight(22)
@@ -89,7 +89,4 @@ class MainNavbar(QScrollArea):
         button.setText(text)
         button.clicked.connect(lambda: self.setTab(index))
         button.setProperty("selected", False)
-        if custom_property is not None:
-            button.setProperty(custom_property, True)
-            button.setFixedHeight(90)
         self.buttons.append(button)

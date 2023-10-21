@@ -1,7 +1,11 @@
 light_style_sheet = """
-    
+    TitleBarButton {
+     qproperty-normalColor: black;
+     qproperty-hoverColor: black;
+     qproperty-hoverBackgroundColor: #ddd;
+    }
     QWidget{background:transparent}
-    QMainWindow{background-color: qlineargradient(y1: 0, y2: 1, stop: 0 #f8f4f4, stop: 1 #e4e0e0)}
+    *[MainWindow="true"]{background-color: qlineargradient(y1: 0, y2: 1, stop: 0 #f8f4f4, stop: 1 #e4e0e0)}
     QTabWidget::pane {border:0px;background:transparent;} 
     QTabBar::tab {background: rgb(10,10,10);border:none;padding:12px;color:#AAA;}
     QTabBar::tab:hover {background:rgb(10,10,10);color:white;}
@@ -43,22 +47,28 @@ light_style_sheet = """
     QPushButton:pressed[topMenuButton="true"]{border-bottom:1px solid #666;color:#000;margin-top:-4px;padding-top:1px}
     QPushButton[topMenuButton="true"][selected="true"]{color:#5b2efc;border-bottom:3px solid #5b2efc;margin-top:-2px;padding-top:0px}
 
-    QPushButton[addTaskButton="true"]{background:#5b2efc;border:none;border-radius:14px;color:white;font-size:18px;margin-right:25px;margin-left:5px;}
+    QPushButton[addTaskButton="true"]{background:#5b2efc;border:none;border-radius:14px;color:white;font-size:18px;margin-right:5px;margin-left:5px;}
     QPushButton[addTaskButton="true"]:hover{background:#4b1eec;}
     QPushButton[addTaskButton="true"]:pressed{background:#3b0edc;color:#ddd}
 
     QLabel[title="true"]{color:black;margin-left:10px;font-size:20px;font-weight:1;font-family:verdana}
-    QWidget[searchBar="true"]{border:1px solid #EEE;margin-top:5px;margin-right:20px;border-radius:17px}
+    QWidget[searchBar="true"]{border:1px solid #EEE;margin-top:5px;border-radius:17px}
     QWidget[searchBar="true"][focused="true"]{border:1px solid #222;}
     
     QLineEdit{color:#222;font-family:verdana;font-size:14px;margin-right:30px}
     
     QPushButton[settings="true"]{color:black;font-size:16px;border:1px solid #ddd;border-radius:10px;background:white;padding:12px;}
+    
 """
 
 dark_style_sheet = """
+    TitleBarButton {
+     qproperty-normalColor: white;
+     qproperty-hoverColor: white;
+     qproperty-hoverBackgroundColor: #444;
+    }
     QWidget{background:transparent}
-    QMainWindow{background-color: qlineargradient(y1: 0, y2: 1, stop: 0 #202020, stop: 1 #1b1b1b)}
+    *[MainWindow="true"]{background-color: qlineargradient(y1: 0, y2: 1, stop: 0 #202020, stop: 1 #1b1b1b)}
     QTabWidget::pane {border:0px;transparent;} 
     QTabBar::tab {background: rgb(10,10,10);border:none;padding:12px;color:#AAA;}
     QTabBar::tab:hover {background:rgb(10,10,10);color:white;}
@@ -101,12 +111,12 @@ dark_style_sheet = """
     QPushButton:pressed[topMenuButton="true"]{border-bottom:1px solid #777;color:#fff;margin-top:-4px;padding-top:1px}
     QPushButton[topMenuButton="true"][selected="true"]{color:#916cee;border-bottom:3px solid #916cee;margin-top:-2px;padding-top:0px}
     
-    QPushButton[addTaskButton="true"]{background:#916cee;border:none;border-radius:14px;color:#222;font-size:18px;margin-right:25px;margin-left:5px;}
+    QPushButton[addTaskButton="true"]{background:#916cee;border:none;border-radius:14px;color:#222;font-size:18px;margin-left:5px;margin-right:5px;}
     QPushButton[addTaskButton="true"]:hover{background:#815cde;}
     QPushButton[addTaskButton="true"]:pressed{background:#714cce;color:#000}
     
     QLabel[title="true"]{color:white;margin-left:10px;font-size:20px;font-weight:1;font-family:verdana}
-    QWidget[searchBar="true"]{border:1px solid #333;margin-top:5px;margin-right:20px;border-radius:17px}
+    QWidget[searchBar="true"]{border:1px solid #333;margin-top:5px;border-radius:17px}
     QWidget[searchBar="true"][focused="true"]{border:1px solid #C8C8C8;}
     
     QLineEdit{color:white;font-family:verdana;font-size:14px;margin-right:30px}
