@@ -19,7 +19,7 @@ class MainWindow(FramelessWindow):
         self.setProperty("MainWindow", True)
         self.resize(820, 534)
         self.setMinimumSize(520, 274)
-        self.is_dark = False
+        self.is_dark = True
         self.mainTabWidget = MainTabWidget(self)
         grid = QGridLayout()
         grid.setContentsMargins(0, 28, 0, 0)

@@ -6,7 +6,7 @@ light_style_sheet = """
     }
     QWidget{background:transparent}
     *[MainWindow="true"]{background-color: qlineargradient(y1: 0, y2: 1, stop: 0 #f8f4f4, stop: 1 #e4e0e0)}
-    QMainWindow[loginPage="true"]{border-image:url("background/Windows-11-Dark-Purple-Abstract-Waves-4K-Wallpaper-2.jpg.jpg");margin-top:4px;}
+    QMainWindow[loginPage="true"]{margin-top:4px;}
     QMainWindow[loginForm="true"]{background:qlineargradient(y1: 0, y2: 1, stop: 0 #f8f4f4, stop: 1 rgba(228, 224, 224,50));border-bottom-left-radius:5px}
     
     QTabWidget::pane {border:0px;background:transparent;} 
@@ -77,7 +77,7 @@ dark_style_sheet = """
     }
     QWidget{background:transparent}
     *[MainWindow="true"]{background-color: qlineargradient(y1: 0, y2: 1, stop: 0 #202020, stop: 1 #1b1b1b)}
-    QMainWindow[loginPage="true"]{border-image:url("background/Windows-11-Dark-Purple-Abstract-Waves-4K-Wallpaper-2.jpg.jpg");margin-top:4px;}
+    QMainWindow[loginPage="true"]{margin-top:4px;}
     QMainWindow[loginForm="true"]{background:qlineargradient(y1: 0, y2: 1, stop: 0 #202020, stop: 1 rgba(27, 27, 27, 50));border-bottom-left-radius:5px}
    
     QTabWidget::pane {border:0px;transparent;} 
@@ -101,7 +101,7 @@ dark_style_sheet = """
     QScrollBar::up-arrow:vertical, QScrollBar::down-arrow:vertical{background: none;opacity: 0%;height: 0px;width:0px;}
     QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical{background: none;opacity: 0%;height: 0px;width:0px;}
     
-    QScrollBar:horizontal{background-color: rgba(12,12,12);height: 10px;margin:2px;border: 1px transparent #2A2929;border-radius: 3px;}
+    QScrollBar:horizontal{background-color: rgb(12,12,12);height: 10px;margin:2px;border: 1px transparent #2A2929;border-radius: 3px;}
     QScrollBar::handle:horizontal{background-color: #333;min-height: 5px;width:5px;border-radius: 3px;}
     QScrollBar::sub-line:horizontal{margin: 3px 0px 3px 0px;height: 5px;width: 0px;subcontrol-position: top;subcontrol-origin: margin;}
     QScrollBar::add-line:horizontal{margin: 3px 0px 3px 0px;height: 5px;width: 0px;subcontrol-position: bottom;subcontrol-origin: margin;}

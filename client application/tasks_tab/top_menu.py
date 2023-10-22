@@ -64,6 +64,7 @@ class TopMenu(QMainWindow):
         button.setFixedHeight(h)
         button.setFixedWidth(w)
         button.setProperty("topMenuButton", True)
+        button.setFocusPolicy(Qt.NoFocus)
         button.setCursor(QCursor(Qt.PointingHandCursor))
         if index is not None:
             button.clicked.connect(lambda: self.setTab(index))

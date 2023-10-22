@@ -92,7 +92,7 @@ class BottomMenu(QMainWindow):
             self.tasksTableWidget.horizontalHeader().setSectionResizeMode(col, QHeaderView.Stretch)
 
         tags = ["Misc", "Project", "University", "Finance", "Home", "Test"]
-        for i in "abcdefghijklmnopqrst":
+        for i in "abcd":
             self.add_task(f"Task {i}", tags[random.randint(0, 5)])
         layout.addWidget(self.searchBar, 0, 0)
         layout.addWidget(self.tasksTableWidget, 1, 0, 1, 1)

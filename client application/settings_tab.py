@@ -1,4 +1,5 @@
 from PyQt5.QtWidgets import QTabWidget, QWidget, QGridLayout, QPushButton
+from PyQt5.QtCore import Qt
 
 class SettingsTab(QWidget):
     def __init__(self, parent):
@@ -13,6 +14,7 @@ class SettingsTab(QWidget):
             self.button.setText("Set theme to Dark mode")
         self.button.clicked.connect(self.toggleDarkmode)
         self.button.setProperty("settings", True)
+        self.button.setFocusPolicy(Qt.NoFocus)
         self.grid.addWidget(self.button)
 
     def toggleDarkmode(self):
