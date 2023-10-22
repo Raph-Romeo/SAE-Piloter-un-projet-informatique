@@ -134,7 +134,7 @@ dark_style_sheet = """
     
     QPushButton[settings="true"]{color:white;font-size:16px;border:1px solid #111;border-radius:10px;background:#252525;padding:12px}
     
-    QLineEdit[loginButton="true"]{background:qlineargradient(x1: 1, x2: 0, stop: 0 rgba(255,255,255,0.2), stop: 1 rgba(255,255,255,0.05));padding:5px;padding-left:10px;border-radius:14px;margin-left:5px}
+    QLineEdit[loginButton="true"]{background:qlineargradient(x1: 1, x2: 0, stop: 0 rgba(255,255,255,0.2), stop: 1 rgba(255,255,255,0.1));padding:5px;padding-left:10px;border-radius:14px;margin-left:5px}
     
     QTableWidget{border:0px solid}
     QTableWidget::item{border-top:1px solid #333;font-family:verdana;font-weight:bold;color:white;}

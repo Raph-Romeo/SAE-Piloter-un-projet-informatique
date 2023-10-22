@@ -12,7 +12,7 @@ class LoginForm(QMainWindow):
         self.widget = QWidget()
         self.setCentralWidget(self.widget)
         grid = QGridLayout(self.widget)
-        grid.setContentsMargins(40, 32, 40, 0)
+        grid.setContentsMargins(40, 0, 40, 0)
         self.setProperty("loginForm", True)
         self.parent = parent
         boxShadow = QGraphicsDropShadowEffect()
@@ -30,10 +30,14 @@ class LoginForm(QMainWindow):
         self.passwordInput.setMaximumWidth(450)
         self.usernameInput.setMaximumWidth(450)
 
+        self.loginTitle = QLabel("Login")
+        self.loginTitle.setStyleSheet("color:rgba(255,255,255,0.5);font-size:26px;font-weight:bold;font-family:verdana;margin-bottom:50px;")
+
         self.usernameInput.returnPressed.connect(self.login)
         self.passwordInput.returnPressed.connect(self.login)
 
         self.setGraphicsEffect(boxShadow)
+        grid.addWidget(self.loginTitle)
         grid.addWidget(self.usernameInput)
         grid.addWidget(self.passwordInput)
         grid.setAlignment(Qt.AlignCenter)
@@ -44,6 +48,7 @@ class LoginForm(QMainWindow):
             pass
         else:
             if self.usernameInput.text() == "toto" and self.passwordInput.text() == "toto":
+                # SUCCESS
                 self.usernameInput.setDisabled(True)
                 self.passwordInput.setDisabled(True)
                 self.hide()
@@ -51,7 +56,7 @@ class LoginForm(QMainWindow):
             else:
                 InfoBar.error(
                     title="Failed to login",
-                    content="Incorrect credentials",
+                    content="Invalid credentials",
                     parent = self.parent,
                     orient=Qt.Horizontal,
                     isClosable= True,
