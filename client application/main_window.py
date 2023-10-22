@@ -19,14 +19,15 @@ class MainWindow(FramelessWindow):
         self.setProperty("MainWindow", True)
         self.resize(820, 534)
         self.setMinimumSize(520, 274)
-        self.is_dark = True
+        self.is_dark = False
         self.mainTabWidget = MainTabWidget(self)
         grid = QGridLayout()
-        grid.setContentsMargins(0, 28, 0, 0)
+        grid.setContentsMargins(0, 0, 0, 0)
         grid.setSpacing(0)
         self.setLayout(grid)
         self.titlebar = TitleBar()
-        self.titlebar.setFixedHeight(46)
+        self.titlebar.setFixedHeight(74)
+        self.titlebar.setContentsMargins(0, 28, 0, 0)
         self.__navbar = MainNavbar(self.mainTabWidget, self)
         self.__navbar.setFixedWidth(148)
         if self.is_dark:
@@ -37,7 +38,7 @@ class MainWindow(FramelessWindow):
         grid.addWidget(self.__navbar, 0, 0, 2, 1)
         grid.addWidget(self.mainTabWidget, 1, 1, 1, 1)
 
-        self.login_page = Login()
+        self.login_page = Login(self.is_dark)
         grid.addWidget(self.login_page, 0, 0, 2, 2)
 
         self.titleBar.raise_()

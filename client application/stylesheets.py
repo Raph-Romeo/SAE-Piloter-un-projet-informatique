@@ -6,7 +6,6 @@ light_style_sheet = """
     }
     QWidget{background:transparent}
     *[MainWindow="true"]{background-color: qlineargradient(y1: 0, y2: 1, stop: 0 #f8f4f4, stop: 1 #e4e0e0)}
-    QMainWindow[loginPage="true"]{margin-top:4px;}
     QMainWindow[loginForm="true"]{background:qlineargradient(y1: 0, y2: 1, stop: 0 #f8f4f4, stop: 1 rgba(228, 224, 224,50));border-bottom-left-radius:5px}
     
     QTabWidget::pane {border:0px;background:transparent;} 
@@ -62,6 +61,8 @@ light_style_sheet = """
     
     QPushButton[settings="true"]{color:black;font-size:16px;border:1px solid #ddd;border-radius:10px;background:white;padding:12px;}
     
+    QLineEdit[loginButton="true"]{background:qlineargradient(x1: 1, x2: 0, stop: 0 rgba(255,255,255,0.5), stop: 1 rgba(255,255,255,0.2));padding:5px;padding-left:10px;border-radius:14px;margin-left:5px}
+    
     QTableWidget{border:0px solid}
     QTableWidget::item{border-top:1px solid #eee;font-family:verdana;}
     QTableView::item:selected {background-color: #7b4eff;color:white;}
@@ -77,7 +78,6 @@ dark_style_sheet = """
     }
     QWidget{background:transparent}
     *[MainWindow="true"]{background-color: qlineargradient(y1: 0, y2: 1, stop: 0 #202020, stop: 1 #1b1b1b)}
-    QMainWindow[loginPage="true"]{margin-top:4px;}
     QMainWindow[loginForm="true"]{background:qlineargradient(y1: 0, y2: 1, stop: 0 #202020, stop: 1 rgba(27, 27, 27, 50));border-bottom-left-radius:5px}
    
     QTabWidget::pane {border:0px;transparent;} 
@@ -133,6 +133,8 @@ dark_style_sheet = """
     QLineEdit{color:white;font-family:verdana;font-size:14px;margin-right:30px}
     
     QPushButton[settings="true"]{color:white;font-size:16px;border:1px solid #111;border-radius:10px;background:#252525;padding:12px}
+    
+    QLineEdit[loginButton="true"]{background:qlineargradient(x1: 1, x2: 0, stop: 0 rgba(255,255,255,0.2), stop: 1 rgba(255,255,255,0.05));padding:5px;padding-left:10px;border-radius:14px;margin-left:5px}
     
     QTableWidget{border:0px solid}
     QTableWidget::item{border-top:1px solid #333;font-family:verdana;font-weight:bold;color:white;}

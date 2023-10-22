@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QMainWindow, QGraphicsDropShadowEffect, QGridLayout, QLineEdit, QLabel, QSizePolicy, QSpacerItem, QWidget
+from PyQt5.QtWidgets import QMainWindow, QGraphicsOpacityEffect, QGraphicsDropShadowEffect, QGridLayout, QLineEdit, QLabel, QSizePolicy, QSpacerItem, QWidget
 from PyQt5.QtGui import QColor
 from PyQt5.QtCore import Qt, QPropertyAnimation
 from qfluentwidgets import InfoBar, InfoBarPosition
@@ -12,12 +12,12 @@ class LoginForm(QMainWindow):
         self.widget = QWidget()
         self.setCentralWidget(self.widget)
         grid = QGridLayout(self.widget)
-        grid.setContentsMargins(40, 4, 40, 0)
+        grid.setContentsMargins(40, 32, 40, 0)
         self.setProperty("loginForm", True)
         self.parent = parent
         boxShadow = QGraphicsDropShadowEffect()
-        boxShadow.setBlurRadius(100)
-        boxShadow.setOffset(-50, 10)
+        boxShadow.setBlurRadius(200)
+        boxShadow.setOffset(-20, 90)
         boxShadow.setColor(QColor(0, 0, 0, 180))
 
         self.usernameInput = QLineEdit()
@@ -25,8 +25,8 @@ class LoginForm(QMainWindow):
         self.usernameInput.setPlaceholderText("Username")
         self.passwordInput.setEchoMode(QLineEdit.Password)
         self.passwordInput.setPlaceholderText("Password")
-        self.usernameInput.setStyleSheet("background:qlineargradient(x1: 1, x2: 0, stop: 0 rgba(255,255,255,0.2), stop: 1 rgba(255,255,255,0.05));border-radius:14px;padding:5px;")
-        self.passwordInput.setStyleSheet("background:qlineargradient(x1: 1, x2: 0, stop: 0 rgba(255,255,255,0.2), stop: 1 rgba(255,255,255,0.05));border-radius:14px;padding:5px;")
+        self.usernameInput.setProperty("loginButton", True)
+        self.passwordInput.setProperty("loginButton", True)
         self.passwordInput.setMaximumWidth(450)
         self.usernameInput.setMaximumWidth(450)
 
@@ -46,7 +46,8 @@ class LoginForm(QMainWindow):
             if self.usernameInput.text() == "toto" and self.passwordInput.text() == "toto":
                 self.usernameInput.setDisabled(True)
                 self.passwordInput.setDisabled(True)
-                self.parent.hide()
+                self.hide()
+                self.parent.fade(self.parent)
             else:
                 InfoBar.error(
                     title="Failed to login",
@@ -58,8 +59,9 @@ class LoginForm(QMainWindow):
                     duration = 2000
                 )
 
+
 class Login(QMainWindow):
-    def __init__(self):
+    def __init__(self, darkmode: bool):
         super().__init__()
         self.setProperty("loginPage", True)
         self.widget = QWidget()
@@ -68,7 +70,10 @@ class Login(QMainWindow):
         grid = QGridLayout(self.widget)
         grid.setContentsMargins(0, 0, 0, 0)
         self.form = LoginForm(self)
-        self.backgroundPath = "background/Windows-11-Dark-Purple-Abstract-Waves-4K-Wallpaper-2.jpg.jpg"
+        if darkmode:
+            self.backgroundPath = "background/dark_login.jpg"
+        else:
+            self.backgroundPath = "background/light_login.jpg"
         self.setStyleSheet('QMainWindow[loginPage="true"]{border-image:url(' + self.backgroundPath + ')}')
         spacer_left = QSpacerItem(1, 1, QSizePolicy.Expanding, QSizePolicy.Expanding)
         grid.addItem(spacer_left, 0, 0)
@@ -82,12 +87,21 @@ class Login(QMainWindow):
             else:
                 self.form.setFixedWidth(500)
 
-    def hide(self):
-        super().hide()
-        # We remove the background because it causes alot of lag when changing the app's theme later on since it has to rerender the image.
-        self.setStyleSheet('QMainWindow[loginPage="true"]{border-image:none}')
+    def fade(self, widget):
+        self.effect = QGraphicsOpacityEffect()
+        self.form.hide()
+        widget.setGraphicsEffect(self.effect)
+        self.animation = QPropertyAnimation(self.effect, b"opacity")
+        self.animation.setDuration(500)
+        self.animation.setStartValue(1)
+        self.animation.setEndValue(0)
+        self.animation.start()
+        self.animation.finished.connect(self.hide)
 
     def show(self):
         super().show()
-        # When the login page comes back (After a user's logout for example), we set the background once again.
-        self.setStyleSheet('QMainWindow[loginPage="true"]{border-image:url(' + self.backgroundPath + ')}')
+        self.form.show()
+
+    def hide(self):
+        super().hide()
+        self.setStyleSheet('QMainWindow[loginPage="true"]{border-image:none}')

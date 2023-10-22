@@ -13,6 +13,7 @@ class MainNavbar(QScrollArea):
         self.setWidgetResizable(True)
         content = QWidget(self)
         self.setWidget(content)
+        self.setStyleSheet("QScrollArea{margin-top:32px}")
         self.__tabWidget = mainTabWidget
         self.parent = parent
         layout = QGridLayout(content)
