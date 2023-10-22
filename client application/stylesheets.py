@@ -6,6 +6,9 @@ light_style_sheet = """
     }
     QWidget{background:transparent}
     *[MainWindow="true"]{background-color: qlineargradient(y1: 0, y2: 1, stop: 0 #f8f4f4, stop: 1 #e4e0e0)}
+    QMainWindow[loginPage="true"]{border-image:url("background/Windows-11-Dark-Purple-Abstract-Waves-4K-Wallpaper-2.jpg.jpg");margin-top:4px;}
+    QMainWindow[loginForm="true"]{background:qlineargradient(y1: 0, y2: 1, stop: 0 #f8f4f4, stop: 1 rgba(228, 224, 224,50));border-bottom-left-radius:5px}
+    
     QTabWidget::pane {border:0px;background:transparent;} 
     QTabBar::tab {background: rgb(10,10,10);border:none;padding:12px;color:#AAA;}
     QTabBar::tab:hover {background:rgb(10,10,10);color:white;}
@@ -74,6 +77,9 @@ dark_style_sheet = """
     }
     QWidget{background:transparent}
     *[MainWindow="true"]{background-color: qlineargradient(y1: 0, y2: 1, stop: 0 #202020, stop: 1 #1b1b1b)}
+    QMainWindow[loginPage="true"]{border-image:url("background/Windows-11-Dark-Purple-Abstract-Waves-4K-Wallpaper-2.jpg.jpg");margin-top:4px;}
+    QMainWindow[loginForm="true"]{background:qlineargradient(y1: 0, y2: 1, stop: 0 #202020, stop: 1 rgba(27, 27, 27, 50));border-bottom-left-radius:5px}
+   
     QTabWidget::pane {border:0px;transparent;} 
     QTabBar::tab {background: rgb(10,10,10);border:none;padding:12px;color:#AAA;}
     QTabBar::tab:hover {background:rgb(10,10,10);color:white;}

@@ -1,4 +1,3 @@
-import sys
 from PyQt5.QtWidgets import QWidget, QMainWindow, QTabWidget, QGridLayout, QMessageBox, QPushButton
 from PyQt5.QtGui import QIcon, QColor
 from stylesheets import dark_style_sheet, light_style_sheet
@@ -6,6 +5,7 @@ from navbar import MainNavbar
 from tab_widgets import MainTabWidget
 from titlebar import TitleBar
 from qframelesswindow import FramelessWindow, StandardTitleBar
+from login import Login
 
 
 class MainWindow(FramelessWindow):
@@ -37,8 +37,7 @@ class MainWindow(FramelessWindow):
         grid.addWidget(self.__navbar, 0, 0, 2, 1)
         grid.addWidget(self.mainTabWidget, 1, 1, 1, 1)
 
-        self.login_page = QWidget()
-        self.login_page.setStyleSheet("background:green;margin-top:4px")
+        self.login_page = Login()
         grid.addWidget(self.login_page, 0, 0, 2, 2)
 
         self.titleBar.raise_()
