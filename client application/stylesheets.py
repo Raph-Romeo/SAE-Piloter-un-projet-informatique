@@ -44,10 +44,10 @@ light_style_sheet = """
     QMainWindow[tasksTopMenu="true"]{background:#FFF;border-radius:10px;margin-right:20px;}
     QWidget[tasksContentWindow="true"]{background:#FFF;border-radius:10px;margin-right:20px;margin-top:5px;margin-bottom:30px}
 
-    QPushButton[topMenuButton="true"]{color:#777;border:none;font-size:12px;font-family:verdana;margin-left:8px;margin-right:8px;margin-bottom:9px;margin-top:-5px}
+    QPushButton[topMenuButton="true"]{color:#777;border:none;font-size:12px;font-family:verdana;margin-left:8px;margin-right:8px;margin-bottom:9px;margin-top:-5px;font-weight:1;}
     QPushButton:hover[topMenuButton="true"]{color:#333}
     QPushButton:pressed[topMenuButton="true"]{border-bottom:1px solid #666;color:#000;margin-top:-4px;padding-top:1px}
-    QPushButton[topMenuButton="true"][selected="true"]{color:#5b2efc;border-bottom:3px solid #5b2efc;margin-top:-2px;padding-top:0px}
+    QPushButton[topMenuButton="true"][selected="true"]{color:#5b2efc;border-bottom:3px solid #5b2efc;margin-top:-2px;padding-top:0px;}
 
     QPushButton[addTaskButton="true"]{background:#5b2efc;border:none;border-radius:14px;color:white;font-size:18px;margin-right:5px;margin-left:5px;}
     QPushButton[addTaskButton="true"]:hover{background:#4b1eec;}
@@ -66,11 +66,16 @@ light_style_sheet = """
     QTableWidget{border:0px solid}
     QTableWidget::item{border-top:1px solid #eee;font-family:verdana;}
     QTableView::item:selected {background-color: #7b4eff;color:white;}
-    QHeaderView::section{background:white;border:none;border-right:1px solid #eee;margin-bottom:5px;font-weight:normal;}
-    QHeaderView::section:active{font-weight:normal}
+    QHeaderView::section{background:white;border:none;border-right:1px solid #eee;margin-bottom:5px;}
+
+    QTableCornerButton::section {background-color:transparent;}
+    
+    QLabel[calendarLabel]{font-weight:bold;font-family:arial;color:#5b2efc}
     
     QHeaderView::section{padding-bottom:5px;margin-bottom:0px;border-bottom:1px solid #ddd}
     QTableWidget[calendarTable]::item{border:none;border-right:1px solid #eee;border-bottom:1px solid #f2f2f2}
+    
+    QPushButton[weekArrow]{color:black;border-radius:11px;font-size:12px;}
 """
 
 dark_style_sheet = """
@@ -140,11 +145,15 @@ dark_style_sheet = """
     QLineEdit[loginButton="true"]{background:qlineargradient(x1: 1, x2: 0, stop: 0 rgba(255,255,255,0.2), stop: 1 rgba(255,255,255,0.1));padding:5px;padding-left:10px;border-radius:14px;margin-left:5px}
     
     QTableWidget{border:0px solid}
-    QTableWidget::item{border-top:1px solid #333;font-family:verdana;font-weight:bold;color:white;}
+    QTableWidget::item{border-top:1px solid #333;font-family:verdana;color:white;}
     QTableView::item:selected {background-color: #5b2efc;color:white;}
-    QHeaderView::section{background:transparent;border:none;border-right:1px solid #333;margin-bottom:5px;font-weight:normal;color:white;}
-    QHeaderView::section:active{font-weight:normal}
+    QHeaderView::section{background:transparent;border:none;border-right:1px solid #333;margin-bottom:5px;color:white;}
+    QTableCornerButton::section {background-color:transparent;}
+    
+    QLabel[calendarLabel]{font-weight:bold;font-family:arial;color:#916cee}
     
     QHeaderView::section{padding-bottom:5px;margin-bottom:0px;border-bottom:1px solid #333}
     QTableWidget[calendarTable]::item{border:none;border-right:1px solid #333;border-bottom:1px solid #444}
+    
+    QPushButton[weekArrow]{color:white;border-radius:11px;font-size:12px;}
 """

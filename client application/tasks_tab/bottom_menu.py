@@ -77,6 +77,7 @@ class BottomMenu(QMainWindow):
 
         self.tasksTableWidget = QTableWidget(0, 6)
         self.tasksTableWidget.setHorizontalHeaderLabels(["Task name", "Tag", "User", "Status", "Time left", "Progress"])
+        self.tasksTableWidget.horizontalHeader().setStyleSheet("QHeaderView::section{border-bottom:none}")
         font = QFont()
         font.setFamily("verdana")
         font.setPointSize(10)

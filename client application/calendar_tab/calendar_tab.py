@@ -1,5 +1,5 @@
-from PyQt5.QtWidgets import QMainWindow, QLabel, QWidget, QTableWidget, QTableWidgetItem, QGridLayout, QGraphicsDropShadowEffect, QHeaderView, QAbstractItemView
-from PyQt5.QtGui import QColor, QFont
+from PyQt5.QtWidgets import QMainWindow, QLabel, QWidget, QTableWidget, QTableWidgetItem, QGridLayout, QGraphicsDropShadowEffect, QHeaderView, QAbstractItemView, QPushButton
+from PyQt5.QtGui import QColor, QFont, QCursor
 from PyQt5.QtCore import Qt, QDate
 from datetime import date, timedelta
 
@@ -24,10 +24,29 @@ class CalendarTab(QWidget):
         self.picker = CalendarPicker(self)
         self.picker.dateChanged.connect(self.datePicked)
         self.picker.setFixedWidth(140)
-        self.monthLabel = QLabel("Month - YYYY")
-        self.monthLabel.setStyleSheet("font-weight:bold;font-family:arial")
+        self.ignore_datepicked = False
+        self.monthLabel = QLabel("...")
+        self.monthLabel.setProperty("calendarLabel", True)
+        self.previousWeek = QPushButton()
+        self.previousWeek.setText("◄")
+        self.previousWeek.setFixedWidth(22)
+        self.previousWeek.setFixedHeight(22)
+        self.previousWeek.clicked.connect(self.toPreviousWeekFunction)
+        self.previousWeek.setFocusPolicy(Qt.NoFocus)
+        self.previousWeek.setCursor(QCursor(Qt.PointingHandCursor))
+        self.previousWeek.setProperty("weekArrow", True)
+        self.nextWeek = QPushButton()
+        self.nextWeek.setText("►")
+        self.nextWeek.setFixedWidth(22)
+        self.nextWeek.setFixedHeight(22)
+        self.nextWeek.setCursor(QCursor(Qt.PointingHandCursor))
+        self.nextWeek.setProperty("weekArrow", True)
+        self.nextWeek.clicked.connect(self.toNextWeekFunction)
+        self.nextWeek.setFocusPolicy(Qt.NoFocus)
         self.calendarControllerGrid.addWidget(self.monthLabel, 0, 0)
-        self.calendarControllerGrid.addWidget(self.picker, 0, 1)
+        self.calendarControllerGrid.addWidget(self.previousWeek, 0, 1)
+        self.calendarControllerGrid.addWidget(self.picker, 0, 2)
+        self.calendarControllerGrid.addWidget(self.nextWeek, 0, 3)
 
         self.calendarView = QTableWidget(24, 7)
         self.parent = mainwindow
@@ -39,13 +58,12 @@ class CalendarTab(QWidget):
         font.setFamily("verdana")
         font.setPointSize(10)
         self.calendarView.horizontalHeader().setFont(font)
-        self.calendarView.setFont(font)
         self.calendarView.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.calendarView.setSelectionMode(QAbstractItemView.NoSelection)
         self.calendarView.setShowGrid(False)
         self.calendarView.horizontalHeader().sectionDoubleClicked.connect(self.focusColumn)
         self.calendarView.horizontalHeader().setStyleSheet("::section{border-right:none;padding-left:5px;padding-right:5px;}")
-        self.calendarView.verticalHeader().setStyleSheet("::section{border:none;border-right:1px solid rgba(80,80,80,60);background:transparent;padding-bottom:22px;}")
+        self.calendarView.verticalHeader().setStyleSheet("::section{border:none;border-right:1px solid rgba(80,80,80,60);background:transparent;padding-bottom:27px;color:rgba(120,120,120,255);padding-left:5px;padding-right:5px;font-size:10px;}")
         self.calendarView.horizontalHeader().setMinimumSectionSize(70)
         self.calendarView.verticalHeader().setMinimumSectionSize(35)
         self.calendarView.horizontalHeader().setSectionsClickable(False)
@@ -54,7 +72,6 @@ class CalendarTab(QWidget):
             self.calendarView.horizontalHeader().setSectionResizeMode(col, QHeaderView.Stretch)
         for row in range(0, self.calendarView.rowCount()):
             self.calendarView.verticalHeader().setSectionResizeMode(row, QHeaderView.Stretch)
-
         self.calendarGrid.addWidget(self.calendarController, 0, 0)
         self.calendarGrid.addWidget(self.calendarView, 1, 0)
         self.setProperty("tasksTopMenu", True)
@@ -65,11 +82,27 @@ class CalendarTab(QWidget):
         boxShadow.setColor(QColor(0, 0, 0, 60))
 
 
-        self.picker.setDate(QDate(date.today().year,date.today().month,date.today().day))
+        self.picker.setDate(QDate().currentDate())
 
         self.calendarWindow.setGraphicsEffect(boxShadow)
 
     def focusColumn(self, column):
+        self.ignore_datepicked = True
+        self.picker.setDate(QDate(self.days_of_week[column]))
+        self.ignore_datepicked = False
+        self.selectedDate = self.days_of_week[column]
+        for i in range(7):
+            header_label = self.calendarView.horizontalHeaderItem(i)
+            if column != i:
+                font = header_label.font()
+                font.setBold(False)
+                font.setFamily("verdana")
+                header_label.setFont(font)
+            else:
+                font = header_label.font()
+                font.setBold(True)
+                font.setFamily("verdana")
+                header_label.setFont(font)
         if self.selectedColumn == column:
             self.calendarView.horizontalHeader().setDefaultAlignment(Qt.AlignCenter)
             self.selectedColumn = None
@@ -85,35 +118,54 @@ class CalendarTab(QWidget):
                     self.calendarView.horizontalHeader().showSection(col)
 
     def datePicked(self, date):
-        days_of_week = []
-        years_months = {}
-        sunday = date.toPyDate() - timedelta(days=int(date.toPyDate().strftime("%w")))
-        for i in range(7):
-            current_date = sunday + timedelta(days=i)
-            day_of_week = current_date.day
-            days_of_week.append(day_of_week)
-            if current_date.year not in years_months.keys():
-                years_months[current_date.year] = []
-                years_months[current_date.year].append(current_date.strftime("%B"))
-            else:
-                if current_date.strftime("%B") not in years_months[current_date.year]:
-                    years_months[current_date.year].append(current_date.strftime("%B"))
-
-        main_title = ""
-        for i in years_months.keys():
-            for q in years_months[i]:
-                if len(years_months[i]) > 1:
-                    if years_months[i].index(q) == 0:
-                        main_title = f"{q}"
-                    else:
-                        main_title += f" - {q} {i}"
-                elif len(years_months.keys()) > 1:
-                    if len(main_title) == 0:
-                        main_title = f"{q} {i}"
-                    else:
-                        main_title += f" - {q} {i}"
+        if not self.ignore_datepicked:
+            self.days_of_week = []
+            years_months = {}
+            self.selectedDate = date.toPyDate()
+            column_index = int(self.selectedDate.strftime("%w"))
+            sunday = self.selectedDate - timedelta(days=int(self.selectedDate.strftime("%w")))
+            for i in range(7):
+                header_label = self.calendarView.horizontalHeaderItem(i)
+                if column_index != i:
+                    font = header_label.font()
+                    font.setBold(False)
+                    font.setFamily("verdana")
+                    header_label.setFont(font)
                 else:
-                    main_title = f"{q} {i}"
+                    font = header_label.font()
+                    font.setBold(True)
+                    font.setFamily("verdana")
+                    header_label.setFont(font)
+                current_date = sunday + timedelta(days=i)
+                self.days_of_week.append(current_date)
+                if current_date.year not in years_months.keys():
+                    years_months[current_date.year] = []
+                    years_months[current_date.year].append(current_date.strftime("%B"))
+                else:
+                    if current_date.strftime("%B") not in years_months[current_date.year]:
+                        years_months[current_date.year].append(current_date.strftime("%B"))
 
-        self.calendarView.setHorizontalHeaderLabels([f"{days_of_week[0]} SUN", f"{days_of_week[1]} MON", f"{days_of_week[2]} TUE", f"{days_of_week[3]} WED", f"{days_of_week[4]} THU", f"{days_of_week[5]} FRI", f"{days_of_week[6]} SAT"])
-        self.monthLabel.setText(main_title)
+            main_title = ""
+            for i in years_months.keys():
+                for q in years_months[i]:
+                    if len(years_months[i]) > 1:
+                        if years_months[i].index(q) == 0:
+                            main_title = f"{q}"
+                        else:
+                            main_title += f" - {q} {i}"
+                    elif len(years_months.keys()) > 1:
+                        if len(main_title) == 0:
+                            main_title = f"{q} {i}"
+                        else:
+                            main_title += f" - {q} {i}"
+                    else:
+                        main_title = f"{q} {i}"
+
+            self.calendarView.setHorizontalHeaderLabels([f"SUN\n{self.days_of_week[0].day}", f"MON\n{self.days_of_week[1].day}", f"TUE\n{self.days_of_week[2].day}", f"WED\n{self.days_of_week[3].day}", f"THU\n{self.days_of_week[4].day}", f"FRI\n{self.days_of_week[5].day}", f"SAT\n{self.days_of_week[6].day}"])
+            self.monthLabel.setText(main_title)
+
+    def toPreviousWeekFunction(self):
+        self.picker.setDate(QDate(self.selectedDate - timedelta(days=7)))
+
+    def toNextWeekFunction(self):
+        self.picker.setDate(QDate(self.selectedDate + timedelta(days=7)))

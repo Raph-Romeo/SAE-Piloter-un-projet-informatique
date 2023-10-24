@@ -6,6 +6,7 @@ from tab_widgets import MainTabWidget
 from titlebar import TitleBar
 from qframelesswindow import FramelessWindow, StandardTitleBar
 from login import Login
+from qfluentwidgets import setTheme, Theme
 
 
 class MainWindow(FramelessWindow):
@@ -57,6 +58,7 @@ class MainWindow(FramelessWindow):
         self.stb.closeBtn.setPressedColor(QColor(255, 255, 255))
         self.stb.closeBtn.setHoverBackgroundColor(QColor(232, 17, 35))
         self.stb.closeBtn.setPressedBackgroundColor(QColor(241, 112, 122))
+        setTheme(Theme.DARK)
 
     def setLightMode(self):
         self.setStyleSheet(light_style_sheet)
@@ -66,3 +68,4 @@ class MainWindow(FramelessWindow):
         self.stb.closeBtn.setPressedColor(QColor(255, 255, 255))
         self.stb.closeBtn.setHoverBackgroundColor(QColor(232, 17, 35))
         self.stb.closeBtn.setPressedBackgroundColor(QColor(241, 112, 122))
+        setTheme(Theme.LIGHT)
