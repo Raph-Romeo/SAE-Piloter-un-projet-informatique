@@ -68,6 +68,9 @@ light_style_sheet = """
     QTableView::item:selected {background-color: #7b4eff;color:white;}
     QHeaderView::section{background:white;border:none;border-right:1px solid #eee;margin-bottom:5px;font-weight:normal;}
     QHeaderView::section:active{font-weight:normal}
+    
+    QHeaderView::section{padding-bottom:5px;margin-bottom:0px;border-bottom:1px solid #ddd}
+    QTableWidget[calendarTable]::item{border:none;border-right:1px solid #eee;border-bottom:1px solid #f2f2f2}
 """
 
 dark_style_sheet = """
@@ -141,4 +144,7 @@ dark_style_sheet = """
     QTableView::item:selected {background-color: #5b2efc;color:white;}
     QHeaderView::section{background:transparent;border:none;border-right:1px solid #333;margin-bottom:5px;font-weight:normal;color:white;}
     QHeaderView::section:active{font-weight:normal}
+    
+    QHeaderView::section{padding-bottom:5px;margin-bottom:0px;border-bottom:1px solid #333}
+    QTableWidget[calendarTable]::item{border:none;border-right:1px solid #333;border-bottom:1px solid #444}
 """

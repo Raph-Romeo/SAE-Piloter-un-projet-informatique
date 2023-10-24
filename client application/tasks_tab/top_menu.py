@@ -45,7 +45,7 @@ class TopMenu(QMainWindow):
         self.__add_button("All tasks (0)", index=0)
         self.__add_button("My tasks", index=1)
         self.__add_button("Completed", index=2)
-        self.__add_button("Friend tasks", index=3)
+        self.__add_button("Created by me", index=3)
 
         self.buttons[0].setProperty("selected", True)
 

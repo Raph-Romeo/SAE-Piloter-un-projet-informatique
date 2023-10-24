@@ -52,7 +52,6 @@ class MainWindow(FramelessWindow):
     def setDarkMode(self):
         self.setStyleSheet(dark_style_sheet)
         self.is_dark = True
-        self.mainTabWidget.darkTabs()
         self.__navbar.darkModeIcons()
         self.stb.closeBtn.setHoverColor(QColor(255, 255, 255))
         self.stb.closeBtn.setPressedColor(QColor(255, 255, 255))
@@ -62,7 +61,6 @@ class MainWindow(FramelessWindow):
     def setLightMode(self):
         self.setStyleSheet(light_style_sheet)
         self.is_dark = False
-        self.mainTabWidget.lightTabs()
         self.__navbar.lightModeIcons()
         self.stb.closeBtn.setHoverColor(QColor(255, 255, 255))
         self.stb.closeBtn.setPressedColor(QColor(255, 255, 255))
