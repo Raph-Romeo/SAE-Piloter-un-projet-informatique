@@ -17,26 +17,13 @@ class TasksTab(QWidget):
         self.contentWindow.setProperty("tasksContentWindow", True)
         self.grid.addWidget(self.contentWindow)
 
-    def darkBoxShadows(self):
         boxShadow = QGraphicsDropShadowEffect()
         boxShadow.setBlurRadius(20)
         boxShadow.setOffset(0)
-        boxShadow.setColor(QColor(20, 20, 20))
+        boxShadow.setColor(QColor(0, 0, 0, 60))
         self.topMenu.setGraphicsEffect(boxShadow)
         boxShadow = QGraphicsDropShadowEffect()
         boxShadow.setBlurRadius(20)
         boxShadow.setOffset(0)
-        boxShadow.setColor(QColor(20, 20, 20))
-        self.contentWindow.setGraphicsEffect(boxShadow)
-
-    def lightBoxShadows(self):
-        boxShadow = QGraphicsDropShadowEffect()
-        boxShadow.setBlurRadius(20)
-        boxShadow.setOffset(0)
-        boxShadow.setColor(QColor(160, 160, 160))
-        self.topMenu.setGraphicsEffect(boxShadow)
-        boxShadow = QGraphicsDropShadowEffect()
-        boxShadow.setBlurRadius(20)
-        boxShadow.setOffset(0)
-        boxShadow.setColor(QColor(160, 160, 160))
+        boxShadow.setColor(QColor(0, 0, 0, 60))
         self.contentWindow.setGraphicsEffect(boxShadow)
