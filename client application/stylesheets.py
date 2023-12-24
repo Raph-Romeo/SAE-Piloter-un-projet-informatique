@@ -75,7 +75,10 @@ light_style_sheet = """
     QHeaderView::section{padding-bottom:5px;margin-bottom:0px;border-bottom:1px solid #ddd}
     QTableWidget[calendarTable]::item{border:none;border-right:1px solid #eee;border-bottom:1px solid #f2f2f2}
     
+    QLabel[taskCalendarItem]{background:#5b2efc;color:white;border-radius:15px;padding:2px;margin:1px;font-family:arial;font-size:12px;}
+    
     QPushButton[weekArrow]{color:black;border-radius:11px;font-size:12px;}
+    QPushButton[weekArrow]:pressed{margin-right:1px;}
 """
 
 dark_style_sheet = """
@@ -155,5 +158,8 @@ dark_style_sheet = """
     QHeaderView::section{padding-bottom:5px;margin-bottom:0px;border-bottom:1px solid #333}
     QTableWidget[calendarTable]::item{border:none;border-right:1px solid #333;border-bottom:1px solid #444}
     
+    QLabel[taskCalendarItem]{background:#916cee;color:white;border-radius:15px;padding:2px;margin:1px;font-family:arial;font-size:12px;}
+    
     QPushButton[weekArrow]{color:white;border-radius:11px;font-size:12px;}
+    QPushButton[weekArrow]:pressed{margin-right:1px;}
 """
