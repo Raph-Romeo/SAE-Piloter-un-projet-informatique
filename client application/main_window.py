@@ -7,6 +7,24 @@ from titlebar import TitleBar
 from qframelesswindow import FramelessWindow, StandardTitleBar
 from login import Login
 from qfluentwidgets import setTheme, Theme
+from datetime import datetime
+
+
+class Task:
+    def __init__(self, name, tag, date_created, start_date, deadline, owner, user, public=False):
+        self.name = name
+        self.tag = tag
+        self.date_created = date_created
+        self.start_date = start_date
+        self.deadline = deadline
+        self.owner = owner
+        self.user = user
+        self.public = public
+
+#class User:
+#    def __init__(self, username, token):
+#        self.username = username
+#        self.token = token
 
 
 class MainWindow(FramelessWindow):
@@ -44,6 +62,8 @@ class MainWindow(FramelessWindow):
 
         self.titleBar.raise_()
 
+        self.connectGetTasksAndEverything()
+
     def toggleDarkmode(self):
         if not self.is_dark:
             self.setDarkMode()
@@ -69,3 +89,8 @@ class MainWindow(FramelessWindow):
         self.stb.closeBtn.setHoverBackgroundColor(QColor(232, 17, 35))
         self.stb.closeBtn.setPressedBackgroundColor(QColor(241, 112, 122))
         setTheme(Theme.LIGHT)
+
+    def connectGetTasksAndEverything(self):
+        self.tasks = [Task("task A", "Home", datetime(2003, 5, 14), datetime(2023, 10, 25, hour=3), datetime(2023, 10, 25, hour=4), "Raphael Romeo","Raphael Romeo"), Task("task B", "Home", datetime(2003, 5, 14), datetime(2023, 10, 25, hour=6), datetime(2023, 10, 25, hour=4), "Raphael Romeo","Raphael Romeo")]
+        self.mainTabWidget.tasksTab.update_tasks(self.tasks)
+        self.mainTabWidget.calendarTab.initiate_calendar()
