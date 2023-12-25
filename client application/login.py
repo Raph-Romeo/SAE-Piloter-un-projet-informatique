@@ -45,7 +45,26 @@ class LoginForm(QMainWindow):
 
     def login(self):
         if len(self.usernameInput.text()) == 0 or len(self.passwordInput.text()) == 0:
-            pass
+            if len(self.usernameInput.text()) == 0:
+                InfoBar.warning(
+                    title="Form is not valid",
+                    content="Please insert a username",
+                    parent=self.parent,
+                    orient=Qt.Horizontal,
+                    isClosable=True,
+                    position=InfoBarPosition.TOP_RIGHT,
+                    duration=2000
+                )
+            else:
+                InfoBar.warning(
+                    title="Form is not valid",
+                    content="Please insert a password",
+                    parent=self.parent,
+                    orient=Qt.Horizontal,
+                    isClosable=True,
+                    position=InfoBarPosition.TOP_RIGHT,
+                    duration=2000
+                )
         else:
             if self.usernameInput.text() == "toto" and self.passwordInput.text() == "toto":
                 # SUCCESS
@@ -53,6 +72,7 @@ class LoginForm(QMainWindow):
                 self.passwordInput.setDisabled(True)
                 self.hide()
                 self.parent.fade(self.parent)
+                self.parent.mainwindow.connectGetTasksAndEverything()
             else:
                 InfoBar.error(
                     title="Failed to login",
@@ -66,7 +86,7 @@ class LoginForm(QMainWindow):
 
 
 class Login(QMainWindow):
-    def __init__(self, darkmode: bool):
+    def __init__(self, mainwindow):
         super().__init__()
         self.setProperty("loginPage", True)
         self.widget = QWidget()
@@ -75,7 +95,8 @@ class Login(QMainWindow):
         grid = QGridLayout(self.widget)
         grid.setContentsMargins(0, 0, 0, 0)
         self.form = LoginForm(self)
-        if darkmode:
+        self.mainwindow = mainwindow
+        if self.mainwindow.is_dark:
             self.backgroundPath = "background/dark_login.jpg"
         else:
             self.backgroundPath = "background/light_login.jpg"
@@ -103,9 +124,27 @@ class Login(QMainWindow):
         self.animation.start()
         self.animation.finished.connect(self.hide)
 
-    def show(self):
-        super().show()
-        self.form.show()
+    def fadeIn(self):
+        self.setHidden(False)
+        if self.mainwindow.is_dark:
+            self.backgroundPath = "background/dark_login.jpg"
+        else:
+            self.backgroundPath = "background/light_login.jpg"
+        self.setStyleSheet('QMainWindow[loginPage="true"]{border-image:url(' + self.backgroundPath + ')}')
+        self.form.usernameInput.setDisabled(False)
+        self.form.passwordInput.setDisabled(False)
+        self.form.passwordInput.setText("")
+        self.effect = QGraphicsOpacityEffect()
+        self.form.setHidden(False)
+        self.setGraphicsEffect(self.effect)
+        self.animation = QPropertyAnimation(self.effect, b"opacity")
+        self.animation.setDuration(500)
+        self.animation.setStartValue(0)
+        self.animation.setEndValue(1)
+        self.animation.start()
+        self.animation.finished.connect(lambda: self.setGraphicsEffect(None))
+        self.form.usernameInput.setStyleSheet("")
+        self.form.passwordInput.setStyleSheet("")
 
     def hide(self):
         super().hide()

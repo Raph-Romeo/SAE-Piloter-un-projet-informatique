@@ -2,14 +2,13 @@ from PyQt5.QtWidgets import QWidget, QGridLayout, QPushButton, QMainWindow, QSpa
 from PyQt5.QtGui import QCursor, QIcon, QColor, QPixmap, QFont
 from color_icon import color_pixmap
 from PyQt5.QtCore import Qt, QSize
-import random
 
 
 class User(QTableWidgetItem):
-    def __init__(self, name, profile_picture="icons/default.png"):
+    def __init__(self, user):
         super().__init__()
-        pixmap = QPixmap(profile_picture)
-        self.setText(name)
+        pixmap = QPixmap(user.profile_picture)
+        self.setText(user.username)
         self.setIcon(QIcon(pixmap))
 
 
@@ -91,10 +90,6 @@ class BottomMenu(QMainWindow):
         self.tasksTableWidget.horizontalHeader().setSectionsClickable(False)
         for col in range(1, self.tasksTableWidget.columnCount()):
             self.tasksTableWidget.horizontalHeader().setSectionResizeMode(col, QHeaderView.Stretch)
-
-        tags = ["Misc", "Project", "University", "Finance", "Home", "Test"]
-        for i in "abcd":
-            self.add_task(f"Task {i}", tags[random.randint(0, 5)])
         layout.addWidget(self.searchBar, 0, 0)
         layout.addWidget(self.tasksTableWidget, 1, 0, 1, 1)
 
@@ -113,15 +108,21 @@ class BottomMenu(QMainWindow):
         self.clearTasks()
         for i in task_list:
             self.tasksTableWidget.setRowCount(self.tasksTableWidget.rowCount() + 1)
-            self.tasksTableWidget.setCellWidget(self.tasksTableWidget.rowCount(), 0, QLabel(i.name))
+            self.tasksTableWidget.setItem(self.tasksTableWidget.rowCount() - 1, 0, QTableWidgetItem(i.name))
+            self.tasksTableWidget.setItem(self.tasksTableWidget.rowCount() - 1, 1, QTableWidgetItem(i.tag))
+            self.tasksTableWidget.setItem(self.tasksTableWidget.rowCount() - 1, 2, User(i.user))
+            self.tasksTableWidget.setItem(self.tasksTableWidget.rowCount() - 1, 3, QTableWidgetItem("Incomplete"))
+            self.tasksTableWidget.setItem(self.tasksTableWidget.rowCount() - 1, 4, QTableWidgetItem("52 days"))
+            self.tasksTableWidget.setItem(self.tasksTableWidget.rowCount() - 1, 5, QTableWidgetItem("20%"))
+            self.tasksTableWidget.setRowHeight(self.tasksTableWidget.rowCount() - 1, 40)
+        self.parent.topMenu.setTaskNumber(len(task_list))
 
     def __focus_search(self, event):
         self.searchBarQlineEdit.setFocus()
 
     def clearTasks(self):
-        self.taskLayout.removeAllWidgets()
-        self.tasks = []
-        self.parent.topMenu.setTaskNumber(len(self.tasks))
+        self.tasksTableWidget.clearContents()
+        self.tasksTableWidget.setRowCount(0)
 
     def searchFilter(self, text):
         if text != "":

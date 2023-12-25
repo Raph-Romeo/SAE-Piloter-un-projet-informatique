@@ -27,3 +27,6 @@ class TasksTab(QWidget):
         boxShadow.setOffset(0)
         boxShadow.setColor(QColor(0, 0, 0, 60))
         self.contentWindow.setGraphicsEffect(boxShadow)
+
+    def update_tasks(self, tasks):
+        self.contentWindow.set_tasks(tasks)

@@ -54,6 +54,8 @@ light_style_sheet = """
     QPushButton[addTaskButton="true"]:pressed{background:#3b0edc;color:#ddd}
 
     QLabel[title="true"]{color:black;margin-left:10px;font-size:20px;font-weight:1;font-family:verdana}
+    QLabel[username_title]{padding:0;font-family:verdana;font-size:12px;color:rgba(0,0,0,170);margin-left:10px;}
+    QLabel[username_title]:hover{color:rgba(0,0,0,255)}
     QWidget[searchBar="true"]{border:1px solid #EEE;margin-top:5px;border-radius:17px}
     QWidget[searchBar="true"][focused="true"]{border:1px solid #222;}
     
@@ -121,7 +123,7 @@ dark_style_sheet = """
     QScrollBar::up-arrow:horizontal, QScrollBar::down-arrow:horizontal{background: none;opacity: 0%;height: 4px;width:0px;}
     QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal{background: none;opacity: 0%;height: 4px;width:0px;}
 
-    
+
     QLabel{color:white;font-family:Consolas;font-size:15px;border:0px solid black;background-color:transparent;padding:0px;padding-left:10px;padding-right:10px;margin:0px;text-indent:0px;}
     QLineEdit{border:0px solid black;margin:0px;padding:0px;font-family:Consolas;color:white;font-size:15px;padding-bottom:10px;text-indent:0px;margin-left:-2px;margin-top:-1px;}
 
@@ -138,6 +140,8 @@ dark_style_sheet = """
     QPushButton[addTaskButton="true"]:pressed{background:#714cce;color:#000}
     
     QLabel[title="true"]{color:white;margin-left:10px;font-size:20px;font-weight:1;font-family:verdana}
+    QLabel[username_title]{padding:0;font-family:verdana;font-size:12px;color:rgba(255,255,255,170);margin-left:10px;}
+    QLabel[username_title]:hover{color:rgba(255,255,255,255)}
     QWidget[searchBar="true"]{border:1px solid #333;margin-top:5px;border-radius:17px}
     QWidget[searchBar="true"][focused="true"]{border:1px solid #C8C8C8;}
     
