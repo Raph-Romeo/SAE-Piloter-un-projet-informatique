@@ -1,6 +1,22 @@
 import socket, threading, sys, time
+from settings import server_port
 
-server_port = 5240
+
+class Client:
+    def __init__(self, serv: object, connection: object, addr: str):
+        print(f"NEW CONNECTION : {addr[0]}:{addr[1]}")
+        self.server = serv
+        self.connection = connection
+        self.addr = addr
+        self.connected = True
+
+    def close(self) -> None:
+        print(f"CONNECTION CLOSED : {self.addr[0]}:{self.addr[1]}")
+        self.server.remove(self)
+        self.connection.close()
+        self.connected = False
+        return
+
 
 class Server:
     def __init__(self):
@@ -39,9 +55,14 @@ class Server:
     def listen(self):
         self.socket.listen()
         while not self.forceStop:
-            self.clients.append(self.socket.accept())
+            conn, addr = self.socket.accept()
+            self.clients.append(Client(self, conn, addr))
+
+    def remove(self, client):
+        self.clients.remove(client)
 
 
 if __name__ == "__main__":
     server = Server()
     sys.exit(server.start())
+
