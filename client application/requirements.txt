@@ -1,0 +1,4 @@
+pyqt5
+PyQt-Fluent-Widgets
+PyQt5-Frameless-Window
+requests
