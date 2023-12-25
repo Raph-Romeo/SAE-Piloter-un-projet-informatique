@@ -9,12 +9,27 @@ class Client:
         self.connection = connection
         self.addr = addr
         self.connected = True
+        self.client_thread = threading.Thread(target=self.handle)
+        self.client_thread.start()
 
     def close(self) -> None:
         print(f"CONNECTION CLOSED : {self.addr[0]}:{self.addr[1]}")
         self.server.remove(self)
         self.connection.close()
         self.connected = False
+        return
+
+    def handle(self) -> None:
+        while self.connected:
+            try:
+                data = self.connection.recv(1024)
+                if len(data) > 0:
+                    print(data.decode())
+                else:
+                    self.close()
+            except Exception as err:
+                print(err)
+                self.close()
         return
 
 
