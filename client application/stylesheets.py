@@ -170,7 +170,7 @@ dark_style_sheet = """
     
     QLineEdit{color:white;font-family:verdana;font-size:14px;margin-right:30px}
     
-    QPushButton[settings="true"]{color:white;font-size:16px;border:1px solid #111;border-radius:10px;background:#252525;padding:12px}
+    QPushButton[settings="true"]{color:white;font-size:16px;border:1px solid #444;border-radius:10px;background:#252525;padding:12px}
     
     QLineEdit[loginButton="true"]{background:qlineargradient(x1: 1, x2: 0, stop: 0 rgba(255,255,255,0.2), stop: 1 rgba(255,255,255,0.1));padding:5px;padding-left:10px;border-radius:14px;margin-left:5px}
     QPushButton[loginButton="true"]{background:qlineargradient(x1: 1, x2: 0, stop: 0 rgba(255,255,255,0.2), stop: 1 rgba(255,255,255,0.1));padding:5px;padding-left:10px;border-radius:14px;margin-left:5px;color:#EEE;margin-right:30px}

@@ -90,6 +90,7 @@ class TopMenu(QMainWindow):
                 self.leftWrapper.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
 
     def setTab(self, index: int):
+        self.tasksTab.contentWindow.reset_date()
         if self.currentIndex is not index:
             self.currentIndex = index
             for button in self.buttons:
