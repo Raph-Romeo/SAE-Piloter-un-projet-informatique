@@ -11,8 +11,10 @@ from qfluentwidgets import setTheme, Theme
 from datetime import datetime, timedelta
 from PyQt5.QtGui import QImage
 import time
+import socket
 import requests
 import json
+from create_task import CreateTaskForm
 
 
 class SendMessageWorker(QObject):
@@ -27,9 +29,18 @@ class SendMessageWorker(QObject):
 
     def run(self):
         try:
-            self.connection.send(self.msg)
-            response = self.connection.recv(4096)
+            remote_ip, remote_port = self.connection.getpeername()
+            conn = socket.socket()
+            conn.connect((remote_ip, remote_port))
+            time.sleep(0.1)
+            # print(remote_ip, remote_port)
+            conn.send(self.msg)
+            response = conn.recv(4096)
             self.message.emit(response)
+            conn.close()
+            # self.connection.send(self.msg)
+            # response = self.connection.recv(4096)
+            # self.message.emit(response)
         except:
             self.error.emit()
             response = json.dumps({"status": 0}).encode()
@@ -43,21 +54,19 @@ class ClockThread(QObject):
 
     def run(self):
         while True:
-            time.sleep(5)
+            time.sleep(1)
             self.update.emit()
 
 
 class Task:
-    def __init__(self, pk_id: int, name: str, tag: str, date_created, start_date, deadline, user, created_by, is_owner: bool = False,
+    def __init__(self, pk_id: int, name: str, tag: str, start_date, deadline, user, is_owner: bool = False,
                  public: bool = False, is_completed: bool = False):
         self.id = pk_id
         self.name = name
         self.tag = tag
-        self.date_created = date_created
         self.start_date = start_date
         self.deadline = deadline
         self.user = user
-        self.created_by = created_by
         self.is_completed = is_completed
         self.public = public
         self.status = None
@@ -73,8 +82,10 @@ class Task:
             self.status = 0
         elif self.deadline is not None and self.start_date < datetime.now() < self.deadline:
             self.status = 1
-        else:
+        elif self.deadline is not None:
             self.status = 3
+        else:
+            self.status = 1
         if status != self.status:
             return True
         else:
@@ -113,7 +124,7 @@ class Task:
                 else:
                     return [f"{int(delta.seconds)} second(s)", 4]
             else:
-                return ["Expired", 4]
+                return [f"{str(self.start_date)}", 4]
 
 
 class User:
@@ -122,8 +133,9 @@ class User:
         image = "icons/default.png"
         if profile_picture_url is not None:
             try:
-                image = QImage()
-                image.loadFromData(requests.get(profile_picture_url).content)
+                img = QImage()
+                img.loadFromData(requests.get(profile_picture_url).content)
+                image = img
             except:
                 pass
         self.profile_picture = image
@@ -206,23 +218,26 @@ class MainWindow(FramelessWindow):
         self.init_send(message.encode(), self.set_tasks)
 
     def set_tasks(self, response: bytes):
-        data = json.loads(response.decode())
+        try:
+            data = json.loads(response.decode())
+        except:
+            return print(f"error decoding tasks message : {response.decode()}")
         if data["status"] == 403:
             self.logout()
         elif data["status"] == 200:
-            self.tasks.clear()
+            self.tasks = []
             for i in data["data"]:
                 try:
-                    deadline = datetime.strptime(i["deadline"], "%Y-%m-%d %H:%M:%S")
+                    deadline = datetime.strptime(i["DL"], "%Y-%m-%d %H:%M:%S")
                 except:
                     deadline = None
                 self.tasks.append(
-                    Task(i["id"], i["name"], i["tag"], datetime.strptime(i["date_created"], "%Y-%m-%d %H:%M:%S"),
-                         datetime.strptime(i["start_date"], "%Y-%m-%d %H:%M:%S"),
-                         deadline, User(i["owner"]["username"], i["owner"]["email"]), User(i["created_by"]["username"], i["created_by"]["email"]),
-                         is_owner=i["is_owner"], public=i["public"], is_completed=i["is_completed"]))
+                    Task(i["id"], i["N"], i["T"],
+                         datetime.strptime(i["SD"], "%Y-%m-%d %H:%M:%S"),
+                         deadline, User(i["ow"]["u"], i["ow"]["e"]),
+                         is_owner=i["io"], public=i["pu"], is_completed=i["IC"]))
             self.mainTabWidget.tasksTab.set_tasks(self.tasks)
-            self.mainTabWidget.calendarTab.initiate_calendar()
+            self.mainTabWidget.calendarTab.refreshCalendar()
 
     def set_task_completed(self, pk: int, is_completed: bool):
         message = json.dumps({"url": "/set_completed", "method": "POST", "token": self.user.auth_token, "data": {"task_id": pk, "is_completed": is_completed}})
@@ -234,7 +249,7 @@ class MainWindow(FramelessWindow):
             for i in self.tasks:
                 if i.id == int(response["data"]["task_id"]):
                     i.is_completed = response["data"]["is_completed"]
-                    self.update_tasks(check_conn=False)
+                    self.update_tasks()
         elif response["status"] == 403:
             self.logout()
 
@@ -264,29 +279,46 @@ class MainWindow(FramelessWindow):
         elif response["status"] == 403:
             self.logout()
 
-    def create_task(self):
-        message = json.dumps({"url": "/create_task", "method": "POST", "token": self.user.auth_token, "data": {"name": "test"}})
+    def create_task_form(self, date=None):
+        self.create_task_dialog = CreateTaskForm(self, date)
+        self.create_task_dialog.exec()
+
+    def create_task(self, data: dict):
+        message = {"url": "/create_task", "method": "POST", "token": self.user.auth_token}
+        message["data"] = data
+        message = json.dumps(message)
         self.init_send(message.encode(), self.create_task_response)
 
     def create_task_response(self, e):
         response = json.loads(e.decode())
         if response["status"] == 200:
             message = json.dumps({"url": "/tasks", "method": "GET", "token": self.user.auth_token})
+            if self.create_task_dialog is not None and self.create_task_dialog.isActiveWindow():
+                self.create_task_dialog.close()
             self.init_send(message.encode(), self.set_tasks)
         elif response["status"] == 403:
+            if self.create_task_dialog is not None and self.create_task_dialog.isActiveWindow():
+                self.create_task_dialog.close()
             self.logout()
+        elif response["status"] == 401:
+            self.create_task_dialog.formError(response["message"])
+            self.create_task_dialog.nextB.setDisabled(False)
+        elif response["status"] == 400:
+            self.create_task_dialog.formError(response["message"])
+            self.create_task_dialog.nextB.setDisabled(False)
 
-    def update_tasks(self, check_conn: bool = True):
+    def update_tasks(self):
         if self.user is not None:
             change = False
-            for task in self.tasks:
-                if task.update_status():
-                    change = True
-            if change:
-                self.mainTabWidget.calendarTab.refreshCalendar()
-            self.mainTabWidget.tasksTab.update_tasks(change)
-        if check_conn and self.connection is not None:
-            self.init_test_connection(json.dumps({"test": True}).encode())
+            try:
+                for task in self.tasks:
+                    if task.update_status():
+                        change = True
+                if change:
+                    self.mainTabWidget.calendarTab.refreshCalendar()
+                self.mainTabWidget.tasksTab.update_tasks(change)
+            except:
+                print("error was raised in the update_tasks function")
 
     def silent(self, e):
         # print(e)

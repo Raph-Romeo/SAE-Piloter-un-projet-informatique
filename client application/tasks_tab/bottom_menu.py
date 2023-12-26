@@ -356,7 +356,7 @@ class BottomMenu(QMainWindow):
                     self.tasksTableWidget.hideRow(i)
 
     def create_task(self):
-        self.mainWindow.create_task()
+        self.mainWindow.create_task_form()
 
     def set_filter(self, x: int):
         self.reset_date()
@@ -437,5 +437,3 @@ class BottomMenu(QMainWindow):
             menu.addAction(Action(FluentIcon.ADD, 'Create Task'))
             menu.menuActions()[0].triggered.connect(lambda: self.create_task())  # Create task
         menu.exec(e.globalPos(), aniType=MenuAnimationType.NONE)
-
-

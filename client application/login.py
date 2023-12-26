@@ -31,7 +31,7 @@ class LoginForm(QMainWindow):
 
         self.usernameInput = QLineEdit()
         self.passwordInput = QLineEdit()
-        self.usernameInput.setPlaceholderText("Username or Email")
+        self.usernameInput.setPlaceholderText("Username")
         self.passwordInput.setEchoMode(QLineEdit.Password)
         self.passwordInput.setPlaceholderText("Password")
         self.usernameInput.setProperty("loginButton", True)

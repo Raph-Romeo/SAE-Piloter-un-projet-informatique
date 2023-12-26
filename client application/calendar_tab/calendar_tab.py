@@ -3,7 +3,7 @@ from PyQt5.QtGui import QColor, QFont, QCursor
 from PyQt5.QtCore import Qt, QDate
 from datetime import date, timedelta
 
-from qfluentwidgets import CalendarPicker, setTheme, Theme, FluentIcon
+from qfluentwidgets import CalendarPicker, setTheme, Theme, FluentIcon, MenuAnimationType, Action, RoundMenu
 
 
 class TaskItem(QWidget):
@@ -40,7 +40,6 @@ class TaskItem(QWidget):
             self.hlayout.addWidget(self.more)
         else:
             self.more.setText(f"+ {self.x-3}")
-
 
 
 class CalendarTab(QWidget):
@@ -99,6 +98,7 @@ class CalendarTab(QWidget):
         self.calendarView.horizontalHeader().setFont(font)
         self.calendarView.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.calendarView.setSelectionMode(QAbstractItemView.NoSelection)
+        self.calendarView.contextMenuEvent = self.contextMenuEvent_table
         self.calendarView.setShowGrid(False)
         self.calendarView.horizontalHeader().sectionDoubleClicked.connect(self.focusColumn)
         self.calendarView.horizontalHeader().setStyleSheet("::section{border-right:none;padding-left:5px;padding-right:5px;}")
@@ -164,6 +164,8 @@ class CalendarTab(QWidget):
     def refreshCalendar(self):
         if self.selectedDate is not None:
             self.datePicked(QDate(self.selectedDate))
+        else:
+            self.initiate_calendar()
 
     def datePicked(self, date):
         if not self.ignore_datepicked:
@@ -215,8 +217,6 @@ class CalendarTab(QWidget):
                                 if task_duration.seconds / 3600 > 1:
                                     self.add_task_calendar(i, task.start_date.hour, task, type=1)
                                     for q in range(1, int(task_duration.seconds / 3600)):
-                                        print(q)
-                                        print("int", int(task_duration.seconds / 3600))
                                         if q == int(task_duration.seconds / 3600) - 1:
                                             self.add_task_calendar(i, task.start_date.hour + q, task, type=2)
                                         else:
@@ -269,3 +269,14 @@ class CalendarTab(QWidget):
 
     def initiate_calendar(self):
         self.picker.setDate(QDate().currentDate())
+
+    def contextMenuEvent_table(self, e):
+        menu = RoundMenu(parent=self)
+        item = self.calendarView.indexAt(e.pos())
+        date = [self.days_of_week[item.column()], item.row()]
+        menu.addAction(Action(FluentIcon.ADD, 'Create Task'))
+        menu.menuActions()[0].triggered.connect(lambda: self.create_task(date))  # Create task
+        menu.exec(e.globalPos(), aniType=MenuAnimationType.NONE)
+
+    def create_task(self, date=None):
+        self.mainwindow.create_task_form(date)

@@ -53,7 +53,7 @@ light_style_sheet = """
     QPushButton[addTaskButton="true"]:hover{background:#4b1eec;}
     QPushButton[addTaskButton="true"]:pressed{background:#3b0edc;color:#ddd}
 
-    QLabel[title="true"]{color:black;margin-left:10px;font-size:20px;font-weight:1;font-family:verdana}
+    *[title="true"]{color:black;margin-left:10px;font-size:20px;font-weight:1;font-family:verdana}
     QLabel[username_title]{padding:0;font-family:verdana;font-size:12px;color:rgba(0,0,0,170);margin-left:10px;}
     QLabel[username_title]:hover{color:rgba(0,0,0,255)}
     QWidget[searchBar="true"]{border:1px solid #EEE;margin-top:5px;border-radius:17px}
@@ -61,6 +61,10 @@ light_style_sheet = """
     
     QLineEdit{color:#222;font-family:verdana;font-size:14px;margin-right:30px}
     QLineEdit:disabled{color:#999}
+    QTextEdit{color:#222;font-family:verdana;font-size:14px;margin-right:30px;border:none;}
+    QTextEdit:disabled{color:#999}
+    
+    *[create_task_form]{padding:5px;border:1px solid #EEE;border-radius:5px;margin:0;font-size:12px;}
     
     QPushButton[settings="true"]{color:black;font-size:16px;border:1px solid #ddd;border-radius:10px;background:white;padding:12px;}
     QPushButton[signout="true"]{color:#c42b1c;font-size:16px;border:1px solid #c42b1c;border-radius:10px;background:white;padding:12px;}
@@ -168,7 +172,7 @@ dark_style_sheet = """
     QPushButton[addTaskButton="true"]:hover{background:#815cde;}
     QPushButton[addTaskButton="true"]:pressed{background:#714cce;color:#000}
     
-    QLabel[title="true"]{color:white;margin-left:10px;font-size:20px;font-weight:1;font-family:verdana}
+    *[title="true"]{color:white;margin-left:10px;font-size:20px;font-weight:1;font-family:verdana}
     QLabel[username_title]{padding:0;font-family:verdana;font-size:12px;color:rgba(255,255,255,170);margin-left:10px;}
     QLabel[username_title]:hover{color:rgba(255,255,255,255)}
     QWidget[searchBar="true"]{border:1px solid #333;margin-top:5px;border-radius:17px}
@@ -176,6 +180,9 @@ dark_style_sheet = """
     
     QLineEdit{color:white;font-family:verdana;font-size:14px;margin-right:30px}
     QLineEdit:disabled{color:#555}
+    QTextEdit{color:white;font-family:verdana;font-size:14px;margin-right:30px;border:none;}
+    QTextEdit:disabled{color:#555}
+    *[create_task_form]{padding:5px;border:1px solid #777;border-radius:5px;margin:0;font-size:12px;}
     
     QPushButton[settings="true"]{color:white;font-size:16px;border:1px solid #555;border-radius:10px;background:#252525;padding:12px}
     QPushButton[signout="true"]{color:#ff99a4;font-size:16px;border:1px solid #ff99a4;border-radius:10px;background:#252525;padding:12px}
