@@ -2,7 +2,8 @@ from PyQt5.QtWidgets import QWidget, QGridLayout, QPushButton, QFileDialog, QApp
 from PyQt5.QtGui import QCursor, QIcon, QColor, QPixmap, QFont
 from color_icon import color_pixmap
 from PyQt5.QtCore import Qt, QSize, QDate
-from qfluentwidgets import IconWidget, FluentIcon, InfoBarIcon, ProgressBar, AvatarWidget, CalendarPicker, ToolButton
+from qfluentwidgets import IconWidget, FluentIcon, InfoBarIcon, ProgressBar, AvatarWidget, CalendarPicker, ToolButton, InfoBar, InfoBarPosition, MenuAnimationType, RoundMenu, Action
+
 
 class User(QWidget):
     def __init__(self, user):
@@ -14,7 +15,7 @@ class User(QWidget):
         self.username.setStyleSheet("font-family:verdana;margin:0px;font-size:12px")
         layout = QHBoxLayout(self)
         layout.setSpacing(0)
-        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setContentsMargins(10, 0, 0, 0)
         layout.addWidget(self.avatar)
         layout.addWidget(self.username)
 
@@ -22,53 +23,98 @@ class User(QWidget):
 class Status(QWidget):
     def __init__(self, status):
         super().__init__()
-        layout = QHBoxLayout(self)
-        layout.setAlignment(Qt.AlignCenter | Qt.AlignVCenter)
-        layout.setContentsMargins(0, 0, 0, 0)
-        status_card = QLabel()
-        layout.addWidget(status_card)
+        self.layout = QHBoxLayout(self)
+        self.layout.setAlignment(Qt.AlignCenter | Qt.AlignVCenter)
+        self.layout.setContentsMargins(0, 0, 0, 0)
+        self.status_card = QLabel()
+        self.layout.addWidget(self.status_card)
         if status == 0:
-            status_card.setText("Upcoming")
-            status_card.setProperty("status0", True)
+            self.status_card.setText("Upcoming")
+            self.status_card.setProperty("status0", True)
         elif status == 1:
-            status_card.setText("Active")
-            status_card.setProperty("status1", True)
+            self.status_card.setText("Active")
+            self.status_card.setProperty("status1", True)
         elif status == 2:
-            status_card.setText("Complete")
-            status_card.setProperty("status2", True)
+            self.status_card.setText("Complete")
+            self.status_card.setProperty("status2", True)
         else:
-            status_card.setText("Expired")
-            status_card.setProperty("status3", True)
+            self.status_card.setText("Expired")
+            self.status_card.setProperty("status3", True)
+
+    def setStatus(self, status):
+        self.status_card.deleteLater()
+        self.status_card = QLabel()
+        self.layout.addWidget(self.status_card)
+        if status == 0:
+            self.status_card.setText("Upcoming")
+            self.status_card.setProperty("status0", True)
+        elif status == 1:
+            self.status_card.setText("Active")
+            self.status_card.setProperty("status1", True)
+        elif status == 2:
+            self.status_card.setText("Complete")
+            self.status_card.setProperty("status2", True)
+        else:
+            self.status_card.setText("Expired")
+            self.status_card.setProperty("status3", True)
+        self.layout.addWidget(self.status_card)
 
 
 class TimeLeft(QWidget):
     def __init__(self, timeleft_item):
         super().__init__()
         self.grid = QGridLayout(self)
-        self.grid.setContentsMargins(0, 0, 0, 0)
+        self.grid.setContentsMargins(10, 0, 0, 0)
         self.grid.setSpacing(0)
-        label = QLabel(timeleft_item[0])
-        label.setAlignment(Qt.AlignLeft)
+        self.label = QLabel(timeleft_item[0])
+        self.label.setAlignment(Qt.AlignLeft)
         self.setProperty("TimeLeft", True)
         if timeleft_item[1] == 0:
-            label.setProperty("TimeLeft0", True)
-            icon = IconWidget(InfoBarIcon.SUCCESS)
+            self.label.setProperty("TimeLeft0", True)
+            self.icon = IconWidget(InfoBarIcon.SUCCESS)
         elif timeleft_item[1] == 1:
-            label.setProperty("TimeLeft1", True)
-            icon = IconWidget(InfoBarIcon.WARNING)
+            self.label.setProperty("TimeLeft1", True)
+            self.icon = IconWidget(InfoBarIcon.WARNING)
         elif timeleft_item[1] == 2:
-            label.setProperty("TimeLeft2", True)
-            icon = IconWidget(InfoBarIcon.WARNING)
+            self.label.setProperty("TimeLeft2", True)
+            self.icon = IconWidget(InfoBarIcon.WARNING)
         elif timeleft_item[1] == 3:
-            label.setProperty("TimeLeft3", True)
-            icon = IconWidget(InfoBarIcon.ERROR)
+            self.label.setProperty("TimeLeft3", True)
+            self.icon = IconWidget(InfoBarIcon.ERROR)
         else:
-            label.setProperty("TimeLeft4", True)
-            icon = IconWidget(FluentIcon.DATE_TIME)
-        icon.setFixedHeight(20)
-        icon.setFixedWidth(20)
-        self.grid.addWidget(icon, 0, 0)
-        self.grid.addWidget(label, 0, 1)
+            self.label.setProperty("TimeLeft4", True)
+            self.icon = IconWidget(FluentIcon.DATE_TIME)
+        self.icon.setFixedHeight(20)
+        self.icon.setFixedWidth(20)
+        self.grid.addWidget(self.icon, 0, 0)
+        self.grid.addWidget(self.label, 0, 1)
+
+    def setTime(self, timeleft_item):
+        self.label.deleteLater()
+        self.icon.deleteLater()
+        self.label = QLabel(timeleft_item[0])
+        self.label.setAlignment(Qt.AlignLeft)
+        self.setProperty("TimeLeft", True)
+        if timeleft_item[1] == 0:
+            self.label.setProperty("TimeLeft0", True)
+            self.icon = IconWidget(InfoBarIcon.SUCCESS)
+        elif timeleft_item[1] == 1:
+            self.label.setProperty("TimeLeft1", True)
+            self.icon = IconWidget(InfoBarIcon.WARNING)
+        elif timeleft_item[1] == 2:
+            self.label.setProperty("TimeLeft2", True)
+            self.icon = IconWidget(InfoBarIcon.WARNING)
+        elif timeleft_item[1] == 3:
+            self.label.setProperty("TimeLeft3", True)
+            self.icon = IconWidget(InfoBarIcon.ERROR)
+        else:
+            self.label.setProperty("TimeLeft4", True)
+            self.icon = IconWidget(FluentIcon.DATE_TIME)
+        self.icon.setFixedHeight(20)
+        self.icon.setFixedWidth(20)
+        self.grid.addWidget(self.icon, 0, 0)
+        self.grid.addWidget(self.label, 0, 1)
+
 
 class progressBar(QWidget):
     def __init__(self, percentage):
@@ -112,17 +158,20 @@ class BottomMenu(QMainWindow):
         self.setContentsMargins(0, 0, 20, 21)
         self.setProperty("tasksTopMenu", True)
         self.parent = parent
+        self.mainWindow = mainWindow
         self.widget = QWidget()
         self.widget.setContentsMargins(0, 0, 0, 0)
         self.setCentralWidget(self.widget)
 
         layout = QGridLayout(self.widget)
 
+        self.filter = 0
+
         self.searchBar = QWidget()
         self.searchBar.setProperty("searchBar", True)
         self.searchBar.setFixedHeight(40)
         self.searchBar.setToolTip("Search tasks")
-        self.searchBarQlineEdit = searchBarQLineEdit(self, mainWindow)
+        self.searchBarQlineEdit = searchBarQLineEdit(self, self.mainWindow)
         self.searchBarQlineEdit.setPlaceholderText("Search tasks")
         self.searchBar.mousePressEvent = self.__focus_search
         self.searchBarQlineEdit.setFixedHeight(40)
@@ -133,6 +182,7 @@ class BottomMenu(QMainWindow):
         self.searchBar.setCursor(QCursor(Qt.IBeamCursor))
         self.searchBarIcon.setPixmap(pixmap.scaled(QSize(20, 20), Qt.KeepAspectRatio, Qt.SmoothTransformation))
         self.searchBar.setLayout(searchBarLayout)
+        self.task_list = []
         searchBarLayout.addWidget(self.searchBarQlineEdit, 0, 1)
         searchBarLayout.addWidget(self.searchBarIcon, 0, 0)
 
@@ -150,6 +200,7 @@ class BottomMenu(QMainWindow):
         self.tasksTableWidget.setShowGrid(False)
         self.tasksTableWidget.horizontalHeader().setMinimumSectionSize(100)
         self.tasksTableWidget.horizontalHeader().setSectionsClickable(False)
+        self.tasksTableWidget.contextMenuEvent = self.contextMenuEvent_table
         for col in range(1, self.tasksTableWidget.columnCount()):
             self.tasksTableWidget.horizontalHeader().setSectionResizeMode(col, QHeaderView.Stretch)
         layout.addWidget(self.searchBar, 0, 0)
@@ -158,7 +209,7 @@ class BottomMenu(QMainWindow):
         self.exportTasksButton = ToolButton()
         self.exportTasksButton.setIcon(FluentIcon.DOWNLOAD)
         self.exportTasksButton.setToolTip("Export tasks")
-        self.exportTasksButton.clicked.connect(self.exportTasks)
+        self.exportTasksButton.mousePressEvent = self.exportMenu
         layout.addWidget(self.tasksDatePicker, 0, 1)
         layout.addWidget(self.exportTasksButton, 0, 2)
         layout.addWidget(self.tasksTableWidget, 1, 0, 1, 3)
@@ -173,11 +224,13 @@ class BottomMenu(QMainWindow):
             self.tasksTableWidget.setCellWidget(self.tasksTableWidget.rowCount() - 1, 2, User(i.user))
             self.tasksTableWidget.setCellWidget(self.tasksTableWidget.rowCount() - 1, 3, Status(i.status))
             self.tasksTableWidget.setCellWidget(self.tasksTableWidget.rowCount() - 1, 4, TimeLeft(i.time_left()))
-            self.tasksTableWidget.setCellWidget(self.tasksTableWidget.rowCount() - 1, 5, progressBar(25))
+            self.tasksTableWidget.setCellWidget(self.tasksTableWidget.rowCount() - 1, 5, progressBar(0))
             self.tasksTableWidget.setRowHeight(self.tasksTableWidget.rowCount() - 1, 40)
         self.parent.topMenu.setTaskNumber(len(task_list))
 
     def date_tasks_filter(self, date):
+        self.parent.topMenu.setTab(None)
+        self.searchBarQlineEdit.setDisabled(True)
         for task in self.task_list:
             if task.deadline != None:
                 if task.start_date.date() <= date.toPyDate() <= task.deadline.date():
@@ -191,6 +244,7 @@ class BottomMenu(QMainWindow):
                     self.tasksTableWidget.hideRow(self.task_list.index(task))
 
     def reset_date(self):
+        self.searchBarQlineEdit.setDisabled(False)
         if self.tasksDatePicker.property("hasDate"):
             self.tasksDatePicker.setText(self.tasksDatePicker.tr('Pick a date'))
             self.tasksDatePicker.setProperty('hasDate', False)
@@ -198,15 +252,74 @@ class BottomMenu(QMainWindow):
             for row in range(self.tasksTableWidget.rowCount()):
                 self.tasksTableWidget.showRow(row)
 
-    def exportTasks(self):
+    def exportMenu(self, event):
+        menu = RoundMenu(parent=self)
+        visible_tasks = []
+        selected_tasks = []
+        menu.addActions([
+            Action(FluentIcon.CLEAR_SELECTION, 'Export selected'),
+            Action(FluentIcon.VIEW, 'Export visible'),
+            Action(FluentIcon.GLOBE, 'Export all tasks')
+        ])
+        if len(self.tasksTableWidget.selectionModel().selectedRows()) == 0:
+            menu.menuActions()[0].setDisabled(True)
+        else:
+            for row in self.tasksTableWidget.selectionModel().selectedRows():
+                selected_tasks.append(self.task_list[row.row()])
+        if len(self.task_list) == 0:
+            menu.menuActions()[1].setDisabled(True)
+            menu.menuActions()[2].setDisabled(True)
+        else:
+            menu.menuActions()[1].setDisabled(True)
+            for row in range(self.tasksTableWidget.rowCount()):
+                if not self.tasksTableWidget.isRowHidden(row):
+                    menu.menuActions()[1].setDisabled(False)
+                    visible_tasks.append(self.task_list[row])
+        menu.menuActions()[0].triggered.connect(lambda: self.export(selected_tasks))
+        menu.menuActions()[1].triggered.connect(lambda: self.export(visible_tasks))
+        menu.menuActions()[2].triggered.connect(lambda: self.export(self.task_list))
+        menu.exec(event.globalPos(), aniType=MenuAnimationType.DROP_DOWN)
+
+    def export(self, tasks):
         try:
-            fileDialog = QFileDialog()
-            fileDialog.show()
-            content = ""
-            for task in self.task_list:
-                content += f"{task.name}\n"
+            file = QFileDialog.getExistingDirectory(self, "Select Directory")
+            if file is not None:
+                content = "Task name,Tag,User,Status,Start date,Task deadline,Created by,date created\n"
+                status = ["Upcoming", "Active", "Complete", "Expired"]
+                for task in tasks:
+                    content += f"{task.name},{task.tag},{task.user.username},{status[task.status]},{task.start_date},{task.deadline},{task.owner.username},{task.date_created}\n"
+                with open(file + "/tasks.csv", "w") as f:
+                    f.write(content)
+                    f.close()
+                InfoBar.success(
+                    title="Success",
+                    content=f"Tasks exported to {file}/tasks.csv",
+                    parent=self.parent,
+                    orient=Qt.Horizontal,
+                    isClosable=True,
+                    position=InfoBarPosition.TOP_RIGHT,
+                    duration=5000
+                )
+            else:
+                InfoBar.error(
+                    title="Cancelled export",
+                    content="No file selected",
+                    parent=self.parent,
+                    orient=Qt.Horizontal,
+                    isClosable=True,
+                    position=InfoBarPosition.TOP_RIGHT,
+                    duration=5000
+                )
         except:
-            pass
+            InfoBar.error(
+                title="Cancelled export",
+                content="Something went wrong",
+                parent=self.parent,
+                orient=Qt.Horizontal,
+                isClosable=True,
+                position=InfoBarPosition.TOP_RIGHT,
+                duration=5000
+            )
 
     def __focus_search(self, event):
         self.searchBarQlineEdit.setFocus()
@@ -216,6 +329,7 @@ class BottomMenu(QMainWindow):
         self.tasksTableWidget.setRowCount(0)
 
     def searchFilter(self, text):
+        self.reset_date()
         if text != "":
             for row in range(self.tasksTableWidget.rowCount()):
                 if text.lower() in self.tasksTableWidget.item(row, 0).text().lower() or text.lower() in self.tasksTableWidget.item(row, 1).text().lower():
@@ -225,3 +339,103 @@ class BottomMenu(QMainWindow):
         else:
             for row in range(self.tasksTableWidget.rowCount()):
                 self.tasksTableWidget.showRow(row)
+        self.apply_filter()
+
+    def apply_filter(self):
+        if self.filter == 1:
+            for i in range(0, len(self.task_list)):
+                if not self.task_list[i].is_owner:
+                    self.tasksTableWidget.hideRow(i)
+        elif self.filter == 2:
+            for i in range(0, len(self.task_list)):
+                if not self.task_list[i].status == 1:
+                    self.tasksTableWidget.hideRow(i)
+        elif self.filter == 3:
+            for i in range(0, len(self.task_list)):
+                if not self.task_list[i].is_completed:
+                    self.tasksTableWidget.hideRow(i)
+
+    def create_task(self):
+        self.mainWindow.create_task()
+
+    def set_filter(self, x: int):
+        self.reset_date()
+        self.filter = x
+        if self.filter == 0:
+            for i in range(0, len(self.task_list)):
+                self.tasksTableWidget.showRow(i)
+        elif self.filter == 1:
+            for i in range(0, len(self.task_list)):
+                if not self.task_list[i].is_owner:
+                    self.tasksTableWidget.hideRow(i)
+                else:
+                    self.tasksTableWidget.showRow(i)
+        elif self.filter == 2:
+            for i in range(0, len(self.task_list)):
+                if not self.task_list[i].status == 1:
+                    self.tasksTableWidget.hideRow(i)
+                else:
+                    self.tasksTableWidget.showRow(i)
+        elif self.filter == 3:
+            for i in range(0, len(self.task_list)):
+                if not self.task_list[i].is_completed:
+                    self.tasksTableWidget.hideRow(i)
+                else:
+                    self.tasksTableWidget.showRow(i)
+        searchbartext = self.searchBarQlineEdit.text()
+        if searchbartext != "":
+            for row in range(self.tasksTableWidget.rowCount()):
+                if searchbartext.lower() in self.tasksTableWidget.item(row,0).text().lower() or searchbartext.lower() in self.tasksTableWidget.item(row, 1).text().lower():
+                    pass
+                else:
+                    self.tasksTableWidget.hideRow(row)
+
+
+    def update_tasks(self, change):
+        if change:
+            self.task_list = self.mainWindow.tasks
+        for row in range(self.tasksTableWidget.rowCount()):
+            self.tasksTableWidget.cellWidget(row, 4).setTime(self.task_list[row].time_left())
+            if change:
+                self.tasksTableWidget.cellWidget(row, 3).setStatus(self.task_list[row].status)
+
+    def contextMenuEvent_table(self, e):
+        menu = RoundMenu(parent=self)
+        selected_tasks = []
+        for row in self.tasksTableWidget.selectionModel().selectedRows():
+            selected_tasks.append(self.task_list[row.row()])
+        if len(selected_tasks) == 1:
+            menu.addAction(Action(FluentIcon.MORE, 'View Task'))
+            if selected_tasks[0].is_completed:
+                menu.addAction(Action(FluentIcon.RETURN, 'Set uncompleted'))
+                menu.menuActions()[1].triggered.connect(lambda: self.mainWindow.set_task_completed(selected_tasks[0].id,False))
+            else:
+                menu.addAction(Action(FluentIcon.COMPLETED, 'Set completed'))
+                menu.menuActions()[1].triggered.connect(lambda: self.mainWindow.set_task_completed(selected_tasks[0].id,True))
+            menu.addAction(Action(FluentIcon.DELETE, 'Delete Task'))
+            menu.addAction(Action(FluentIcon.EDIT, 'Edit Task'))
+            menu.addAction(Action(FluentIcon.SAVE_COPY, 'Export Task'))
+            menu.addSeparator()
+            menu.addAction(Action(FluentIcon.ADD, 'Create Task'))
+            #menu.menuActions()[0].triggered.connect(lambda: self.view_task(selected_tasks[0].id)) # View task
+            menu.menuActions()[2].triggered.connect(lambda: self.mainWindow.delete_task(selected_tasks[0].id)) # DELETE SINGLE TASK
+            #menu.menuActions()[3].triggered.connect(lambda: self.editTask(selected_tasks[0].id)) # EDIT TASK
+            menu.menuActions()[4].triggered.connect(lambda: self.export(selected_tasks)) # Export tasks
+            menu.menuActions()[5].triggered.connect(lambda: self.create_task()) # Create task
+        elif len(selected_tasks) > 1:
+            menu.addAction(Action(FluentIcon.DELETE, 'Delete Tasks'))
+            menu.addAction(Action(FluentIcon.SAVE_COPY, 'Export Tasks'))
+            menu.addSeparator()
+            menu.addAction(Action(FluentIcon.ADD, 'Create Task'))
+            task_ids = []
+            for i in selected_tasks:
+                task_ids.append(i.id)
+            menu.menuActions()[0].triggered.connect(lambda: self.mainWindow.delete_tasks(task_ids))  # DELETE MULTIPLE TASK
+            menu.menuActions()[1].triggered.connect(lambda: self.export(selected_tasks))  # Export tasks
+            menu.menuActions()[2].triggered.connect(lambda: self.create_task())  # Create task
+        else:
+            menu.addAction(Action(FluentIcon.ADD, 'Create Task'))
+            menu.menuActions()[0].triggered.connect(lambda: self.create_task())  # Create task
+        menu.exec(e.globalPos(), aniType=MenuAnimationType.NONE)
+
+

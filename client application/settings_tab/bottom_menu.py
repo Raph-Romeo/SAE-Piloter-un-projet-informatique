@@ -11,7 +11,6 @@ class ApplicationSettings(QWidget):
         self.grid = QGridLayout(self)
         self.button = QPushButton()
         self.parent = mainWindow
-
         if self.parent.is_dark:
             self.button.setText("Set theme to Light mode")
             self.button.setIcon(QIcon("icons/sun.png"))
@@ -39,8 +38,17 @@ class ApplicationSettings(QWidget):
 class AccountSettings(QWidget):
     def __init__(self, mainWindow):
         super().__init__()
-
-
+        self.setContentsMargins(0, 0, 0, 0)
+        self.grid = QGridLayout(self)
+        self.button = QPushButton()
+        self.parent = mainWindow
+        self.button.setText("Sign out")
+        self.button.clicked.connect(self.parent.logout)
+        self.button.setProperty("signout", True)
+        self.button.setFocusPolicy(Qt.NoFocus)
+        self.button.setIconSize(QSize(20, 20))
+        self.button.setCursor(QCursor(Qt.PointingHandCursor))
+        self.grid.addWidget(self.button)
 
 
 class BottomMenu(QMainWindow):
@@ -54,6 +62,7 @@ class BottomMenu(QMainWindow):
         self.tabwidget.addTab(AccountSettings(mainWindow), "Account settings")
         self.setCentralWidget(self.tabwidget)
         self.tabwidget.tabBar().hide()
+
 
     def setTab(self, value: int) -> None:
         self.tabwidget.setCurrentIndex(value)

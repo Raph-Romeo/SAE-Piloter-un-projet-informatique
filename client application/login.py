@@ -2,12 +2,15 @@ from PyQt5.QtWidgets import QMainWindow, QGraphicsOpacityEffect, QPushButton, QH
 from PyQt5.QtGui import QColor, QCursor, QIcon
 from PyQt5.QtCore import Qt, QPropertyAnimation
 from qfluentwidgets import InfoBar, InfoBarPosition, FluentIcon, Theme, AvatarWidget
+import json
+import hashlib
 
 
 class LoginForm(QMainWindow):
-    def __init__(self, parent):
+    def __init__(self, parent, init_send):
         super().__init__()
         self.setFixedWidth(500)
+        self.init_send = init_send
         self.widget = QWidget()
         self.setCentralWidget(self.widget)
         grid = QGridLayout(self.widget)
@@ -36,17 +39,8 @@ class LoginForm(QMainWindow):
         self.passwordInput.setMaximumWidth(450)
         self.usernameInput.setMaximumWidth(450)
 
-        self.loginButton = QPushButton()
-        self.loginButton.setText("Login")
-        self.loginButton.setProperty("loginButton", True)
-        self.loginButton.setMaximumWidth(450)
-        self.loginButton.setFixedHeight(28)
-        self.loginButton.setCursor(QCursor(Qt.PointingHandCursor))
-        self.loginButton.clicked.connect(self.login)
-
         loginFormLayout.addWidget(self.usernameInput)
         loginFormLayout.addWidget(self.passwordInput)
-        loginFormLayout.addWidget(self.loginButton)
 
         # Sign up form
 
@@ -180,24 +174,40 @@ class LoginForm(QMainWindow):
                         duration=2000
                 )
         else:
-            # FORM IS VALID
-            # ATTEMPT LOGIN:
-            if self.usernameInput.text() == "toto" and self.passwordInput.text() == "toto":
-                self.usernameInput.setDisabled(True)
-                self.passwordInput.setDisabled(True)
-                self.hide()
-                self.parent.fade(self.parent)
-                self.parent.mainwindow.connectGetTasksAndEverything()
-            else:
-                InfoBar.error(
-                    title="Failed to login",
-                    content="Invalid credentials",
-                    parent=self.parent,
-                    orient=Qt.Horizontal,
-                    isClosable=True,
-                    position=InfoBarPosition.TOP_RIGHT,
-                    duration=2000
-                )
+            self.usernameInput.setDisabled(True)
+            self.passwordInput.setDisabled(True)
+            message = {"url": "/auth", "method": "POST", "data": {"username": self.usernameInput.text(), "password": hashlib.md5(self.passwordInput.text().encode("utf-8"), usedforsecurity=True).hexdigest()}}
+            data = json.dumps(message)
+            self.init_send(data.encode(), self.login_response)
+
+    def login_response(self, response: bytes):
+        response = json.loads(response.decode())
+        if response["status"] == 200:
+            self.hide()
+            self.parent.fade(self.parent)
+            self.parent.mainwindow.loadSession(response["data"])
+        elif response["status"] == 401:
+            InfoBar.error(
+                title="Failed to login",
+                content=response["message"],
+                parent=self.parent,
+                orient=Qt.Horizontal,
+                isClosable=True,
+                position=InfoBarPosition.TOP_RIGHT,
+                duration=2000
+            )
+        elif response["status"] == 400:
+            InfoBar.error(
+                title="Server error",
+                content=response["message"],
+                parent=self.parent,
+                orient=Qt.Horizontal,
+                isClosable=True,
+                position=InfoBarPosition.TOP_RIGHT,
+                duration=2000
+            )
+        self.usernameInput.setDisabled(False)
+        self.passwordInput.setDisabled(False)
 
     def toggleForm(self):
         if self.currentForm == 0:
@@ -212,13 +222,6 @@ class LoginForm(QMainWindow):
             self.signUpForm.hide()
             self.signUpButton.setText("Create account")
             self.formTitle.setText("Login")
-            self.chooseUsernameInput.setText("")
-            self.emailInput.setText("")
-            self.choosePasswordInput.setText("")
-            self.confirmPasswordInput.setText("")
-            self.firstNameInput.setText("")
-            self.lastNameInput.setText("")
-            self.setSignUpFormPage(0)
 
     def setSignUpFormPage(self, page: int):
         self.signUpFormPage = page
@@ -259,7 +262,7 @@ class Login(QMainWindow):
         self.setCentralWidget(self.widget)
         grid = QGridLayout(self.widget)
         grid.setContentsMargins(0, 0, 0, 0)
-        self.form = LoginForm(self)
+        self.form = LoginForm(self, mainwindow.init_send)
         self.mainwindow = mainwindow
         if self.mainwindow.is_dark:
             self.backgroundPath = "background/dark_login.jpg"

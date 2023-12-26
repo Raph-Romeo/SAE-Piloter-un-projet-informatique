@@ -28,6 +28,7 @@ class TitleBar(QWidget):
         self.title = QLabel()
         self.title.setText("Tasks")
         self.title.setProperty("title", True)
+        self.user = None
         grid = QGridLayout(self)
         grid.setContentsMargins(5, 5, 35, 5)
         grid.addWidget(self.title, 0, 0)
@@ -55,12 +56,16 @@ class TitleBar(QWidget):
         self.title.setText(title)
 
     def setUserPanel(self, user):
-        self.user = user
+        if self.user is None:
+            self.user = user
+        else:
+            self.user = user
+            self.avatarWidget.deleteLater()
         self.username.setText(self.user.username)
-        avatarWidget = AvatarWidget(self.user.profile_picture, self)
-        avatarWidget.setRadius(16)
-        avatarWidget.setProperty("profile_picture_title", True)
-        self.user_grid.addWidget(avatarWidget, 0, 1)
+        self.avatarWidget = AvatarWidget(self.user.profile_picture, self)
+        self.avatarWidget.setRadius(16)
+        self.avatarWidget.setProperty("profile_picture_title", True)
+        self.user_grid.addWidget(self.avatarWidget, 0, 1)
 
     def userDetailsMenu(self, e):
         menu = RoundMenu(parent=self)
@@ -69,7 +74,7 @@ class TitleBar(QWidget):
         menu.addSeparator()
         menu.addActions([
             Action(FluentIcon.PEOPLE, 'Friends'),
-            Action(FluentIcon.SETTING, 'Edit profile')
+            Action(FluentIcon.SETTING, 'Account settings')
         ])
         menu.addSeparator()
         menu.addAction(Action(FluentIcon.PAGE_LEFT, 'Sign-out'))

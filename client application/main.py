@@ -1,14 +1,18 @@
 import sys
 from PyQt5.QtWidgets import QApplication
-from main_window import MainWindow
+from connection_window import Application
+
+
+server_address = "127.0.0.1"
+server_port = 5240
 
 
 def main():
     app = QApplication(sys.argv)
-    window = MainWindow()
-    window.show()
+    application = Application(server_address, server_port)
+    application.connect()
     app.exec()
 
 
 if __name__ == '__main__':
-    main()
+    sys.exit(main())

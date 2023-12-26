@@ -35,6 +35,7 @@ class TopMenu(QMainWindow):
         self.addTaskButton.setFixedHeight(28)
         self.addTaskButton.setCursor(QCursor(Qt.PointingHandCursor))
         self.addTaskButton.setToolTip("Create new task")
+        self.addTaskButton.clicked.connect(lambda: self.tasksTab.contentWindow.create_task())
         topLayout.addWidget(self.addTaskButton, 0, 1)
 
         layout = QGridLayout(self.innerLeft)
@@ -89,17 +90,16 @@ class TopMenu(QMainWindow):
                 self.leftWrapper.horizontalScrollBar().show()
                 self.leftWrapper.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
 
-    def setTab(self, index: int):
-        self.tasksTab.contentWindow.reset_date()
+    def setTab(self, index):
         if self.currentIndex is not index:
             self.currentIndex = index
             for button in self.buttons:
                 if button.property("selected"):
                     button.setProperty("selected", False)
                     button.setStyleSheet("")
-            self.buttons[index].setProperty("selected", True)
-            self.buttons[index].setStyleSheet("")
-            if self.tasksTab.contentWindow.searchBarQlineEdit.text() != "":
-                self.tasksTab.contentWindow.searchBarQlineEdit.setText("")
+            if self.currentIndex is not None:
+                self.buttons[index].setProperty("selected", True)
+                self.buttons[index].setStyleSheet("")
+                self.tasksTab.contentWindow.set_filter(index)
         else:
             return False

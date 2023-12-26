@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import QMainWindow, QLabel, QWidget, QTableWidget, QHBoxLayout, QItemDelegate, QTableWidgetItem, QGridLayout, QGraphicsDropShadowEffect, QHeaderView, QAbstractItemView, QPushButton
 from PyQt5.QtGui import QColor, QFont, QCursor
 from PyQt5.QtCore import Qt, QDate
-from datetime import datetime, timedelta
+from datetime import date, timedelta
 
 from qfluentwidgets import CalendarPicker, setTheme, Theme, FluentIcon
 
@@ -11,20 +11,36 @@ class TaskItem(QWidget):
         super().__init__()
         self.hlayout = QHBoxLayout(self)
         self.hlayout.setContentsMargins(0, 0, 0, 0)
+        self.x = 1
         label = QLabel(task.name)
         label.setProperty("taskCalendarItem", True)
+        label.setProperty(f"TaskCalendarItemStatus{task.status}", True)
         label.setAlignment(Qt.AlignCenter)
         self.types = ["border-radius:15px;", "border-bottom-left-radius:0px;border-bottom-right-radius:0px;margin:0px;margin-top:1px;", "border-top-left-radius:0px;border-top-right-radius:0px;margin:0px;margin-bottom:1px;", "border-radius:0px;margin:0px;"]
         label.setStyleSheet(self.types[type])
         self.hlayout.addWidget(label)
         self.hlayout.setSpacing(0)
+        self.more = None
 
     def append_task(self, task, type):
-        label = QLabel(task.name)
-        label.setProperty("taskCalendarItem", True)
-        label.setAlignment(Qt.AlignCenter)
-        label.setStyleSheet(self.types[type] + "margin-left:1px")
-        self.hlayout.addWidget(label)
+        self.x += 1
+        if self.x <= 3:
+            label = QLabel(task.name)
+            label.setProperty("taskCalendarItem", True)
+            label.setProperty(f"TaskCalendarItemStatus{task.status}", True)
+            label.setAlignment(Qt.AlignCenter)
+            label.setStyleSheet(self.types[type] + "margin-left:1px")
+            self.hlayout.addWidget(label)
+        elif self.x == 4:
+            self.more = QLabel("+ 1")
+            self.more.setProperty("taskCalendarItem", True)
+            self.more.setProperty(f"TaskCalendarItemStatus1", True)
+            self.more.setAlignment(Qt.AlignCenter)
+            self.more.setStyleSheet(self.types[type] + "margin-left:1px")
+            self.hlayout.addWidget(self.more)
+        else:
+            self.more.setText(f"+ {self.x-3}")
+
 
 
 class CalendarTab(QWidget):
@@ -39,6 +55,7 @@ class CalendarTab(QWidget):
         self.calendarGrid = QGridLayout(self.calendarWidget)
         self.calendarGrid.setContentsMargins(0, 0, 20, 0)
         self.dayFocus = False
+        self.selectedDate = None
 
         self.calendarController = QWidget()
         self.calendarController.setFixedHeight(70)
@@ -144,6 +161,10 @@ class CalendarTab(QWidget):
                 else:
                     self.calendarView.horizontalHeader().showSection(col)
 
+    def refreshCalendar(self):
+        if self.selectedDate is not None:
+            self.datePicked(QDate(self.selectedDate))
+
     def datePicked(self, date):
         if not self.ignore_datepicked:
             self.calendarView.clearContents()
@@ -178,7 +199,7 @@ class CalendarTab(QWidget):
                     if task.deadline is not None:
                         if task.start_date.date() <= current_date <= task.deadline.date():
                             task_duration = task.deadline - task.start_date
-                            if task_duration.days > 1:
+                            if task_duration.days >= 1:
                                 if current_date == task.deadline.date():
                                     self.add_task_calendar(i, task.deadline.hour - 1, task, type=2)  # Bottom
                                     for q in range(0, task.deadline.hour - 1):
@@ -194,6 +215,8 @@ class CalendarTab(QWidget):
                                 if task_duration.seconds / 3600 > 1:
                                     self.add_task_calendar(i, task.start_date.hour, task, type=1)
                                     for q in range(1, int(task_duration.seconds / 3600)):
+                                        print(q)
+                                        print("int", int(task_duration.seconds / 3600))
                                         if q == int(task_duration.seconds / 3600) - 1:
                                             self.add_task_calendar(i, task.start_date.hour + q, task, type=2)
                                         else:
@@ -246,7 +269,3 @@ class CalendarTab(QWidget):
 
     def initiate_calendar(self):
         self.picker.setDate(QDate().currentDate())
-        if int(datetime.now().hour) <= 20:
-            self.calendarView.scrollTo(self.calendarView.model().index(int(datetime.now().hour) + 3, 0))
-        else:
-            self.calendarView.scrollTo(self.calendarView.model().index(23, 0))
