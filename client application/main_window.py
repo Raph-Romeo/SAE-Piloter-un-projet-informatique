@@ -307,6 +307,12 @@ class MainWindow(FramelessWindow):
             self.create_task_dialog.formError(response["message"])
             self.create_task_dialog.nextB.setDisabled(False)
 
+    def create_user(self, data: dict, func):
+        message = {"url": "/create_user", "method": "POST"}
+        message["data"] = data
+        message = json.dumps(message)
+        self.init_send(message.encode(), func)
+
     def update_tasks(self):
         if self.user is not None:
             change = False
@@ -321,12 +327,13 @@ class MainWindow(FramelessWindow):
                 print("error was raised in the update_tasks function")
 
     def silent(self, e):
-        # print(e)
+        print(e)
         pass
 
     def logout(self):
         self.user = None
         self.tasks.clear()
+        self.mainTabWidget.tasksTab.set_tasks([])
         self.login_page.fadeIn()
 
     def attempt_connection(self):

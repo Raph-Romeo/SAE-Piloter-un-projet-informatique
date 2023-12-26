@@ -113,7 +113,7 @@ light_style_sheet = """
     QPushButton[weekArrow]{color:black;border-radius:11px;font-size:12px;}
     QPushButton[weekArrow]:pressed{margin-right:1px;}
     
-    QPushButton[signupFormButton]{color:gray;font-size:12px;text-align:left;margin-left:15px;margin-top:5px;}
+    QPushButton[signupFormButton]{color:#666;font-size:12px;text-align:left;margin-left:15px;margin-top:5px;}
 """
 
 dark_style_sheet = """
