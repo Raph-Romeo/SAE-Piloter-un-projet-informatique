@@ -1,0 +1,2 @@
+cryptography==41.0.7
+mysql_connector_repackaged==0.3.1
