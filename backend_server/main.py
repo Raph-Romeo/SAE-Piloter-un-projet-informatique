@@ -1,5 +1,21 @@
-import socket, threading, sys, time
-from settings import server_port
+import socket, views, threading, sys, json, time, datetime
+from settings import *
+import mysql.connector
+
+
+class Request:
+    def __init__(self, request, client):
+        self.client = client
+        if "url" in request.keys():
+            self.url = request["url"]
+        else:
+            self.url = None
+        print(self.url, self.client.addr)
+
+
+class View:
+    def __init__(self, view):
+        self.view = view
 
 
 class Client:
@@ -11,12 +27,21 @@ class Client:
         self.connected = True
         self.client_thread = threading.Thread(target=self.handle)
         self.client_thread.start()
+        self.database_connection = None
+        # self.database_connection = mysql.connector.connect(
+        #    host=database_params["host"],
+        #    port=database_params["port"],
+        #    user=database_params["user"],
+        #    password=database_params["password"],
+        #    database=database_params["database"]
+        #)
 
     def close(self) -> None:
         print(f"CONNECTION CLOSED : {self.addr[0]}:{self.addr[1]}")
         self.server.remove(self)
         self.connection.close()
         self.connected = False
+        # self.database_connection.close()
         return
 
     def handle(self) -> None:
@@ -24,7 +49,8 @@ class Client:
             try:
                 data = self.connection.recv(1024)
                 if len(data) > 0:
-                    print(data.decode())
+                    data = Request(json.loads(data.decode("utf-8")), self)
+                    self.connection.send(self.server.request(data))
                 else:
                     self.close()
             except Exception as err:
@@ -45,6 +71,11 @@ class Server:
         self.socket = socket.socket()
         self.clients = []
         self.number_of_attempts = 0
+
+        # server URLS:
+        self.urls = {
+            "/test": View(views.test),
+        }
 
     def close(self) -> None:
         self.forceStop = True
@@ -76,9 +107,17 @@ class Server:
     def remove(self, client):
         self.clients.remove(client)
 
+    def request(self, request: object) -> bytes:
+        try:
+            if request.url in self.urls.keys():
+                return self.urls[request.url].view(request)
+            else:
+                return json.dumps({"status": 404, "message": "Url not found"}).encode()
+        except:
+            return json.dumps({"status": 400, "message": "Invalid request"}).encode()
+
 
 if __name__ == "__main__":
     server = Server()
     sys.exit(server.start())
-
 
