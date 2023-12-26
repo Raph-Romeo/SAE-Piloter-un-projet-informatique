@@ -24,3 +24,35 @@ def login(request) -> bytes:
             # token : username + "," + md5_password + "," + time Encrypted secret key
             token = request.client.generate_token(username, password).decode()
             return json.dumps({"status": 200, "message": "Success", "data": {"token": token, "user_data": {"username": result[1], "email": result[3]}}}).encode()
+
+
+def get_user(request, pk: int):
+    cursor = request.client.database_connection.cursor()
+    query = "SELECT * FROM User WHERE id = %s"
+    cursor.execute(query, (pk,))
+    result = cursor.fetchone()
+    cursor.close()
+    return {"username": result[1], "email": result[3]}
+
+
+def tasks(request) -> bytes:
+    if request.method == "GET":
+        user_id = request.user.data[0]
+        cursor = request.client.database_connection.cursor()
+        query = "SELECT * FROM Task WHERE user_id = %s OR created_by = %s"
+        cursor.execute(query, (user_id, user_id,))
+        result = cursor.fetchall()
+        cursor.close()
+        message = {"status": 200, "message": "Success", "data": []}
+        users = {}
+        for i in result:
+            if i[6] not in users:
+                users[i[6]] = get_user(request, i[6])
+            if i[7] not in users:
+                users[i[7]] = get_user(request, i[7])
+            if i[6] == user_id:
+                is_owner = True
+            else:
+                is_owner = False
+            message["data"].append({"id": i[0], "name": i[1], "tag": i[2], "date_created": str(i[3]), "start_date": str(i[4]), "deadline": str(i[5]), "owner": users[i[6]], "is_owner": is_owner, "created_by": users[i[7]], "public": i[8], "important": i[9], "is_completed": i[10]})
+        return json.dumps(message).encode()
