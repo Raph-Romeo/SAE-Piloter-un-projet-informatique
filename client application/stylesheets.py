@@ -64,6 +64,27 @@ light_style_sheet = """
     QPushButton[settings="true"]{color:black;font-size:16px;border:1px solid #ddd;border-radius:10px;background:white;padding:12px;}
     
     QLineEdit[loginButton="true"]{background:qlineargradient(x1: 1, x2: 0, stop: 0 rgba(255,255,255,0.5), stop: 1 rgba(255,255,255,0.2));padding:5px;padding-left:10px;border-radius:14px;margin-left:5px}
+    QPushButton[loginButton="true"]{background:qlineargradient(x1: 1, x2: 0, stop: 0 rgba(255,255,255,0.5), stop: 1 rgba(255,255,255,0.2));padding:5px;padding-left:10px;border-radius:14px;margin-left:5px;color:#444;margin-right:30px}
+    
+    QLabel[TimeLeft3]{
+        color: #c42b1c;
+    }
+    QLabel[TimeLeft2]{
+        color: #9d5d00;
+    }
+    QLabel[TimeLeft1]{
+        color: #9d5d00;
+    }
+    QLabel[TimeLeft0]{
+        color: #0f7b0f;
+    }
+    QLabel[TimeLeft4]{
+        color: #666;
+    }
+    QLabel[status0]{background:black;color:white;border-radius:8px;font-family:verdana;margin:5px;padding:5px;font-size:11px;}
+    QLabel[status1]{background:#5b2efc;color:white;border-radius:8px;font-family:verdana;margin:5px;padding:5px;font-size:11px;}
+    QLabel[status2]{background:#0f7b0f;color:white;border-radius:8px;font-family:verdana;margin:5px;padding:5px;font-size:11px;}
+    QLabel[status3]{background:#c42b1c;color:white;border-radius:8px;font-family:verdana;margin:5px;padding:5px;font-size:11px;}
     
     QTableWidget{border:0px solid}
     QTableWidget::item{border-top:1px solid #eee;font-family:verdana;}
@@ -149,9 +170,31 @@ dark_style_sheet = """
     
     QLineEdit{color:white;font-family:verdana;font-size:14px;margin-right:30px}
     
-    QPushButton[settings="true"]{color:white;font-size:16px;border:1px solid #555;border-radius:10px;background:#252525;padding:12px}
+    QPushButton[settings="true"]{color:white;font-size:16px;border:1px solid #111;border-radius:10px;background:#252525;padding:12px}
     
     QLineEdit[loginButton="true"]{background:qlineargradient(x1: 1, x2: 0, stop: 0 rgba(255,255,255,0.2), stop: 1 rgba(255,255,255,0.1));padding:5px;padding-left:10px;border-radius:14px;margin-left:5px}
+    QPushButton[loginButton="true"]{background:qlineargradient(x1: 1, x2: 0, stop: 0 rgba(255,255,255,0.2), stop: 1 rgba(255,255,255,0.1));padding:5px;padding-left:10px;border-radius:14px;margin-left:5px;color:#EEE;margin-right:30px}
+    
+    QLabel[TimeLeft3]{
+        color: #ff99a4;
+    }
+    QLabel[TimeLeft2]{
+        color: #fce100;
+    }
+    QLabel[TimeLeft1]{
+        color: #fce100;
+    }
+    QLabel[TimeLeft0]{
+        color: #6ccb5f;
+    }
+    QLabel[TimeLeft4]{
+        color: #888;
+    }
+    QLabel[status0]{background:#EEE;color:black;border-radius:8px;font-family:verdana;margin:5px;padding:5px;font-size:11px;}
+    QLabel[status1]{background:#916cee;color:white;border-radius:8px;font-family:verdana;margin:5px;padding:5px;font-size:11px;}
+    QLabel[status2]{background:#6ccb5f;color:white;border-radius:8px;font-family:verdana;margin:5px;padding:5px;font-size:11px;}
+    QLabel[status3]{background:#ff99a4;color:white;border-radius:8px;font-family:verdana;margin:5px;padding:5px;font-size:11px;}
+    
     
     QTableWidget{border:0px solid}
     QTableWidget::item{border-top:1px solid #333;font-family:verdana;color:white;}

@@ -2,22 +2,44 @@ from PyQt5.QtWidgets import QWidget, QGridLayout, QPushButton, QMainWindow, QHBo
 from PyQt5.QtGui import QCursor, QIcon, QColor, QPixmap, QFont
 from color_icon import color_pixmap
 from PyQt5.QtCore import Qt, QSize
-from qfluentwidgets import IconWidget, FluentIcon, InfoBarIcon, ProgressBar
+from qfluentwidgets import IconWidget, FluentIcon, InfoBarIcon, ProgressBar, AvatarWidget
 
 
-class User(QTableWidgetItem):
+class User(QWidget):
     def __init__(self, user):
         super().__init__()
-        pixmap = QPixmap(user.profile_picture)
-        self.setText(user.username)
-        self.setIcon(QIcon(pixmap))
+        self.avatar = AvatarWidget()
+        self.avatar.setImage(user.profile_picture)
+        self.avatar.setRadius(12)
+        self.username = QLabel(user.username)
+        self.username.setStyleSheet("font-family:verdana;margin:0px;font-size:12px")
+        layout = QHBoxLayout(self)
+        layout.setSpacing(0)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.addWidget(self.avatar)
+        layout.addWidget(self.username)
 
 
-class Status(QTableWidgetItem):
-    def __init__(self, name):
+class Status(QWidget):
+    def __init__(self, status):
         super().__init__()
-        self.picture = QLabel()
-        self.setText(name)
+        layout = QHBoxLayout(self)
+        layout.setAlignment(Qt.AlignCenter | Qt.AlignVCenter)
+        layout.setContentsMargins(0, 0, 0, 0)
+        status_card = QLabel()
+        layout.addWidget(status_card)
+        if status == 0:
+            status_card.setText("Upcoming")
+            status_card.setProperty("status0", True)
+        elif status == 1:
+            status_card.setText("Active")
+            status_card.setProperty("status1", True)
+        elif status == 2:
+            status_card.setText("Complete")
+            status_card.setProperty("status2", True)
+        else:
+            status_card.setText("Expired")
+            status_card.setProperty("status3", True)
 
 
 class TimeLeft(QWidget):
@@ -29,19 +51,21 @@ class TimeLeft(QWidget):
         label = QLabel(timeleft_item[0])
         label.setAlignment(Qt.AlignLeft)
         self.setProperty("TimeLeft", True)
-        if timeleft_item[1] == 3:
-            self.setProperty("TimeLeft3", True)
-            self.setStyleSheet("color:green")
-            icon = IconWidget(FluentIcon.DATE_TIME)
-        elif timeleft_item[1] == 2:
-            self.setProperty("TimeLeft2", True)
-            icon = IconWidget(InfoBarIcon.WARNING)
+        if timeleft_item[1] == 0:
+            label.setProperty("TimeLeft0", True)
+            icon = IconWidget(InfoBarIcon.SUCCESS)
         elif timeleft_item[1] == 1:
-            self.setProperty("TimeLeft1", True)
+            label.setProperty("TimeLeft1", True)
             icon = IconWidget(InfoBarIcon.WARNING)
-        else:
-            self.setProperty("TimeLeft0", True)
+        elif timeleft_item[1] == 2:
+            label.setProperty("TimeLeft2", True)
+            icon = IconWidget(InfoBarIcon.WARNING)
+        elif timeleft_item[1] == 3:
+            label.setProperty("TimeLeft3", True)
             icon = IconWidget(InfoBarIcon.ERROR)
+        else:
+            label.setProperty("TimeLeft4", True)
+            icon = IconWidget(FluentIcon.DATE_TIME)
         icon.setFixedHeight(20)
         icon.setFixedWidth(20)
         self.grid.addWidget(icon, 0, 0)
@@ -51,7 +75,7 @@ class progressBar(QWidget):
     def __init__(self, percentage):
         super().__init__()
         self.grid = QGridLayout(self)
-        self.grid.setContentsMargins(0, 0, 0, 0)
+        self.grid.setContentsMargins(5, 0, 5, 0)
         self.grid.setSpacing(0)
         self.progress_bar = ProgressBar()
         self.progress_bar.setValue(percentage)
@@ -149,10 +173,10 @@ class BottomMenu(QMainWindow):
             self.tasksTableWidget.setRowCount(self.tasksTableWidget.rowCount() + 1)
             self.tasksTableWidget.setItem(self.tasksTableWidget.rowCount() - 1, 0, QTableWidgetItem(i.name))
             self.tasksTableWidget.setItem(self.tasksTableWidget.rowCount() - 1, 1, QTableWidgetItem(i.tag))
-            self.tasksTableWidget.setItem(self.tasksTableWidget.rowCount() - 1, 2, User(i.user))
-            self.tasksTableWidget.setItem(self.tasksTableWidget.rowCount() - 1, 3, QTableWidgetItem("Incomplete"))
+            self.tasksTableWidget.setCellWidget(self.tasksTableWidget.rowCount() - 1, 2, User(i.user))
+            self.tasksTableWidget.setCellWidget(self.tasksTableWidget.rowCount() - 1, 3, Status(i.status))
             self.tasksTableWidget.setCellWidget(self.tasksTableWidget.rowCount() - 1, 4, TimeLeft(i.time_left()))
-            self.tasksTableWidget.setCellWidget(self.tasksTableWidget.rowCount() - 1, 5, progressBar(50))
+            self.tasksTableWidget.setCellWidget(self.tasksTableWidget.rowCount() - 1, 5, progressBar(25))
             self.tasksTableWidget.setRowHeight(self.tasksTableWidget.rowCount() - 1, 40)
         self.parent.topMenu.setTaskNumber(len(task_list))
 

@@ -74,6 +74,10 @@ class TitleBar(QWidget):
         menu.addSeparator()
         menu.addAction(Action(FluentIcon.PAGE_LEFT, 'Sign-out'))
         menu.menuActions()[1].triggered.connect(lambda: self.mainwindow.navbar.setTab(3))
-        menu.menuActions()[2].triggered.connect(lambda: self.mainwindow.navbar.setTab(4))
+        menu.menuActions()[2].triggered.connect(self.edit_profile)
         menu.menuActions()[3].triggered.connect(lambda: self.mainwindow.logout())
         menu.exec(e.globalPos(), aniType=MenuAnimationType.NONE)
+
+    def edit_profile(self):
+        self.mainwindow.navbar.setTab(4)
+        self.mainwindow.mainTabWidget.settingsTab.topMenu.setTab(1)

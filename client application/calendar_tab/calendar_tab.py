@@ -1,27 +1,30 @@
-from PyQt5.QtWidgets import QMainWindow, QLabel, QWidget, QTableWidget, QItemDelegate, QTableWidgetItem, QGridLayout, QGraphicsDropShadowEffect, QHeaderView, QAbstractItemView, QPushButton
+from PyQt5.QtWidgets import QMainWindow, QLabel, QWidget, QTableWidget, QHBoxLayout, QItemDelegate, QTableWidgetItem, QGridLayout, QGraphicsDropShadowEffect, QHeaderView, QAbstractItemView, QPushButton
 from PyQt5.QtGui import QColor, QFont, QCursor
 from PyQt5.QtCore import Qt, QDate
-from datetime import date, timedelta
+from datetime import datetime, timedelta
 
-from qfluentwidgets import CalendarPicker, setTheme, Theme
+from qfluentwidgets import CalendarPicker, setTheme, Theme, FluentIcon
 
 
 class TaskItem(QWidget):
-    def __init__(self, name):
+    def __init__(self, task, type):
         super().__init__()
-        self.grid = QGridLayout(self)
-        self.grid.setContentsMargins(0,0,0,0)
-        label = QLabel(name)
+        self.hlayout = QHBoxLayout(self)
+        self.hlayout.setContentsMargins(0, 0, 0, 0)
+        label = QLabel(task.name)
         label.setProperty("taskCalendarItem", True)
         label.setAlignment(Qt.AlignCenter)
-        self.grid.addWidget(label)
-        self.grid.setSpacing(0)
+        self.types = ["border-radius:15px;", "border-bottom-left-radius:0px;border-bottom-right-radius:0px;margin:0px;margin-top:1px;", "border-top-left-radius:0px;border-top-right-radius:0px;margin:0px;margin-bottom:1px;", "border-radius:0px;margin:0px;"]
+        label.setStyleSheet(self.types[type])
+        self.hlayout.addWidget(label)
+        self.hlayout.setSpacing(0)
 
-    def append_task(self, name):
-        label = QLabel(name)
+    def append_task(self, task, type):
+        label = QLabel(task.name)
         label.setProperty("taskCalendarItem", True)
         label.setAlignment(Qt.AlignCenter)
-        self.grid.addWidget(label, 0, self.grid.columnCount())
+        label.setStyleSheet(self.types[type] + "margin-left:1px")
+        self.hlayout.addWidget(label)
 
 
 class CalendarTab(QWidget):
@@ -172,11 +175,33 @@ class CalendarTab(QWidget):
                     if current_date.strftime("%B") not in years_months[current_date.year]:
                         years_months[current_date.year].append(current_date.strftime("%B"))
                 for task in self.mainwindow.tasks:
-                    if QDate(task.start_date) == QDate(current_date):
-                        if self.calendarView.cellWidget(task.start_date.hour, i) is not None:
-                            self.calendarView.cellWidget(task.start_date.hour, i).append_task(task.name)
-                        else:
-                            self.calendarView.setCellWidget(task.start_date.hour, i, TaskItem(task.name))
+                    if task.deadline is not None:
+                        if task.start_date.date() <= current_date <= task.deadline.date():
+                            task_duration = task.deadline - task.start_date
+                            if task_duration.days > 1:
+                                if current_date == task.deadline.date():
+                                    self.add_task_calendar(i, task.deadline.hour - 1, task, type=2)  # Bottom
+                                    for q in range(0, task.deadline.hour - 1):
+                                        self.add_task_calendar(i, q, task, type=3)  # Square
+                                elif current_date == task.start_date.date():
+                                    self.add_task_calendar(i, task.start_date.hour, task, type=1)  # Top
+                                    for q in range(0, 24 - (task.start_date.hour - 1)):
+                                        self.add_task_calendar(i, task.start_date.hour + q + 1, task, type=3)  # Square
+                                else:
+                                    for q in range(0, 24):
+                                        self.add_task_calendar(i, q, task, type=3)  # Square
+                            else:
+                                if task_duration.seconds / 3600 > 1:
+                                    self.add_task_calendar(i, task.start_date.hour, task, type=1)
+                                    for q in range(1, int(task_duration.seconds / 3600)):
+                                        if q == int(task_duration.seconds / 3600) - 1:
+                                            self.add_task_calendar(i, task.start_date.hour + q, task, type=2)
+                                        else:
+                                            self.add_task_calendar(i, task.start_date.hour + q, task, type=3)
+                                else:
+                                    self.add_task_calendar(i, task.start_date.hour, task)
+                    elif QDate(task.start_date) == QDate(current_date):
+                        self.add_task_calendar(i, task.start_date.hour, task)
             main_title = ""
             for i in years_months.keys():
                 for q in years_months[i]:
@@ -194,6 +219,12 @@ class CalendarTab(QWidget):
                         main_title = f"{q} {i}"
             self.calendarView.setHorizontalHeaderLabels([f"SUN\n{self.days_of_week[0].day}", f"MON\n{self.days_of_week[1].day}", f"TUE\n{self.days_of_week[2].day}", f"WED\n{self.days_of_week[3].day}", f"THU\n{self.days_of_week[4].day}", f"FRI\n{self.days_of_week[5].day}", f"SAT\n{self.days_of_week[6].day}"])
             self.monthLabel.setText(main_title)
+
+    def add_task_calendar(self, day, hour, task, type=0):
+        if self.calendarView.cellWidget(hour, day) is not None:
+            self.calendarView.cellWidget(hour, day).append_task(task, type)
+        else:
+            self.calendarView.setCellWidget(hour, day, TaskItem(task, type))
 
     def toPreviousWeekFunction(self):
         if self.dayFocus:
@@ -215,3 +246,7 @@ class CalendarTab(QWidget):
 
     def initiate_calendar(self):
         self.picker.setDate(QDate().currentDate())
+        if int(datetime.now().hour) <= 20:
+            self.calendarView.scrollTo(self.calendarView.model().index(int(datetime.now().hour) + 3, 0))
+        else:
+            self.calendarView.scrollTo(self.calendarView.model().index(23, 0))

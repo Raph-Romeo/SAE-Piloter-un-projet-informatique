@@ -36,8 +36,17 @@ class LoginForm(QMainWindow):
         self.passwordInput.setMaximumWidth(450)
         self.usernameInput.setMaximumWidth(450)
 
+        self.loginButton = QPushButton()
+        self.loginButton.setText("Login")
+        self.loginButton.setProperty("loginButton", True)
+        self.loginButton.setMaximumWidth(450)
+        self.loginButton.setFixedHeight(28)
+        self.loginButton.setCursor(QCursor(Qt.PointingHandCursor))
+        self.loginButton.clicked.connect(self.login)
+
         loginFormLayout.addWidget(self.usernameInput)
         loginFormLayout.addWidget(self.passwordInput)
+        loginFormLayout.addWidget(self.loginButton)
 
         # Sign up form
 
@@ -183,11 +192,11 @@ class LoginForm(QMainWindow):
                 InfoBar.error(
                     title="Failed to login",
                     content="Invalid credentials",
-                    parent = self.parent,
+                    parent=self.parent,
                     orient=Qt.Horizontal,
-                    isClosable= True,
+                    isClosable=True,
                     position=InfoBarPosition.TOP_RIGHT,
-                    duration = 2000
+                    duration=2000
                 )
 
     def toggleForm(self):
@@ -203,6 +212,13 @@ class LoginForm(QMainWindow):
             self.signUpForm.hide()
             self.signUpButton.setText("Create account")
             self.formTitle.setText("Login")
+            self.chooseUsernameInput.setText("")
+            self.emailInput.setText("")
+            self.choosePasswordInput.setText("")
+            self.confirmPasswordInput.setText("")
+            self.firstNameInput.setText("")
+            self.lastNameInput.setText("")
+            self.setSignUpFormPage(0)
 
     def setSignUpFormPage(self, page: int):
         self.signUpFormPage = page

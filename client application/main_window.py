@@ -13,7 +13,7 @@ import requests
 
 
 class Task:
-    def __init__(self, name, tag, date_created, start_date, deadline, owner, user, status=0, public=False):
+    def __init__(self, name, tag, date_created, start_date, deadline, owner, user, status=0, public=False, importance=0):
         self.name = name
         self.tag = tag
         self.date_created = date_created
@@ -21,25 +21,53 @@ class Task:
         self.deadline = deadline
         self.owner = owner
         self.user = user
+        if datetime.now() < self.start_date:
+            self.status = 0
+        elif self.start_date < datetime.now() < self.deadline:
+            self.status = 1
+        else:
+            self.status = 3
         # 0 = Upcoming, 1 = Active, 2 = Complete, 3 = Expired
-        self.status = status
+        #self.status = status
         self.public = public
+        self.importance = importance
 
     def time_left(self):
-        if self.status != 2 and self.deadline is None:
-            return ["No limit", 0]
-        delta = self.deadline - datetime.now()
-        if delta.seconds > 0:
-            if delta.days > 0:
-                return [f"{delta.days} day(s)", 0]
-            elif delta.seconds > 3600:
-                return [f"{int(delta.seconds/3600)} hour(s)", 1]
-            elif delta.seconds > 60:
-                return [f"{int(delta.seconds / 60)} minute(s)", 2]
+        if self.status != 2 and self.deadline is not None and datetime.now() > self.start_date:
+            if self.deadline is None:
+                return ["No limit", 0]
+            delta = self.deadline - datetime.now()
+            timestamp_timeleft = delta.days * 86400 + delta.seconds
+            if timestamp_timeleft > 0:
+                timestamp_timeleft = delta.days * 86400 + delta.seconds
+                if timestamp_timeleft > 86400:
+                    return [f"{delta.days} day(s)", 0]
+                elif timestamp_timeleft > 3600:
+                    return [f"{int(delta.seconds/3600)} hour(s)", 1]
+                elif timestamp_timeleft > 60:
+                    return [f"{int(delta.seconds / 60)} minute(s)", 2]
+                else:
+                    return [f"{int(delta.seconds)} second(s)", 3]
             else:
-                return [f"{int(delta.seconds)} second(s)", 3]
+                return ["Expired", 3]
         else:
-            return ["Expired", 3]
+            if self.deadline is None:
+                delta = self.start_date - datetime.now()
+            else:
+                delta = self.deadline - datetime.now()
+            timestamp_timeleft = delta.days * 86400 + delta.seconds
+            if timestamp_timeleft > 0:
+                timestamp_timeleft = delta.days * 86400 + delta.seconds
+                if timestamp_timeleft > 86400:
+                    return [f"{delta.days} day(s)", 4]
+                elif timestamp_timeleft > 3600:
+                    return [f"{int(delta.seconds / 3600)} hour(s)", 4]
+                elif timestamp_timeleft > 60:
+                    return [f"{int(delta.seconds / 60)} minute(s)", 4]
+                else:
+                    return [f"{int(delta.seconds)} second(s)", 4]
+            else:
+                return ["Expired", 4]
 
 
 
@@ -120,14 +148,13 @@ class MainWindow(FramelessWindow):
         setTheme(Theme.LIGHT)
 
     def connectGetTasksAndEverything(self):
-        self.user = User("toto", "toto@toto.com", profile_picture_url="https://img6.arthub.ai/63d88fba-d272.webp")
+        self.user = User("toto", "toto@toto.com", profile_picture_url="https://wallpapers.com/images/hd/cool-profile-picture-87h46gcobjl5e4xu.jpg")
         self.tasks = [
-            Task("task A", "Home", datetime(2003, 5, 14), datetime(2023, 11, 25, hour=3), datetime(2023, 11, 27, hour=7), self.user,self.user, status=2),
-            Task("task B", "Home", datetime(2003, 5, 14), datetime(2023, 11, 8, hour=6), datetime(2023, 12, 11, hour=8), self.user,self.user, status=1),
-            Task("task E", "Test", datetime(2003, 5, 14), datetime(2023, 11, 10, hour=6), datetime(2023, 11, 10, hour=8),self.user, self.user),
-            Task("task C", "Home", datetime(2003, 5, 14), datetime(2023, 10, 25, hour=6), datetime(2023, 10, 25, hour=7), self.user, self.user, status=3),
-            Task("Aniv de Mehdi", "Home", datetime(2003, 5, 14), datetime(2023, 12, 21, hour=6), datetime(2023, 12, 21, hour=7), self.user, self.user),
-
+            Task("task A", "Home", datetime(2003, 5, 14), datetime(2023, 11, 5, hour=3), datetime(2023, 11, 29, hour=14), self.user,self.user, status=0),
+            Task("task B", "Home", datetime(2003, 5, 14), datetime(2023, 10, 25, hour=6), datetime(2023, 11, 9, hour=2), self.user,self.user, status=1),
+            Task("task C", "Home", datetime(2003, 5, 14), datetime(2023, 10, 25, hour=6), datetime(2023, 10, 25, hour=8), self.user, self.user, status=2),
+            Task("task D", "Home", datetime(2003, 5, 14), datetime(2023, 11, 25, hour=6), datetime(2023, 11, 25, hour=9), self.user, self.user, status=3),
+            Task("task E", "Home", datetime(2003, 5, 14), datetime(2023, 11, 25, hour=6), None, self.user, self.user, status=1),
         ]
         self.mainTabWidget.tasksTab.update_tasks(self.tasks)
         self.mainTabWidget.calendarTab.initiate_calendar()
