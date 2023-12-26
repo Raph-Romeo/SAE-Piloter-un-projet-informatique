@@ -1,7 +1,8 @@
-from PyQt5.QtWidgets import QWidget, QGridLayout, QPushButton, QMainWindow, QSpacerItem, QSizePolicy, QLineEdit, QLabel, QScrollArea, QHeaderView, QTableWidget, QTableWidgetItem, QAbstractItemView
+from PyQt5.QtWidgets import QWidget, QGridLayout, QPushButton, QMainWindow, QHBoxLayout, QSpacerItem, QSizePolicy, QLineEdit, QLabel, QScrollArea, QHeaderView, QTableWidget, QTableWidgetItem, QAbstractItemView
 from PyQt5.QtGui import QCursor, QIcon, QColor, QPixmap, QFont
 from color_icon import color_pixmap
 from PyQt5.QtCore import Qt, QSize
+from qfluentwidgets import IconWidget, FluentIcon, InfoBarIcon, ProgressBar
 
 
 class User(QTableWidgetItem):
@@ -17,6 +18,44 @@ class Status(QTableWidgetItem):
         super().__init__()
         self.picture = QLabel()
         self.setText(name)
+
+
+class TimeLeft(QWidget):
+    def __init__(self, timeleft_item):
+        super().__init__()
+        self.grid = QGridLayout(self)
+        self.grid.setContentsMargins(0, 0, 0, 0)
+        self.grid.setSpacing(0)
+        label = QLabel(timeleft_item[0])
+        label.setAlignment(Qt.AlignLeft)
+        self.setProperty("TimeLeft", True)
+        if timeleft_item[1] == 3:
+            self.setProperty("TimeLeft3", True)
+            self.setStyleSheet("color:green")
+            icon = IconWidget(FluentIcon.DATE_TIME)
+        elif timeleft_item[1] == 2:
+            self.setProperty("TimeLeft2", True)
+            icon = IconWidget(InfoBarIcon.WARNING)
+        elif timeleft_item[1] == 1:
+            self.setProperty("TimeLeft1", True)
+            icon = IconWidget(InfoBarIcon.WARNING)
+        else:
+            self.setProperty("TimeLeft0", True)
+            icon = IconWidget(InfoBarIcon.ERROR)
+        icon.setFixedHeight(20)
+        icon.setFixedWidth(20)
+        self.grid.addWidget(icon, 0, 0)
+        self.grid.addWidget(label, 0, 1)
+
+class progressBar(QWidget):
+    def __init__(self, percentage):
+        super().__init__()
+        self.grid = QGridLayout(self)
+        self.grid.setContentsMargins(0, 0, 0, 0)
+        self.grid.setSpacing(0)
+        self.progress_bar = ProgressBar()
+        self.progress_bar.setValue(percentage)
+        self.grid.addWidget(self.progress_bar)
 
 
 class searchBarQLineEdit(QLineEdit):
@@ -112,8 +151,8 @@ class BottomMenu(QMainWindow):
             self.tasksTableWidget.setItem(self.tasksTableWidget.rowCount() - 1, 1, QTableWidgetItem(i.tag))
             self.tasksTableWidget.setItem(self.tasksTableWidget.rowCount() - 1, 2, User(i.user))
             self.tasksTableWidget.setItem(self.tasksTableWidget.rowCount() - 1, 3, QTableWidgetItem("Incomplete"))
-            self.tasksTableWidget.setItem(self.tasksTableWidget.rowCount() - 1, 4, QTableWidgetItem("52 days"))
-            self.tasksTableWidget.setItem(self.tasksTableWidget.rowCount() - 1, 5, QTableWidgetItem("20%"))
+            self.tasksTableWidget.setCellWidget(self.tasksTableWidget.rowCount() - 1, 4, TimeLeft(i.time_left()))
+            self.tasksTableWidget.setCellWidget(self.tasksTableWidget.rowCount() - 1, 5, progressBar(50))
             self.tasksTableWidget.setRowHeight(self.tasksTableWidget.rowCount() - 1, 40)
         self.parent.topMenu.setTaskNumber(len(task_list))
 

@@ -7,13 +7,13 @@ from titlebar import TitleBar
 from qframelesswindow import FramelessWindow, StandardTitleBar
 from login import Login
 from qfluentwidgets import setTheme, Theme
-from datetime import datetime
+from datetime import datetime, timedelta
 from PyQt5.QtGui import QImage
 import requests
 
 
 class Task:
-    def __init__(self, name, tag, date_created, start_date, deadline, owner, user, public=False):
+    def __init__(self, name, tag, date_created, start_date, deadline, owner, user, status=0, public=False):
         self.name = name
         self.tag = tag
         self.date_created = date_created
@@ -21,7 +21,26 @@ class Task:
         self.deadline = deadline
         self.owner = owner
         self.user = user
+        # 0 = Upcoming, 1 = Active, 2 = Complete, 3 = Expired
+        self.status = status
         self.public = public
+
+    def time_left(self):
+        if self.status != 2 and self.deadline is None:
+            return ["No limit", 0]
+        delta = self.deadline - datetime.now()
+        if delta.seconds > 0:
+            if delta.days > 0:
+                return [f"{delta.days} day(s)", 0]
+            elif delta.seconds > 3600:
+                return [f"{int(delta.seconds/3600)} hour(s)", 1]
+            elif delta.seconds > 60:
+                return [f"{int(delta.seconds / 60)} minute(s)", 2]
+            else:
+                return [f"{int(delta.seconds)} second(s)", 3]
+        else:
+            return ["Expired", 3]
+
 
 
 class User:
@@ -103,9 +122,11 @@ class MainWindow(FramelessWindow):
     def connectGetTasksAndEverything(self):
         self.user = User("toto", "toto@toto.com", profile_picture_url="https://img6.arthub.ai/63d88fba-d272.webp")
         self.tasks = [
-            Task("task A", "Home", datetime(2003, 5, 14), datetime(2023, 10, 25, hour=3), datetime(2023, 10, 25, hour=4), self.user,self.user),
-            Task("task B", "Home", datetime(2003, 5, 14), datetime(2023, 10, 25, hour=6), datetime(2023, 10, 25, hour=4), self.user,self.user),
-            Task("task C", "Home", datetime(2003, 5, 14), datetime(2023, 10, 25, hour=6), datetime(2023, 10, 25, hour=4), self.user, self.user),
+            Task("task A", "Home", datetime(2003, 5, 14), datetime(2023, 11, 25, hour=3), datetime(2023, 11, 27, hour=7), self.user,self.user, status=2),
+            Task("task B", "Home", datetime(2003, 5, 14), datetime(2023, 11, 8, hour=6), datetime(2023, 12, 11, hour=8), self.user,self.user, status=1),
+            Task("task E", "Test", datetime(2003, 5, 14), datetime(2023, 11, 10, hour=6), datetime(2023, 11, 10, hour=8),self.user, self.user),
+            Task("task C", "Home", datetime(2003, 5, 14), datetime(2023, 10, 25, hour=6), datetime(2023, 10, 25, hour=7), self.user, self.user, status=3),
+            Task("Aniv de Mehdi", "Home", datetime(2003, 5, 14), datetime(2023, 12, 21, hour=6), datetime(2023, 12, 21, hour=7), self.user, self.user),
 
         ]
         self.mainTabWidget.tasksTab.update_tasks(self.tasks)
