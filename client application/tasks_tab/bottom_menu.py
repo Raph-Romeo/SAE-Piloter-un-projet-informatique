@@ -203,7 +203,8 @@ class BottomMenu(QMainWindow):
         self.tasksTableWidget.horizontalHeader().setMinimumSectionSize(100)
         self.tasksTableWidget.horizontalHeader().setSectionsClickable(False)
         self.tasksTableWidget.contextMenuEvent = self.contextMenuEvent_table
-        for col in range(1, self.tasksTableWidget.columnCount()):
+        self.tasksTableWidget.cellDoubleClicked.connect(self.doubleClick)
+        for col in range(3, self.tasksTableWidget.columnCount()):
             self.tasksTableWidget.horizontalHeader().setSectionResizeMode(col, QHeaderView.Stretch)
         layout.addWidget(self.searchBar, 0, 0)
         self.tasksDatePicker = CalendarPicker()
@@ -417,11 +418,10 @@ class BottomMenu(QMainWindow):
         searchbartext = self.searchBarQlineEdit.text()
         if searchbartext != "":
             for row in range(self.tasksTableWidget.rowCount()):
-                if searchbartext.lower() in self.tasksTableWidget.item(row,0).text().lower() or searchbartext.lower() in self.tasksTableWidget.item(row, 1).text().lower():
+                if searchbartext.lower() in self.tasksTableWidget.item(row, 0).text().lower() or searchbartext.lower() in self.tasksTableWidget.item(row, 1).text().lower():
                     pass
                 else:
                     self.tasksTableWidget.hideRow(row)
-
 
     def update_tasks(self, change):
         if change:
@@ -430,6 +430,9 @@ class BottomMenu(QMainWindow):
             self.tasksTableWidget.cellWidget(row, 4).setTime(self.task_list[row].time_left())
             if change:
                 self.tasksTableWidget.cellWidget(row, 3).setStatus(self.task_list[row].status)
+
+    def doubleClick(self, e):
+        return self.mainWindow.init_view_task_window(self.task_list[e].id)
 
     def contextMenuEvent_table(self, e):
         menu = RoundMenu(parent=self)
@@ -449,7 +452,7 @@ class BottomMenu(QMainWindow):
             menu.addAction(Action(FluentIcon.SAVE_COPY, 'Export Task'))
             menu.addSeparator()
             menu.addAction(Action(FluentIcon.ADD, 'Create Task'))
-            #menu.menuActions()[0].triggered.connect(lambda: self.view_task(selected_tasks[0].id)) # View task
+            menu.menuActions()[0].triggered.connect(lambda: self.mainWindow.init_view_task_window(selected_tasks[0].id)) # View task
             menu.menuActions()[2].triggered.connect(lambda: self.mainWindow.delete_task(selected_tasks[0].id)) # DELETE SINGLE TASK
             #menu.menuActions()[3].triggered.connect(lambda: self.editTask(selected_tasks[0].id)) # EDIT TASK
             menu.menuActions()[4].triggered.connect(lambda: self.export(selected_tasks)) # Export tasks

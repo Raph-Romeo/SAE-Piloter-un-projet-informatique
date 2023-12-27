@@ -1,5 +1,4 @@
 import sys
-
 from PyQt5.QtCore import Qt, QDate, QTime
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QApplication, QWidget, QHBoxLayout, QLineEdit, QTextEdit, QComboBox, QStackedWidget, QVBoxLayout, QLabel, QGridLayout, QPlainTextEdit

@@ -10,6 +10,7 @@ from login import Login
 from qfluentwidgets import setTheme, Theme
 from datetime import datetime, timedelta
 from PyQt5.QtGui import QImage
+from view_task import ViewTask
 import time
 import socket
 import requests
@@ -32,14 +33,10 @@ class SendMessageWorker(QObject):
             remote_ip, remote_port = self.connection.getpeername()
             conn = socket.socket()
             conn.connect((remote_ip, remote_port))
-            # print(remote_ip, remote_port)
             conn.send(self.msg)
             response = conn.recv(4096)
             self.message.emit(response)
             conn.close()
-            # self.connection.send(self.msg)
-            # response = self.connection.recv(4096)
-            # self.message.emit(response)
         except:
             self.error.emit()
             response = json.dumps({"status": 0}).encode()
@@ -340,6 +337,18 @@ class MainWindow(FramelessWindow):
             self.hide()
         self.connection = None
         self.lw.reconnect()
+
+    def init_view_task_window(self, task_id):
+        message = json.dumps({"url": "/task_details", "method": "POST", "token": self.user.auth_token, "data": [task_id]})
+        self.init_send(message.encode(), self.view_task)
+
+    def view_task(self, response):
+        response = json.loads(response.decode())
+        if response["status"] == 200:
+            self.view_task_dialog = ViewTask(self, response["data"][0])
+            self.view_task_dialog.exec()
+        elif response["status"] == 403:
+            self.logout()
 
     def clockThreadInit(self):
         self.clockThread = QThread()

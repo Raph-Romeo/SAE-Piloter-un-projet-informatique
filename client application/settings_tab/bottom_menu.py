@@ -20,7 +20,7 @@ class ApplicationSettings(QWidget):
         self.button.clicked.connect(self.toggleDarkmode)
         self.button.setProperty("settings", True)
         self.button.setFocusPolicy(Qt.NoFocus)
-        self.button.setIconSize(QSize(20,20))
+        self.button.setIconSize(QSize(20, 20))
         self.button.setCursor(QCursor(Qt.PointingHandCursor))
         self.grid.addWidget(self.button)
 

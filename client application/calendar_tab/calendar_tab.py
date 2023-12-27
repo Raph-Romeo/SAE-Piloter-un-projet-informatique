@@ -5,7 +5,6 @@ from datetime import date, timedelta
 
 from qfluentwidgets import CalendarPicker, setTheme, Theme, FluentIcon, MenuAnimationType, Action, RoundMenu
 
-
 class TaskItem(QWidget):
     def __init__(self, task, type):
         super().__init__()
