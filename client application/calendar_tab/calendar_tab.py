@@ -5,13 +5,25 @@ from datetime import date, timedelta
 
 from qfluentwidgets import CalendarPicker, setTheme, Theme, FluentIcon, MenuAnimationType, Action, RoundMenu
 
+
+class TaskItemLabel(QLabel):
+    def __init__(self, text, task_id, func):
+        super().__init__()
+        self.setText(text)
+        self.task_id = task_id
+        self.view_task = func
+
+    def mouseDoubleClickEvent(self, a0):
+        self.view_task(self.task_id)
+
+
 class TaskItem(QWidget):
-    def __init__(self, task, type):
+    def __init__(self, task, type, mainWindow_view_task):
         super().__init__()
         self.hlayout = QHBoxLayout(self)
         self.hlayout.setContentsMargins(0, 0, 0, 0)
         self.x = 1
-        label = QLabel(task.name)
+        label = TaskItemLabel(text=task.name, task_id=task.id, func=mainWindow_view_task)
         label.setProperty("taskCalendarItem", True)
         label.setProperty(f"TaskCalendarItemStatus{task.status}", True)
         label.setAlignment(Qt.AlignCenter)
@@ -21,10 +33,10 @@ class TaskItem(QWidget):
         self.hlayout.setSpacing(0)
         self.more = None
 
-    def append_task(self, task, type):
+    def append_task(self, task, type, mainWindow_view_task):
         self.x += 1
         if self.x <= 3:
-            label = QLabel(task.name)
+            label = TaskItemLabel(text=task.name, task_id=task.id, func=mainWindow_view_task)
             label.setProperty("taskCalendarItem", True)
             label.setProperty(f"TaskCalendarItemStatus{task.status}", True)
             label.setAlignment(Qt.AlignCenter)
@@ -244,9 +256,9 @@ class CalendarTab(QWidget):
 
     def add_task_calendar(self, day, hour, task, type=0):
         if self.calendarView.cellWidget(hour, day) is not None:
-            self.calendarView.cellWidget(hour, day).append_task(task, type)
+            self.calendarView.cellWidget(hour, day).append_task(task, type, self.mainwindow.init_view_task_window)
         else:
-            self.calendarView.setCellWidget(hour, day, TaskItem(task, type))
+            self.calendarView.setCellWidget(hour, day, TaskItem(task, type, self.mainwindow.init_view_task_window))
 
     def toPreviousWeekFunction(self):
         if self.dayFocus:
