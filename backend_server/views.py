@@ -58,6 +58,29 @@ def tasks(request) -> bytes:
         return json.dumps(message).encode()
 
 
+def set_completed(request) -> bytes:
+    if request.method == "POST":
+        user_id = request.user.data[0]
+        try:
+            task_id = request.data["task_id"]
+            is_completed = request.data["is_completed"]
+        except KeyError:
+            return json.dumps({"status": 400, "message": "Request is invalid"}).encode()
+        cursor = request.client.database_connection.cursor()
+        query = "SELECT * FROM Task WHERE id = %s"
+        cursor.execute(query, (task_id, ))
+        result = cursor.fetchone()
+        cursor.close()
+        if result[6] != user_id and result[7] != user_id:
+            return json.dumps({"status": 403, "message": "Forbidden"}).encode()
+        cursor = request.client.database_connection.cursor()
+        query = "UPDATE Task SET is_completed = %s WHERE id = %s"
+        cursor.execute(query, (is_completed, task_id,))
+        request.client.database_connection.commit()
+        cursor.close()
+        return json.dumps({"status": 200, "message": "Success", "data": {"task_id": task_id, "is_completed": is_completed}}).encode()
+
+
 def create_task(request) -> bytes:
     if request.method == "POST":
         user_id = request.user.data[0]  # User id that creates the task
