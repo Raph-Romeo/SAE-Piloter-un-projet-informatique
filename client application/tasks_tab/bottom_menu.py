@@ -3,6 +3,7 @@ from PyQt5.QtGui import QCursor, QIcon, QColor, QPixmap, QFont
 from color_icon import color_pixmap
 from PyQt5.QtCore import Qt, QSize, QDate
 from qfluentwidgets import IconWidget, FluentIcon, InfoBarIcon, ProgressBar, AvatarWidget, CalendarPicker, ToolButton, InfoBar, InfoBarPosition, MenuAnimationType, RoundMenu, Action
+import json
 
 
 class User(QWidget):
@@ -155,6 +156,7 @@ class searchBarQLineEdit(QLineEdit):
 class BottomMenu(QMainWindow):
     def __init__(self, mainWindow, parent):
         super().__init__()
+        self.file = None
         self.setContentsMargins(0, 0, 20, 21)
         self.setProperty("tasksTopMenu", True)
         self.parent = parent
@@ -280,46 +282,76 @@ class BottomMenu(QMainWindow):
         menu.menuActions()[2].triggered.connect(lambda: self.export(self.task_list))
         menu.exec(event.globalPos(), aniType=MenuAnimationType.DROP_DOWN)
 
+    def get_tasks(self, task_ids, f_type):
+        message = json.dumps({"url": "/task_details", "method": "POST", "token": self.mainWindow.user.auth_token, "data": task_ids})
+        if f_type == "CSV":
+            self.mainWindow.init_send(message.encode(), self.tasks_to_csv)
+        elif f_type == "PDF":
+            self.mainWindow.init_send(message.encode(), self.tasks_to_pdf)
+
+    def tasks_to_pdf(self, response):
+        try:
+            data = json.loads(response.decode())
+        except:
+            return print(f"error decoding tasks message : {response.decode()}")
+        if data["status"] == 200:
+            try:
+                # ELMIRRRRR C'EST ICI C'EST ICI QUE TU VAS METTRE TA CLASSEEEEE
+                # TaskPDF(data["data"], self.file)
+                InfoBar.success(title="Export successful",content=f"Exported task(s) to {self.file}",parent=self.parent,orient=Qt.Horizontal,isClosable=True,position=InfoBarPosition.TOP_RIGHT,duration=5000)
+            except Exception as err:
+                print(err)
+                InfoBar.error(title="Cancelled export",content="Something went wrong while creating PDF file",parent=self.parent,orient=Qt.Horizontal,isClosable=True,position=InfoBarPosition.TOP_RIGHT,duration=5000)
+        elif data["status"] == 403:
+            self.mainWindow.logout()
+        else:
+            InfoBar.error(title="Server error",content=data["message"],parent=self.parent,orient=Qt.Horizontal,isClosable=True,position=InfoBarPosition.TOP_RIGHT,duration=5000)
+
+    def tasks_to_csv(self, response):
+        try:
+            data = json.loads(response.decode())
+            print(data)
+        except:
+            return print(f"error decoding tasks message : {response.decode()}")
+        if data["status"] == 200:
+            try:
+                content = "Task name,Tag\n"
+                status = ["Upcoming", "Active", "Complete", "Expired"]
+                for task in data["data"]:
+                    content += f"{task['name']},{task['tag']}\n"
+                with open(self.file, "w") as f:
+                    f.write(content)
+                f.close()
+                InfoBar.success(title="Export successful",content=f"Exported task(s) to {self.file}",parent=self.parent,orient=Qt.Horizontal,isClosable=True,position=InfoBarPosition.TOP_RIGHT,duration=5000)
+            except Exception as err:
+                print(err)
+                InfoBar.error(title="Cancelled export",content="Something went wrong while creating CSV file",parent=self.parent,orient=Qt.Horizontal,isClosable=True,position=InfoBarPosition.TOP_RIGHT,duration=5000)
+        elif data["status"] == 403:
+            self.mainWindow.logout()
+        else:
+            InfoBar.error(title="Server error",content=data["message"],parent=self.parent,orient=Qt.Horizontal,isClosable=True,position=InfoBarPosition.TOP_RIGHT,duration=5000)
+
     def export(self, tasks):
         try:
-            file = QFileDialog.getExistingDirectory(self, "Select Directory")
+            file, _ = QFileDialog.getSaveFileName(self, "Choose File", "", "PDF Files (*.pdf);;CSV Files (*.csv)")
             if file is not None:
-                content = "Task name,Tag,User,Status,Start date,Task deadline,Created by,date created\n"
-                status = ["Upcoming", "Active", "Complete", "Expired"]
+                # Determine the selected file extension
+                if file.endswith(".pdf"):
+                    InfoBar.info(title="Export", content=f"Exporting tasks to PDF...", parent=self.parent, orient=Qt.Horizontal, isClosable=True, position=InfoBarPosition.TOP_RIGHT,duration=5000)
+                    file_format = "PDF"
+                elif file.endswith(".csv"):
+                    InfoBar.info(title="Export", content=f"Exporting tasks to CSV...", parent=self.parent, orient=Qt.Horizontal, isClosable=True, position=InfoBarPosition.TOP_RIGHT,duration=5000)
+                    file_format = "CSV"
+                else:
+                    return InfoBar.error(title="Cancelled export", content="No file selected", parent=self.parent, orient=Qt.Horizontal, isClosable=True, position=InfoBarPosition.TOP_RIGHT, duration=5000)
+                self.file = file
+                task_ids = []
                 for task in tasks:
-                    content += f"{task.name},{task.tag},{task.user.username},{status[task.status]},{task.start_date},{task.deadline},{task.owner.username},{task.date_created}\n"
-                with open(file + "/tasks.csv", "w") as f:
-                    f.write(content)
-                    f.close()
-                InfoBar.success(
-                    title="Success",
-                    content=f"Tasks exported to {file}/tasks.csv",
-                    parent=self.parent,
-                    orient=Qt.Horizontal,
-                    isClosable=True,
-                    position=InfoBarPosition.TOP_RIGHT,
-                    duration=5000
-                )
-            else:
-                InfoBar.error(
-                    title="Cancelled export",
-                    content="No file selected",
-                    parent=self.parent,
-                    orient=Qt.Horizontal,
-                    isClosable=True,
-                    position=InfoBarPosition.TOP_RIGHT,
-                    duration=5000
-                )
-        except:
-            InfoBar.error(
-                title="Cancelled export",
-                content="Something went wrong",
-                parent=self.parent,
-                orient=Qt.Horizontal,
-                isClosable=True,
-                position=InfoBarPosition.TOP_RIGHT,
-                duration=5000
-            )
+                    task_ids.append(task.id)
+                self.get_tasks(task_ids, file_format)
+        except Exception as err:
+            InfoBar.error(title="Cancelled export",content="Something went wrong",parent=self.parent,orient=Qt.Horizontal,isClosable=True,position=InfoBarPosition.TOP_RIGHT,duration=5000)
+            print(err)
 
     def __focus_search(self, event):
         self.searchBarQlineEdit.setFocus()
