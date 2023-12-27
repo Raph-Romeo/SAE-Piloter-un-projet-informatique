@@ -140,6 +140,7 @@ class Server:
         self.urls = {
             "/auth": View(views.login),
             "/tasks": View(views.tasks, protected=True),
+            "/create_task": View(views.create_task, protected=True),
         }
 
     def close(self) -> None:

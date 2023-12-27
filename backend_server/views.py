@@ -56,3 +56,18 @@ def tasks(request) -> bytes:
                 is_owner = False
             message["data"].append({"id": i[0], "name": i[1], "tag": i[2], "date_created": str(i[3]), "start_date": str(i[4]), "deadline": str(i[5]), "owner": users[i[6]], "is_owner": is_owner, "created_by": users[i[7]], "public": i[8], "important": i[9], "is_completed": i[10]})
         return json.dumps(message).encode()
+
+
+def create_task(request) -> bytes:
+    if request.method == "POST":
+        user_id = request.user.data[0]  # User id that creates the task
+        try:
+            name = request.data["name"]
+        except KeyError:
+            return json.dumps({"status": 400, "message": "Request is invalid"}).encode()
+        cursor = request.client.database_connection.cursor()
+        query = f"INSERT INTO Task (name, tag, date_created, start_date, deadline, user_id, created_by, public, importance, is_completed) VALUES('{name}','University','2023-12-17 12:56:00','2023-12-12 15:56:00','2023-12-26 16:00:00','{user_id}','{user_id}',true,1, FALSE)"
+        cursor.execute(query)
+        request.client.database_connection.commit()
+        cursor.close()
+        return json.dumps({"status": 200, "message": "Ok", "data": {"is_created": True}}).encode()
