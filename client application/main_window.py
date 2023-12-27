@@ -32,7 +32,6 @@ class SendMessageWorker(QObject):
             remote_ip, remote_port = self.connection.getpeername()
             conn = socket.socket()
             conn.connect((remote_ip, remote_port))
-            time.sleep(0.1)
             # print(remote_ip, remote_port)
             conn.send(self.msg)
             response = conn.recv(4096)
