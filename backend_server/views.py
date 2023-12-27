@@ -56,3 +56,90 @@ def tasks(request) -> bytes:
                 is_owner = False
             message["data"].append({"id": i[0], "name": i[1], "tag": i[2], "date_created": str(i[3]), "start_date": str(i[4]), "deadline": str(i[5]), "owner": users[i[6]], "is_owner": is_owner, "created_by": users[i[7]], "public": i[8], "important": i[9], "is_completed": i[10]})
         return json.dumps(message).encode()
+
+
+def set_completed(request) -> bytes:
+    if request.method == "POST":
+        user_id = request.user.data[0]
+        try:
+            task_id = request.data["task_id"]
+            is_completed = request.data["is_completed"]
+        except KeyError:
+            return json.dumps({"status": 400, "message": "Request is invalid"}).encode()
+        cursor = request.client.database_connection.cursor()
+        query = "SELECT * FROM Task WHERE id = %s"
+        cursor.execute(query, (task_id, ))
+        result = cursor.fetchone()
+        cursor.close()
+        if result[6] != user_id and result[7] != user_id:
+            return json.dumps({"status": 403, "message": "Forbidden"}).encode()
+        cursor = request.client.database_connection.cursor()
+        query = "UPDATE Task SET is_completed = %s WHERE id = %s"
+        cursor.execute(query, (is_completed, task_id,))
+        request.client.database_connection.commit()
+        cursor.close()
+        return json.dumps({"status": 200, "message": "Success", "data": {"task_id": task_id, "is_completed": is_completed}}).encode()
+
+
+def delete_task(request) -> bytes:
+    if request.method == "POST":
+        user_id = request.user.data[0]
+        try:
+            task_id = request.data["task_id"]
+        except KeyError:
+            return json.dumps({"status": 400, "message": "Request is invalid"}).encode()
+        cursor = request.client.database_connection.cursor()
+        query = "SELECT * FROM Task WHERE id = %s"
+        cursor.execute(query, (task_id,))
+        result = cursor.fetchone()
+        cursor.close()
+        if result[6] != user_id and result[7] != user_id:
+            return json.dumps({"status": 403, "message": "Forbidden"}).encode()
+        try:
+            cursor = request.client.database_connection.cursor()
+            query = "DELETE FROM Task WHERE id = %s"
+            cursor.execute(query, (task_id,))
+            request.client.database_connection.commit()
+            cursor.close()
+        except:
+            pass
+        return json.dumps({"status": 200, "message": "Success", "data": {"task_id": task_id, "is_deleted": True}}).encode()
+
+
+def delete_tasks(request) -> bytes:
+    if request.method == "POST":
+        user_id = request.user.data[0]
+        try:
+            task_ids = request.data["task_ids"]
+        except KeyError:
+            return json.dumps({"status": 400, "message": "Request is invalid"}).encode()
+        list_of_ids = ",".join(map(str, task_ids))
+        cursor = request.client.database_connection.cursor()
+        query = f"SELECT * FROM Task WHERE id IN ({list_of_ids})"
+        cursor.execute(query)
+        result = cursor.fetchall()
+        cursor.close()
+        for i in result:
+            if i[6] != user_id and i[7] != user_id:
+                return json.dumps({"status": 403, "message": "Forbidden"}).encode()
+        cursor = request.client.database_connection.cursor()
+        query = f"DELETE FROM Task WHERE id IN ({list_of_ids});"
+        cursor.execute(query)
+        request.client.database_connection.commit()
+        cursor.close()
+        return json.dumps({"status": 200, "message": "Success", "data": {"task_ids": task_ids, "is_deleted": True}}).encode()
+
+
+def create_task(request) -> bytes:
+    if request.method == "POST":
+        user_id = request.user.data[0]  # User id that creates the task
+        try:
+            name = request.data["name"]
+        except KeyError:
+            return json.dumps({"status": 400, "message": "Request is invalid"}).encode()
+        cursor = request.client.database_connection.cursor()
+        query = f"INSERT INTO Task (name, tag, date_created, start_date, deadline, user_id, created_by, public, importance, is_completed) VALUES('{name}','University','2023-12-17 12:56:00','2023-12-12 15:56:00','2023-12-26 16:00:00','{user_id}','{user_id}',true,1, FALSE)"
+        cursor.execute(query)
+        request.client.database_connection.commit()
+        cursor.close()
+        return json.dumps({"status": 200, "message": "Ok", "data": {"is_created": True}}).encode()
