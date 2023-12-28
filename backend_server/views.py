@@ -229,3 +229,38 @@ def create_user(request) -> bytes:
         cursor.close()
         return json.dumps({"status": 200, "message": "Ok", "data": {"is_created": True}}).encode()
 
+def task_details(request) -> bytes:
+    if request.method == "POST":
+        user_id = request.user.data[0]
+        try:
+            task_ids = request.data
+        except AttributeError:
+            return json.dumps({"status": 400, "message": "Bad request"}).encode()
+
+        cursor = request.client.database_connection.cursor()
+        query = "SELECT * FROM Task WHERE id IN ({})".format(','.join(['%s'] * len(task_ids)))
+        cursor.execute(query, (task_ids))
+        result = cursor.fetchall()
+        cursor.close()
+        for i in result:
+            if i is not None:
+                if i[6] != user_id and i[7] != user_id:
+                    return json.dumps({"status": 403, "message": "Forbidden"}).encode()
+        message = {"status": 200, "data": []}
+        users = {}
+        result.reverse()
+        found_ids = []
+        for i in result:
+            if i is not None:
+                if i[6] not in users:
+                    users[i[6]] = get_user(request, i[6])
+                if i[7] not in users:
+                    users[i[7]] = get_user(request, i[7])
+                found_ids.append(i[0])
+                message["data"].append({"id": i[0], "name": i[1], "tag": i[2], "creation_date": str(i[3]), "start_date": str(i[4]), "deadline": str(i[5]), "user": users[i[6]], "creator": users[i[7]], "importance": i[9], "is_complete": i[10], "description": i[11]})
+
+        if len(task_ids) != len(found_ids):
+            for task_id in task_ids:
+                if task_id not in found_ids:
+                    message["data"].append({"id": task_id, "not_found": True})
+        return json.dumps(message).encode()

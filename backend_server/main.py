@@ -159,7 +159,7 @@ class Server:
             "/delete_task": View(views.delete_task, protected=True),
             "/delete_tasks": View(views.delete_tasks, protected=True),
             "/create_task": View(views.create_task, protected=True),
-            #"/task_details": View(views.task_details, protected=True),
+            "/task_details": View(views.task_details, protected=True),
             # "/update_task": View(views.update_task, protected=True),
         }
 
