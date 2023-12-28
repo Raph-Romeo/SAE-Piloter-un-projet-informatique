@@ -117,7 +117,7 @@ class CreateTaskForm(MessageBoxBase):
         self.selectUser = ComboBox()
         self.users = [self.mainWindow.user.username]
         self.selectUser.addItems(user_format(self.users))
-        l2 = QLabel("Task importance")
+        l2 = QLabel("Task priority")
         l2.setStyleSheet("font-size:12px;font-family:verdana;")
         self.selectImportance = ComboBox()
         self.selectImportance.addItems(['1', '2', '3'])

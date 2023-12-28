@@ -11,6 +11,7 @@ from qfluentwidgets import setTheme, Theme
 from datetime import datetime, timedelta
 from PyQt5.QtGui import QImage
 from view_task import ViewTask
+import threading
 import time
 import socket
 import requests
@@ -142,8 +143,8 @@ class User:
 class MainWindow(FramelessWindow):
     def __init__(self, connection, lw):
         super().__init__()
-        self.worker = None
-        self.thread = None
+        self.workers = []
+        self.threads = []
         self.user = None
         self.stb = StandardTitleBar(self)
         self.stb.setTitle("Taskmaster PRO")
@@ -345,7 +346,10 @@ class MainWindow(FramelessWindow):
     def view_task(self, response):
         response = json.loads(response.decode())
         if response["status"] == 200:
-            self.view_task_dialog = ViewTask(self, response["data"][0])
+            try:
+                self.view_task_dialog = ViewTask(self, response["data"][0])
+            except:
+                return print("Task doesn't exist")
             self.view_task_dialog.exec()
         elif response["status"] == 403:
             self.logout()
@@ -363,30 +367,19 @@ class MainWindow(FramelessWindow):
         self.clockThread.start()
 
     def init_send(self, message: bytes, return_function):
-        self.thread = QThread()
-        self.worker = SendMessageWorker(self.connection, message)
-        self.worker.moveToThread(self.thread)
-        self.thread.started.connect(self.worker.run)
-        self.worker.finished.connect(self.thread.quit)
-        self.worker.finished.connect(self.thread.exit)
-        self.worker.finished.connect(self.worker.deleteLater)
-        self.thread.finished.connect(self.thread.deleteLater)
-        self.worker.message.connect(return_function)
-        self.worker.error.connect(self.attempt_connection)
-        self.thread.start()
-
-    def init_test_connection(self, message: bytes):
-        self.test_thread = QThread()
-        self.test_worker = SendMessageWorker(self.connection, message)
-        self.test_worker.moveToThread(self.test_thread)
-        self.test_thread.started.connect(self.test_worker.run)
-        self.test_worker.finished.connect(self.test_thread.quit)
-        self.test_worker.finished.connect(self.test_thread.exit)
-        self.test_worker.finished.connect(self.test_worker.deleteLater)
-        self.test_thread.finished.connect(self.test_thread.deleteLater)
-        self.test_worker.message.connect(self.silent)
-        self.test_worker.error.connect(self.attempt_connection)
-        self.test_thread.start()
+        self.threads.append(QThread())
+        self.workers.append(SendMessageWorker(self.connection, message))
+        thread = self.threads[len(self.threads) - 1]
+        worker = self.workers[len(self.workers) - 1]
+        worker.moveToThread(thread)
+        thread.started.connect(worker.run)
+        worker.finished.connect(thread.quit)
+        worker.finished.connect(thread.exit)
+        worker.finished.connect(worker.deleteLater)
+        thread.finished.connect(thread.deleteLater)
+        worker.message.connect(return_function)
+        worker.error.connect(self.attempt_connection)
+        thread.start()
 
     def closeEvent(self, event):
         try:

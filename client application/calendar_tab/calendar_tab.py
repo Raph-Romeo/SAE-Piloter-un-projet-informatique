@@ -261,22 +261,28 @@ class CalendarTab(QWidget):
             self.calendarView.setCellWidget(hour, day, TaskItem(task, type, self.mainwindow.init_view_task_window))
 
     def toPreviousWeekFunction(self):
-        if self.dayFocus:
-            if (int((self.selectedDate - timedelta(days=1)).strftime("%w")) == 6):
-                self.picker.setDate(QDate(self.selectedDate - timedelta(days=1)))
+        if self.selectedDate is not None:
+            if self.dayFocus:
+                if (int((self.selectedDate - timedelta(days=1)).strftime("%w")) == 6):
+                    self.picker.setDate(QDate(self.selectedDate - timedelta(days=1)))
+                else:
+                    self.focusColumn(int((self.selectedDate - timedelta(days=1)).strftime("%w")))
             else:
-                self.focusColumn(int((self.selectedDate - timedelta(days=1)).strftime("%w")))
+                self.picker.setDate(QDate(self.selectedDate - timedelta(days=7)))
         else:
-            self.picker.setDate(QDate(self.selectedDate - timedelta(days=7)))
+            print("waiting for init...")
 
     def toNextWeekFunction(self):
-        if self.dayFocus:
-            if (int((self.selectedDate + timedelta(days=1)).strftime("%w")) == 0):
-                self.picker.setDate(QDate(self.selectedDate + timedelta(days=1)))
+        if self.selectedDate is not None:
+            if self.dayFocus:
+                if (int((self.selectedDate + timedelta(days=1)).strftime("%w")) == 0):
+                    self.picker.setDate(QDate(self.selectedDate + timedelta(days=1)))
+                else:
+                    self.focusColumn(int((self.selectedDate + timedelta(days=1)).strftime("%w")))
             else:
-                self.focusColumn(int((self.selectedDate + timedelta(days=1)).strftime("%w")))
+                self.picker.setDate(QDate(self.selectedDate + timedelta(days=7)))
         else:
-            self.picker.setDate(QDate(self.selectedDate + timedelta(days=7)))
+            print("waiting for init...")
 
     def initiate_calendar(self):
         self.picker.setDate(QDate().currentDate())
@@ -284,10 +290,13 @@ class CalendarTab(QWidget):
     def contextMenuEvent_table(self, e):
         menu = RoundMenu(parent=self)
         item = self.calendarView.indexAt(e.pos())
-        date = [self.days_of_week[item.column()], item.row()]
-        menu.addAction(Action(FluentIcon.ADD, 'Create Task'))
-        menu.menuActions()[0].triggered.connect(lambda: self.create_task(date))  # Create task
-        menu.exec(e.globalPos(), aniType=MenuAnimationType.NONE)
+        if self.selectedDate is not None:
+            date = [self.days_of_week[item.column()], item.row()]
+            menu.addAction(Action(FluentIcon.ADD, 'Create Task'))
+            menu.menuActions()[0].triggered.connect(lambda: self.create_task(date))  # Create task
+            menu.exec(e.globalPos(), aniType=MenuAnimationType.NONE)
+        else:
+            print("waiting for init...")
 
     def create_task(self, date=None):
         self.mainwindow.create_task_form(date)
