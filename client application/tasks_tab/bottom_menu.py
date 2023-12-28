@@ -9,15 +9,20 @@ import json
 class User(QWidget):
     def __init__(self, user):
         super().__init__()
-        self.avatar = AvatarWidget()
-        self.avatar.setImage(user.profile_picture)
-        self.avatar.setRadius(12)
+        # self.avatar = AvatarWidget()
+        # self.avatar.setImage(user.profile_picture)
+        # self.avatar.setRadius(12)
+        # User avatar causes major lag to the application.
+        self.icon = IconWidget(QIcon(user.profile_picture))
+        self.icon.setFixedHeight(24)
+        self.icon.setFixedWidth(24)
         self.username = QLabel(user.username)
         self.username.setStyleSheet("font-family:verdana;margin:0px;font-size:12px")
         layout = QHBoxLayout(self)
         layout.setSpacing(0)
         layout.setContentsMargins(10, 0, 0, 0)
-        layout.addWidget(self.avatar)
+        # layout.addWidget(self.avatar)
+        layout.addWidget(self.icon)
         layout.addWidget(self.username)
 
 
@@ -332,7 +337,7 @@ class BottomMenu(QMainWindow):
         else:
             InfoBar.error(title="Server error",content=data["message"],parent=self.parent,orient=Qt.Horizontal,isClosable=True,position=InfoBarPosition.TOP_RIGHT,duration=5000)
 
-    def export(self, tasks):
+    def export(self, tasks, task_id=None):
         try:
             file, _ = QFileDialog.getSaveFileName(self, "Choose File", "", "PDF Files (*.pdf);;CSV Files (*.csv)")
             if file is not None:
@@ -347,8 +352,11 @@ class BottomMenu(QMainWindow):
                     return InfoBar.error(title="Cancelled export", content="No file selected", parent=self.parent, orient=Qt.Horizontal, isClosable=True, position=InfoBarPosition.TOP_RIGHT, duration=5000)
                 self.file = file
                 task_ids = []
-                for task in tasks:
-                    task_ids.append(task.id)
+                if tasks is not None:
+                    for task in tasks:
+                        task_ids.append(task.id)
+                else:
+                    task_ids.append(task_id)
                 self.get_tasks(task_ids, file_format)
         except Exception as err:
             InfoBar.error(title="Cancelled export",content="Something went wrong",parent=self.parent,orient=Qt.Horizontal,isClosable=True,position=InfoBarPosition.TOP_RIGHT,duration=5000)
@@ -449,7 +457,7 @@ class BottomMenu(QMainWindow):
                 menu.menuActions()[1].triggered.connect(lambda: self.mainWindow.set_task_completed(selected_tasks[0].id,True))
             menu.addAction(Action(FluentIcon.DELETE, 'Delete Task'))
             menu.addAction(Action(FluentIcon.EDIT, 'Edit Task'))
-            menu.addAction(Action(FluentIcon.SAVE_COPY, 'Export Task'))
+            menu.addAction(Action(FluentIcon.SAVE_AS, 'Export Task'))
             menu.addSeparator()
             menu.addAction(Action(FluentIcon.ADD, 'Create Task'))
             menu.menuActions()[0].triggered.connect(lambda: self.mainWindow.init_view_task_window(selected_tasks[0].id)) # View task
@@ -459,7 +467,7 @@ class BottomMenu(QMainWindow):
             menu.menuActions()[5].triggered.connect(lambda: self.create_task()) # Create task
         elif len(selected_tasks) > 1:
             menu.addAction(Action(FluentIcon.DELETE, 'Delete Tasks'))
-            menu.addAction(Action(FluentIcon.SAVE_COPY, 'Export Tasks'))
+            menu.addAction(Action(FluentIcon.SAVE_AS, 'Export Tasks'))
             menu.addSeparator()
             menu.addAction(Action(FluentIcon.ADD, 'Create Task'))
             task_ids = []

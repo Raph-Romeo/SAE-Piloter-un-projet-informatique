@@ -106,9 +106,13 @@ light_style_sheet = """
     
     QLabel[taskCalendarItem]{border-radius:15px;padding:2px;margin:1px;font-family:arial;font-size:12px;}
     QLabel[TaskCalendarItemStatus0]{background:#222;color:white;}
+    QLabel[TaskCalendarItemStatus0]:hover{background:rgba(34, 34, 34, 200);color:black;}
     QLabel[TaskCalendarItemStatus1]{background:#5b2efc;color:white;}
+    QLabel[TaskCalendarItemStatus1]:hover{background:rgba(91, 46, 252, 200);color:black;}
     QLabel[TaskCalendarItemStatus2]{background:#3bd16f;color:white;}
+    QLabel[TaskCalendarItemStatus2]:hover{background:rgba(59, 209, 111, 200);color:black;}
     QLabel[TaskCalendarItemStatus3]{background:#c42b1c;color:white;}
+    QLabel[TaskCalendarItemStatus3]:hover{background:rgba(196, 43, 28, 200);color:black;}
     
     QPushButton[weekArrow]{color:black;border-radius:11px;font-size:12px;}
     QPushButton[weekArrow]:pressed{margin-right:1px;}
@@ -223,9 +227,13 @@ dark_style_sheet = """
     
     QLabel[taskCalendarItem]{border-radius:15px;padding:2px;margin:1px;font-family:arial;font-size:12px;}
     QLabel[TaskCalendarItemStatus0]{background:#EEE;color:black;}
+    QLabel[TaskCalendarItemStatus0]:hover{background:rgba(238, 238, 238, 200);color:white;}
     QLabel[TaskCalendarItemStatus1]{background:#916cee;color:white;}
+    QLabel[TaskCalendarItemStatus1]:hover{background:rgba(145, 108, 238, 200);color:black;}
     QLabel[TaskCalendarItemStatus2]{background:#6ccb5f;color:black;}
+    QLabel[TaskCalendarItemStatus2]:hover{background:rgba(108, 203, 95, 200);color:white;}
     QLabel[TaskCalendarItemStatus3]{background:#ff99a4;color:black;}
+    QLabel[TaskCalendarItemStatus3]:hover{background:rgba(255, 153, 164, 200);color:white;}
     
     QPushButton[weekArrow]{color:white;border-radius:11px;font-size:12px;}
     QPushButton[weekArrow]:pressed{margin-right:1px;}

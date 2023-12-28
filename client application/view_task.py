@@ -8,7 +8,7 @@ from qfluentwidgets import MessageBoxBase, HorizontalSeparator, SubtitleLabel, L
 from datetime import datetime
 
 
-def format_date(input_string):
+def format_date(input_string, include_date=True):
     def ordinal_suffix(day):
         if 10 <= day % 100 <= 20:
             suffix = 'th'
@@ -26,8 +26,10 @@ def format_date(input_string):
             input_datetime.strftime("%B"),
             input_datetime.strftime("%Y")
         )
-
-        return output_string
+        if include_date:
+            return output_string + f" at {input_string.split(' ')[1]}"
+        else:
+            return output_string
     except:
         return input_string
 
@@ -47,6 +49,7 @@ class ViewTask(MessageBoxBase):
         self.closeButton.clicked.connect(self.cancelEvent)
         self.closeButton.setIcon(FluentIcon.CLOSE)
         self.currentPage = 1
+        self.task_id = data["id"]
         header_layout = QHBoxLayout(self.formHeader)
         header_layout.addWidget(self.titleLabel)
         header_layout.addWidget(self.closeButton)
@@ -96,12 +99,12 @@ class ViewTask(MessageBoxBase):
             self.taskDescriptionText.setPlaceholderText("Description")
         self.taskDescriptionText.setReadOnly(True)
         self.taskDescriptionText.setStyleSheet("margin-left:20px;")
-        self.creation = QLabel(f"Created on the {format_date(data['creation_date'])}, by user {data['creator']['u']} ({data['creator']['e']})")
+        self.creation = QLabel(f"Created on the {format_date(data['creation_date'], False)}, by user {data['creator']['u']} ({data['creator']['e']})")
         self.creation.setStyleSheet("font-size:14px;font-family:verdana;")
-        self.start_date = QLabel(f"Start date : {format_date(data['start_date'])} at {data['start_date'].split(' ')[1]}")
+        self.start_date = QLabel(f"Start date : {format_date(data['start_date'])}")
         self.start_date.setStyleSheet("font-size:14px;font-family:verdana;")
         if data['deadline'] != 'None':
-            self.deadline = QLabel(f"Task must be completed before : {format_date(data['deadline'])} at {data['deadline'].split(' ')[1]}")
+            self.deadline = QLabel(f"Task must be completed before : {format_date(data['deadline'])}")
         else:
             self.deadline = QLabel()
             self.deadline.setHidden(True)
@@ -137,18 +140,32 @@ class ViewTask(MessageBoxBase):
         self.footer = QWidget()
         self.footer.setFixedHeight(60)
         footer_layout = QHBoxLayout(self.footer)
-        self.backB = PushButton()
-        self.backB.setText("BACK")
-        self.backB.setDisabled(True)
-        self.nextB = PushButton()
-        self.nextB.setText("NEXT")
-        self.backB.setIcon(FluentIcon.LEFT_ARROW)
-        self.nextB.setIcon(FluentIcon.RIGHT_ARROW)
-        footer_layout.addWidget(self.backB)
-        footer_layout.addWidget(self.nextB)
+        self.deleteButton = PushButton()
+        self.deleteButton.setText("Delete")
+        self.deleteButton.clicked.connect(self.deleteSelf)
+        self.deleteButton.setIcon(FluentIcon.DELETE)
+
+
+        self.editButton = PushButton()
+        self.editButton.setText("Edit")
+        self.editButton.setIcon(FluentIcon.EDIT)
+        #self.editButton.clicked.connect(lambda: self.mainWindow.delete_task(data["id"]))
+
+        self.exportButton = PushButton()
+        self.exportButton.setText("Export")
+        self.exportButton.setIcon(FluentIcon.SAVE_AS)
+        self.exportButton.clicked.connect(lambda: self.mainWindow.mainTabWidget.tasksTab.contentWindow.export(None, task_id=self.task_id))
+
+        footer_layout.addWidget(self.deleteButton)
+        footer_layout.addWidget(self.editButton)
+        footer_layout.addWidget(self.exportButton)
         self.viewLayout.addWidget(self.footer)
 
         self.buttonGroup.setHidden(True)
 
     def cancelEvent(self, e):
+        self.close()
+
+    def deleteSelf(self):
+        self.mainWindow.delete_task(self.task_id)
         self.close()
