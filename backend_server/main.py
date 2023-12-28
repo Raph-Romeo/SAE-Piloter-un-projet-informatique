@@ -7,7 +7,7 @@ import mysql.connector
 class Request:
     def __init__(self, request, client):
         self.client = client
-        if "test" in request.keys():
+        if "t" in request.keys():
             self.test = True
         else:
             self.test = False
@@ -52,20 +52,15 @@ class Client:
         self.connected = True
         self.client_thread = threading.Thread(target=self.handle)
         self.client_thread.start()
-        self.database_connection = mysql.connector.connect(
-            host=database_params["host"],
-            port=database_params["port"],
-            user=database_params["user"],
-            password=database_params["password"],
-            database=database_params["database"]
-        )
 
     def close(self) -> None:
-        print(f"CONNECTION CLOSED : {self.addr[0]}:{self.addr[1]}")
-        self.server.remove(self)
+        #print(f"CONNECTION CLOSED : {self.addr[0]}:{self.addr[1]}")
         self.connection.close()
         self.connected = False
-        self.database_connection.close()
+        try:
+            self.database_connection.close()
+        except:
+            pass
         return
 
     def handle(self) -> None:
@@ -77,6 +72,15 @@ class Client:
                     if data.test:
                         self.connection.send(json.dumps({"status": 200}).encode())
                     else:
+                        self.database_connection = mysql.connector.connect(
+                            host=database_params["host"],
+                            port=database_params["port"],
+                            user=database_params["user"],
+                            password=database_params["password"],
+                            database=database_params["database"]
+                        )
+                        while self.database_connection is None:
+                            time.sleep(0.1)
                         self.connection.send(self.server.request(data))
                 else:
                     self.close()
@@ -113,6 +117,14 @@ class Client:
         cursor.close()
         return result
 
+    def check_email(self, email):
+        cursor = self.database_connection.cursor()
+        query = "SELECT * FROM User WHERE email = %s"
+        cursor.execute(query, (email,))
+        result = cursor.fetchone()
+        cursor.close()
+        return result
+
     def check_username_and_password(self, username, password):
         cursor = self.database_connection.cursor()
         query = "SELECT * FROM User WHERE username = %s AND password = %s"
@@ -138,12 +150,17 @@ class Server:
 
         # server URLS:
         self.urls = {
-            "/auth": View(views.login),
+            # Users + AUTHENTICATION
+            "/auth": View(views.login, protected=False),
+            "/create_user": View(views.create_user, protected=False),
+            # Tasks CRUD
             "/tasks": View(views.tasks, protected=True),
             "/set_completed": View(views.set_completed, protected=True),
             "/delete_task": View(views.delete_task, protected=True),
             "/delete_tasks": View(views.delete_tasks, protected=True),
             "/create_task": View(views.create_task, protected=True),
+            #"/task_details": View(views.task_details, protected=True),
+            # "/update_task": View(views.update_task, protected=True),
         }
 
     def close(self) -> None:
@@ -194,7 +211,8 @@ class Server:
                     return self.urls[request.url].view(request)
             else:
                 return json.dumps({"status": 404, "message": "Url not found"}).encode()
-        except:
+        except Exception as err:
+            print(err)
             return json.dumps({"status": 400, "message": "Invalid request"}).encode()
 
 
