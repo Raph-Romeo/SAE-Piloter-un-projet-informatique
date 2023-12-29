@@ -381,3 +381,70 @@ def friend_request(request) -> bytes:
                 return json.dumps({"status": 400, "message": "You cannot send a friend request to yourself !"}).encode()
         else:
             return json.dumps({"status": 404, "message": "No user was found with matching username"}).encode()
+
+def cancel_friend_request(request) -> bytes:
+    if request.method == "POST":
+        user_id = request.user.data[0]
+        request_id = request.data["request_id"]
+        cursor = request.client.database_connection.cursor()
+        query = "SELECT * FROM friendships WHERE friendships_id = %s AND status = '0'"
+        cursor.execute(query, (request_id,))
+        result = cursor.fetchone()
+        cursor.close()
+        if result is not None:
+            if result[1] == user_id:
+                cursor = request.client.database_connection.cursor()
+                query = f"DELETE FROM friendships WHERE friendships_id = {result[0]}"
+                cursor.execute(query)
+                request.client.database_connection.commit()
+                cursor.close()
+                return json.dumps({"status": 200, "message": "Cancelled friend request."}).encode()
+            else:
+                return json.dumps({"status": 403, "message": "You are not allowed to perform this action"}).encode()
+        else:
+            return json.dumps({"status": 404, "message": "Friend request is no longer available"}).encode()
+
+def accept_friend_request(request) -> bytes:
+    if request.method == "POST":
+        user_id = request.user.data[0]
+        request_id = request.data["request_id"]
+        cursor = request.client.database_connection.cursor()
+        query = "SELECT * FROM friendships WHERE friendships_id = %s AND status = '0'"
+        cursor.execute(query, (request_id,))
+        result = cursor.fetchone()
+        cursor.close()
+        if result is not None:
+            if result[2] == user_id:
+                cursor = request.client.database_connection.cursor()
+                query = f"UPDATE friendships SET status = '1' WHERE friendships_id = {result[0]}"
+                cursor.execute(query)
+                request.client.database_connection.commit()
+                cursor.close()
+                return json.dumps({"status": 200, "message": "Friend request accepted !"}).encode()
+            else:
+                return json.dumps({"status": 403, "message": "You are not allowed to perform this action"}).encode()
+        else:
+            return json.dumps({"status": 404, "message": "Friend request is no longer available"}).encode()
+
+
+def deny_friend_request(request) -> bytes:
+    if request.method == "POST":
+        user_id = request.user.data[0]
+        request_id = request.data["request_id"]
+        cursor = request.client.database_connection.cursor()
+        query = "SELECT * FROM friendships WHERE friendships_id = %s AND status = '0'"
+        cursor.execute(query, (request_id,))
+        result = cursor.fetchone()
+        cursor.close()
+        if result is not None:
+            if result[2] == user_id:
+                cursor = request.client.database_connection.cursor()
+                query = f"DELETE FROM friendships WHERE friendships_id = {result[0]}"
+                cursor.execute(query)
+                request.client.database_connection.commit()
+                cursor.close()
+                return json.dumps({"status": 200, "message": "Denied friend request."}).encode()
+            else:
+                return json.dumps({"status": 403, "message": "You are not allowed to perform this action"}).encode()
+        else:
+            return json.dumps({"status": 404, "message": "Friend request is no longer available"}).encode()
