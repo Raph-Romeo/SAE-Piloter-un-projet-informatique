@@ -264,3 +264,48 @@ def task_details(request) -> bytes:
                 if task_id not in found_ids:
                     message["data"].append({"id": task_id, "not_found": True})
         return json.dumps(message).encode()
+
+def fetch_requests(request) -> bytes:
+    if request.method == "GET":
+        user_id = request.user.data[0]
+        try:
+            cursor = request.client.database_connection.cursor()
+            query = f"SELECT * FROM friendships WHERE user2_id = {user_id} AND status = '0'"
+            cursor.execute(query)
+            result = cursor.fetchall()
+            cursor.close()
+            request_num = len(result)
+            cursor = request.client.database_connection.cursor()
+            query = f"SELECT * FROM friendships WHERE (user1_id = {user_id} OR user2_id = {user_id}) AND status = '1'"
+            cursor.execute(query)
+            result = cursor.fetchall()
+            cursor.close()
+            number_of_friends = len(result)
+
+            # result = ["1", "2", "3"] TESTING IF THERE WERE 3 PENDING REQUESTS
+            return json.dumps({"status": 200, "data": {"request_num": request_num, "number_of_friends": number_of_friends}}).encode()
+        except:
+            return json.dumps({"status": 400, "message": "Could get data from database"}).encode()
+
+def friends(request) -> bytes:
+    if request.method == "GET":
+        user_id = request.user.data[0]
+        try:
+            cursor = request.client.database_connection.cursor()
+            query = f"SELECT * FROM friendships WHERE (user1_id = {user_id} OR user2_id = {user_id}) AND status = '1'"
+            cursor.execute(query)
+            result = cursor.fetchall()
+            cursor.close()
+            message = {"status": 200, "data": {"friends": []}}
+            for i in result:
+                if i[1] == user_id:
+                    friend = get_user(request, i[2], True)
+                    friend["request_id"] = i[0]
+                    message["data"]["friends"].append(friend)
+                else:
+                    friend = get_user(request, i[1], True)
+                    friend["request_id"] = i[0]
+                    message["data"]["friends"].append(friend)
+            return json.dumps(message).encode()
+        except:
+            return json.dumps({"status": 400, "message": "Could get data from database"}).encode()
