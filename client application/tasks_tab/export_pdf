@@ -15,8 +15,8 @@ class TaskPDF:
         self.margin_bottom = 36
         self.logo_width = 50
         self.logo_height = 50
-        self.user_icon_path = "../icons/default.png"
-        self.creator_icon_path = "../icons/default.png"
+        self.user_icon_path = "../icons/per1.png"
+        self.creator_icon_path = "../icons/per1.png"
         self.importance_icon_path = "../icons/danger.webp"
         self.file_name = file_name if file_name else self.get_file_name()
         self.c = canvas.Canvas(self.file_name, pagesize=letter)
