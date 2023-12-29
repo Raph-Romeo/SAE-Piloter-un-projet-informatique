@@ -302,8 +302,8 @@ class MainWindow(FramelessWindow):
         for task in self.tasks:
             if task.id not in task_ids:
                 tasks.append(task)
+        self.mainTabWidget.tasksTab.contentWindow.remove_tasks(task_ids)
         self.tasks = tasks
-        self.mainTabWidget.tasksTab.contentWindow.remove_tasks(task_ids, self.tasks)
         self.mainTabWidget.calendarTab.refreshCalendar()
 
     def add_task(self, task):
@@ -313,7 +313,7 @@ class MainWindow(FramelessWindow):
             deadline = None
         new_task = Task(task["id"], task["N"], task["T"],datetime.strptime(task["SD"], "%Y-%m-%d %H:%M:%S"),deadline, User(task["ow"]["u"], task["ow"]["e"]),is_owner=task["io"], public=task["pu"], is_completed=task["IC"])
         self.tasks.insert(0, new_task)
-        self.mainTabWidget.tasksTab.contentWindow.add_task(new_task, self.tasks)
+        self.mainTabWidget.tasksTab.contentWindow.add_task(new_task)
         self.mainTabWidget.calendarTab.refreshCalendar()
 
     def set_tasks(self, response: bytes):
@@ -335,7 +335,7 @@ class MainWindow(FramelessWindow):
                          datetime.strptime(i["SD"], "%Y-%m-%d %H:%M:%S"),
                          deadline, User(i["ow"]["u"], i["ow"]["e"]),
                          is_owner=i["io"], public=i["pu"], is_completed=i["IC"]))
-            self.mainTabWidget.tasksTab.set_tasks(self.tasks)
+            self.mainTabWidget.tasksTab.set_tasks()
             self.mainTabWidget.calendarTab.refreshCalendar()
 
     def set_task_completed(self, pk: int, is_completed: bool):

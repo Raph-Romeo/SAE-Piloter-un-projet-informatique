@@ -31,5 +31,5 @@ class TasksTab(QWidget):
     def update_tasks(self, change):
         self.contentWindow.update_tasks(change)
 
-    def set_tasks(self, tasks):
-        self.contentWindow.set_tasks(tasks)
+    def set_tasks(self):
+        self.contentWindow.set_tasks()

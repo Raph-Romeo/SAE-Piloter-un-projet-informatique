@@ -202,7 +202,6 @@ class BottomMenu(QMainWindow):
         self.searchBar.setCursor(QCursor(Qt.IBeamCursor))
         self.searchBarIcon.setPixmap(pixmap.scaled(QSize(20, 20), Qt.KeepAspectRatio, Qt.SmoothTransformation))
         self.searchBar.setLayout(searchBarLayout)
-        self.task_list = []
         searchBarLayout.addWidget(self.searchBarQlineEdit, 0, 1)
         searchBarLayout.addWidget(self.searchBarIcon, 0, 0)
 
@@ -245,10 +244,9 @@ class BottomMenu(QMainWindow):
         layout.addWidget(self.exportTasksButton, 0, 3)
         layout.addWidget(self.tasksTableWidget, 1, 0, 1, 4)
 
-    def set_tasks(self, task_list):
+    def set_tasks(self):
         self.clearTasks()
-        self.task_list = task_list
-        for i in task_list:
+        for i in self.mainWindow.tasks:
             self.tasksTableWidget.setRowCount(self.tasksTableWidget.rowCount() + 1)
             self.tasksTableWidget.setItem(self.tasksTableWidget.rowCount() - 1, 0, QTableWidgetItem(i.name))
             self.tasksTableWidget.setItem(self.tasksTableWidget.rowCount() - 1, 1, QTableWidgetItem(i.tag))
@@ -257,22 +255,21 @@ class BottomMenu(QMainWindow):
             self.tasksTableWidget.setCellWidget(self.tasksTableWidget.rowCount() - 1, 4, TimeLeft(i.time_left()))
             self.tasksTableWidget.setCellWidget(self.tasksTableWidget.rowCount() - 1, 5, progressBar(0))
             self.tasksTableWidget.setRowHeight(self.tasksTableWidget.rowCount() - 1, 40)
-        self.parent.topMenu.setTaskNumber(len(task_list))
+        self.parent.topMenu.setTaskNumber(len(self.mainWindow.tasks))
         self.apply_filter()
         self.refreshTasksButton.setDisabled(False)
 
-    def remove_tasks(self, task_ids, task_list):
+    def remove_tasks(self, task_ids):
         task_indexes_to_remove = []
-        for i in range(len(self.task_list)):
-            if self.task_list[i].id in task_ids:
+        for i in range(len(self.mainWindow.tasks)):
+            if self.mainWindow.tasks[i].id in task_ids:
                 task_indexes_to_remove.append(i)
         task_indexes_to_remove.sort()
         task_indexes_to_remove.reverse()
         for row in task_indexes_to_remove:
             self.tasksTableWidget.removeRow(row)
-        self.task_list = task_list
 
-    def add_task(self, task, task_list):
+    def add_task(self, task):
         self.tasksTableWidget.insertRow(0)
         self.tasksTableWidget.setItem(0, 0, QTableWidgetItem(task.name))
         self.tasksTableWidget.setItem(0, 1, QTableWidgetItem(task.tag))
@@ -281,23 +278,22 @@ class BottomMenu(QMainWindow):
         self.tasksTableWidget.setCellWidget(0, 4, TimeLeft(task.time_left()))
         self.tasksTableWidget.setCellWidget(0, 5, progressBar(0))
         self.tasksTableWidget.setRowHeight(0, 40)
-        self.task_list = task_list
-        self.parent.topMenu.setTaskNumber(len(task_list))
+        self.parent.topMenu.setTaskNumber(len(self.mainWindow.tasks))
 
     def date_tasks_filter(self, date):
         self.parent.topMenu.setTab(None)
         self.searchBarQlineEdit.setDisabled(True)
-        for task in self.task_list:
+        for task in self.mainWindow.tasks:
             if task.deadline != None:
                 if task.start_date.date() <= date.toPyDate() <= task.deadline.date():
-                    self.tasksTableWidget.showRow(self.task_list.index(task))
+                    self.tasksTableWidget.showRow(self.mainWindow.tasks.index(task))
                 else:
-                    self.tasksTableWidget.hideRow(self.task_list.index(task))
+                    self.tasksTableWidget.hideRow(self.mainWindow.tasks.index(task))
             else:
                 if task.start_date.date() == date.toPyDate():
-                    self.tasksTableWidget.showRow(self.task_list.index(task))
+                    self.tasksTableWidget.showRow(self.mainWindow.tasks.index(task))
                 else:
-                    self.tasksTableWidget.hideRow(self.task_list.index(task))
+                    self.tasksTableWidget.hideRow(self.mainWindow.tasks.index(task))
 
     def reset_date(self):
         self.searchBarQlineEdit.setDisabled(False)
@@ -321,8 +317,8 @@ class BottomMenu(QMainWindow):
             menu.menuActions()[0].setDisabled(True)
         else:
             for row in self.tasksTableWidget.selectionModel().selectedRows():
-                selected_tasks.append(self.task_list[row.row()])
-        if len(self.task_list) == 0:
+                selected_tasks.append(self.mainWindow.tasks[row.row()])
+        if len(self.mainWindow.tasks) == 0:
             menu.menuActions()[1].setDisabled(True)
             menu.menuActions()[2].setDisabled(True)
         else:
@@ -330,10 +326,10 @@ class BottomMenu(QMainWindow):
             for row in range(self.tasksTableWidget.rowCount()):
                 if not self.tasksTableWidget.isRowHidden(row):
                     menu.menuActions()[1].setDisabled(False)
-                    visible_tasks.append(self.task_list[row])
+                    visible_tasks.append(self.mainWindow.tasks[row])
         menu.menuActions()[0].triggered.connect(lambda: self.export(selected_tasks))
         menu.menuActions()[1].triggered.connect(lambda: self.export(visible_tasks))
-        menu.menuActions()[2].triggered.connect(lambda: self.export(self.task_list))
+        menu.menuActions()[2].triggered.connect(lambda: self.export(self.mainWindow.tasks))
         menu.exec(event.globalPos(), aniType=MenuAnimationType.DROP_DOWN)
 
     def get_tasks(self, task_ids, f_type):
@@ -435,16 +431,16 @@ class BottomMenu(QMainWindow):
 
     def apply_filter(self):
         if self.filter == 1:
-            for i in range(0, len(self.task_list)):
-                if not self.task_list[i].is_owner:
+            for i in range(0, len(self.mainWindow.tasks)):
+                if not self.mainWindow.tasks[i].is_owner:
                     self.tasksTableWidget.hideRow(i)
         elif self.filter == 2:
-            for i in range(0, len(self.task_list)):
-                if not self.task_list[i].status == 1:
+            for i in range(0, len(self.mainWindow.tasks)):
+                if not self.mainWindow.tasks[i].status == 1:
                     self.tasksTableWidget.hideRow(i)
         elif self.filter == 3:
-            for i in range(0, len(self.task_list)):
-                if not self.task_list[i].is_completed:
+            for i in range(0, len(self.mainWindow.tasks)):
+                if not self.mainWindow.tasks[i].is_completed:
                     self.tasksTableWidget.hideRow(i)
 
     def create_task(self):
@@ -454,23 +450,23 @@ class BottomMenu(QMainWindow):
         self.reset_date()
         self.filter = x
         if self.filter == 0:
-            for i in range(0, len(self.task_list)):
+            for i in range(0, len(self.mainWindow.tasks)):
                 self.tasksTableWidget.showRow(i)
         elif self.filter == 1:
-            for i in range(0, len(self.task_list)):
-                if not self.task_list[i].is_owner:
+            for i in range(0, len(self.mainWindow.tasks)):
+                if not self.mainWindow.tasks[i].is_owner:
                     self.tasksTableWidget.hideRow(i)
                 else:
                     self.tasksTableWidget.showRow(i)
         elif self.filter == 2:
-            for i in range(0, len(self.task_list)):
-                if not self.task_list[i].status == 1 or not self.task_list[i].is_owner:
+            for i in range(0, len(self.mainWindow.tasks)):
+                if not self.mainWindow.tasks[i].status == 1 or not self.mainWindow.tasks[i].is_owner:
                     self.tasksTableWidget.hideRow(i)
                 else:
                     self.tasksTableWidget.showRow(i)
         elif self.filter == 3:
-            for i in range(0, len(self.task_list)):
-                if not self.task_list[i].is_completed:
+            for i in range(0, len(self.mainWindow.tasks)):
+                if not self.mainWindow.tasks[i].is_completed:
                     self.tasksTableWidget.hideRow(i)
                 else:
                     self.tasksTableWidget.showRow(i)
@@ -484,22 +480,21 @@ class BottomMenu(QMainWindow):
 
     def update_tasks(self, change):
         if change:
-            self.task_list = self.mainWindow.tasks
             self.apply_filter()
         for row in range(self.tasksTableWidget.rowCount()):
-            self.tasksTableWidget.cellWidget(row, 4).setTime(self.task_list[row].time_left())
+            self.tasksTableWidget.cellWidget(row, 4).setTime(self.mainWindow.tasks[row].time_left())
             if change:
-                self.tasksTableWidget.cellWidget(row, 3).setStatus(self.task_list[row].status)
+                self.tasksTableWidget.cellWidget(row, 3).setStatus(self.mainWindow.tasks[row].status)
 
     def doubleClick(self, e):
-        return self.mainWindow.init_view_task_window(self.task_list[e].id)
+        return self.mainWindow.init_view_task_window(self.mainWindow.tasks[e].id)
 
     def contextMenuEvent_table(self, e):
         menu = RoundMenu(parent=self)
         selected_tasks = []
         for row in self.tasksTableWidget.selectionModel().selectedRows():
             if not self.tasksTableWidget.isRowHidden(row.row()):
-                selected_tasks.append(self.task_list[row.row()])
+                selected_tasks.append(self.mainWindow.tasks[row.row()])
         if len(selected_tasks) == 1:
             menu.addAction(Action(FluentIcon.MORE, 'View Task'))
             if selected_tasks[0].is_completed:
@@ -539,7 +534,7 @@ class BottomMenu(QMainWindow):
             selected_tasks = []
             for row in self.tasksTableWidget.selectionModel().selectedRows():
                 if not self.tasksTableWidget.isRowHidden(row.row()):
-                    selected_tasks.append(self.task_list[row.row()])
+                    selected_tasks.append(self.mainWindow.tasks[row.row()])
             if len(selected_tasks) > 0:
                 task_ids = []
                 for i in selected_tasks:
