@@ -149,7 +149,6 @@ class ViewTask(MessageBoxBase):
         self.deleteButton.clicked.connect(self.deleteSelf)
         self.deleteButton.setIcon(FluentIcon.DELETE)
 
-
         self.editButton = PushButton()
         self.editButton.setText("Edit")
         self.editButton.setIcon(FluentIcon.EDIT)
@@ -162,6 +161,7 @@ class ViewTask(MessageBoxBase):
         self.saveButton.setText("Save changes")
         self.saveButton.setHidden(True)
         self.saveButton.setIcon(FluentIcon.SAVE)
+        self.saveButton.setDisabled(True)
         self.cancelEditButton = PushButton()
         self.cancelEditButton.setText("Cancel changes")
         self.cancelEditButton.setHidden(True)

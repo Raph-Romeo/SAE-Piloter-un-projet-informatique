@@ -116,6 +116,8 @@ class CreateTaskForm(MessageBoxBase):
         l1.setStyleSheet("font-size:12px;font-family:verdana;")
         self.selectUser = ComboBox()
         self.users = [self.mainWindow.user.username]
+        for user in self.mainWindow.friends:
+            self.users.append(user.username)
         self.selectUser.addItems(user_format(self.users))
         l2 = QLabel("Task priority")
         l2.setStyleSheet("font-size:12px;font-family:verdana;")
