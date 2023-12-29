@@ -26,13 +26,15 @@
 
 # Getting started.
 
-## Server (Back-end)
+## Server (Back end)
+### ⚠️ All of the following actions are performed within the 📁 backend_server directory from this repository.
 
 System requirements :
  - **Docker**
  - **Operating system** : Linux
 
-## Application (Front-end)
+## Application (Front end)
+### ⚠️ All of the following actions are performed within the 📁 client application directory from this repository.
 
 System requirements :
  - **Python** : version 3.9 or greater
@@ -40,18 +42,37 @@ System requirements :
  - **Storage** : 160Mb
 
 There are two methods to run the application.
-### First method :
+### First method using Python
 
-### Second method :
+```bat
+pip install -r requirements.txt
+```
+
+Once all packages are installed you may run main.py
+
+```bat
+python main.py
+```
+
+Or alternatively, you may run the run.bat file.
+
+### Second method -- Executable
+
+Ensure that Python is accessible from your environment variable : **PATH**
+
+Please run the **package.bat** file.
+_This will create a virtual environment containing the application's essential modules (from requirements.txt) and then it will create an executable file to run the application. It will be created inside a folder called **packaged_application**_
+
+You may then run the created executable located at **packaged_application/TaskMasterPro.exe**
 
 # Our team :
- - **Raphael ROMEO**
- - **Emir ERASLAN**
- - **Elmir BATJARI**
- - **Elias LAMINE**
- - **Khalil DAOUDI**
- - **Mehdi REHM**
- - **Shpend RASHITI**
+ - **Raphael ROMEO** - raphael.romeo@uha.fr
+ - **Emir ERASLAN** - emir.eraslan@uha.fr
+ - **Elmir BATJARI** - elmir.batjari@uha.fr
+ - **Elias LAMINE** - elias.lamine@uha.fr
+ - **Khalil DAOUDI** - khalil.daoudi@uha.fr
+ - **Mehdi REHM** - medhi.rehm@uha.fr
+ - **Shpend RASHITI** - shpend.rashiti@uha.fr
 
 ### Backend : 
  - **Shpend RASHITI** (Backend developper and database) 
