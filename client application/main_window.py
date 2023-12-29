@@ -294,6 +294,7 @@ class MainWindow(FramelessWindow):
                 except Exception as err:
                     print("failed to create friend object", err)
             self.mainTabWidget.friendsTab.set_friends(self.friends)
+            self.mainTabWidget.friendsTab.refreshFriendsButton.setDisabled(False)
 
     # This method is subject to change. Only a temporary solution
     def remove_tasks(self, task_ids: list):
@@ -302,7 +303,7 @@ class MainWindow(FramelessWindow):
             if task.id not in task_ids:
                 tasks.append(task)
         self.tasks = tasks
-        self.mainTabWidget.tasksTab.set_tasks(self.tasks)
+        self.mainTabWidget.tasksTab.contentWindow.remove_tasks(task_ids, self.tasks)
         self.mainTabWidget.calendarTab.refreshCalendar()
 
     def add_task(self, task):
@@ -310,12 +311,9 @@ class MainWindow(FramelessWindow):
             deadline = datetime.strptime(task["DL"], "%Y-%m-%d %H:%M:%S")
         except:
             deadline = None
-        self.tasks.insert(0,
-            Task(task["id"], task["N"], task["T"],
-                 datetime.strptime(task["SD"], "%Y-%m-%d %H:%M:%S"),
-                 deadline, User(task["ow"]["u"], task["ow"]["e"]),
-                 is_owner=task["io"], public=task["pu"], is_completed=task["IC"]))
-        self.mainTabWidget.tasksTab.set_tasks(self.tasks)
+        new_task = Task(task["id"], task["N"], task["T"],datetime.strptime(task["SD"], "%Y-%m-%d %H:%M:%S"),deadline, User(task["ow"]["u"], task["ow"]["e"]),is_owner=task["io"], public=task["pu"], is_completed=task["IC"])
+        self.tasks.insert(0, new_task)
+        self.mainTabWidget.tasksTab.contentWindow.add_task(new_task, self.tasks)
         self.mainTabWidget.calendarTab.refreshCalendar()
 
     def set_tasks(self, response: bytes):
@@ -596,6 +594,12 @@ class MainWindow(FramelessWindow):
         else:
             return
 
-    def update_friends(self):
+    def update_friends(self):  # refresh friends...
         message = json.dumps({"url": "/friends", "method": "GET", "token": self.user.auth_token})
         self.init_send(message.encode(), self.set_friends)
+
+    def refresh_tasks(self):
+        InfoBar.info(title="", content="Refreshing tasks...", parent=self, orient=Qt.Horizontal, isClosable=True, position=InfoBarPosition.TOP_RIGHT, duration=2000)
+        self.mainTabWidget.tasksTab.contentWindow.refreshTasksButton.setDisabled(True)
+        message = json.dumps({"url": "/tasks", "method": "GET", "token": self.user.auth_token})
+        self.init_send(message.encode(), self.set_tasks)

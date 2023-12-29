@@ -230,15 +230,20 @@ class BottomMenu(QMainWindow):
         for col in range(3, self.tasksTableWidget.columnCount()):
             self.tasksTableWidget.horizontalHeader().setSectionResizeMode(col, QHeaderView.Stretch)
         layout.addWidget(self.searchBar, 0, 0)
+        self.refreshTasksButton = ToolButton()
+        self.refreshTasksButton.setIcon(FluentIcon.UPDATE)
+        self.refreshTasksButton.setToolTip("Refresh tasks")
+        self.refreshTasksButton.clicked.connect(self.refreshTasks)
         self.tasksDatePicker = CalendarPicker()
         self.tasksDatePicker.dateChanged.connect(self.date_tasks_filter)
         self.exportTasksButton = ToolButton()
         self.exportTasksButton.setIcon(FluentIcon.DOWNLOAD)
         self.exportTasksButton.setToolTip("Export tasks")
         self.exportTasksButton.mousePressEvent = self.exportMenu
-        layout.addWidget(self.tasksDatePicker, 0, 1)
-        layout.addWidget(self.exportTasksButton, 0, 2)
-        layout.addWidget(self.tasksTableWidget, 1, 0, 1, 3)
+        layout.addWidget(self.refreshTasksButton, 0, 1)
+        layout.addWidget(self.tasksDatePicker, 0, 2)
+        layout.addWidget(self.exportTasksButton, 0, 3)
+        layout.addWidget(self.tasksTableWidget, 1, 0, 1, 4)
 
     def set_tasks(self, task_list):
         self.clearTasks()
@@ -254,6 +259,30 @@ class BottomMenu(QMainWindow):
             self.tasksTableWidget.setRowHeight(self.tasksTableWidget.rowCount() - 1, 40)
         self.parent.topMenu.setTaskNumber(len(task_list))
         self.apply_filter()
+        self.refreshTasksButton.setDisabled(False)
+
+    def remove_tasks(self, task_ids, task_list):
+        task_indexes_to_remove = []
+        for i in range(len(self.task_list)):
+            if self.task_list[i].id in task_ids:
+                task_indexes_to_remove.append(i)
+        task_indexes_to_remove.sort()
+        task_indexes_to_remove.reverse()
+        for row in task_indexes_to_remove:
+            self.tasksTableWidget.removeRow(row)
+        self.task_list = task_list
+
+    def add_task(self, task, task_list):
+        self.tasksTableWidget.insertRow(0)
+        self.tasksTableWidget.setItem(0, 0, QTableWidgetItem(task.name))
+        self.tasksTableWidget.setItem(0, 1, QTableWidgetItem(task.tag))
+        self.tasksTableWidget.setCellWidget(0, 2, User(task.user))
+        self.tasksTableWidget.setCellWidget(0, 3, Status(task.status))
+        self.tasksTableWidget.setCellWidget(0, 4, TimeLeft(task.time_left()))
+        self.tasksTableWidget.setCellWidget(0, 5, progressBar(0))
+        self.tasksTableWidget.setRowHeight(0, 40)
+        self.task_list = task_list
+        self.parent.topMenu.setTaskNumber(len(task_list))
 
     def date_tasks_filter(self, date):
         self.parent.topMenu.setTab(None)
@@ -435,7 +464,7 @@ class BottomMenu(QMainWindow):
                     self.tasksTableWidget.showRow(i)
         elif self.filter == 2:
             for i in range(0, len(self.task_list)):
-                if not self.task_list[i].status == 1:
+                if not self.task_list[i].status == 1 or not self.task_list[i].is_owner:
                     self.tasksTableWidget.hideRow(i)
                 else:
                     self.tasksTableWidget.showRow(i)
@@ -518,3 +547,6 @@ class BottomMenu(QMainWindow):
                 self.mainWindow.delete_tasks(task_ids)
         else:
             super(QTableWidget, self.tasksTableWidget).keyPressEvent(event)
+
+    def refreshTasks(self):
+        self.mainWindow.refresh_tasks()

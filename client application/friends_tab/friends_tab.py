@@ -27,19 +27,25 @@ class FriendsTab(QWidget):
         self.topTitle.setProperty("calendarLabel", True)
         friendsTabLayout.addWidget(self.topTitle, 0, 0)
 
+        self.refreshFriendsButton = ToolButton()
+        self.refreshFriendsButton.setIcon(FluentIcon.UPDATE)
+        self.refreshFriendsButton.setToolTip("Refresh friends")
+        self.refreshFriendsButton.clicked.connect(self.refresh_friends)
+        friendsTabLayout.addWidget(self.refreshFriendsButton, 0, 1)
+
         self.requestsButton = PushButton()
         self.requestsButton.setText("Friend requests")
         self.requestsButton.setIcon(None)
         self.requestsButton.setFixedWidth(150)
         self.requestsButton.clicked.connect(self.init_friend_requests_menu)
-        friendsTabLayout.addWidget(self.requestsButton, 0, 1)
+        friendsTabLayout.addWidget(self.requestsButton, 0, 2)
 
         self.addFriendButton = PushButton()
         self.addFriendButton.setText("Add friend")
         self.addFriendButton.setIcon(FluentIcon.ADD)
         self.addFriendButton.setFixedWidth(120)
         self.addFriendButton.clicked.connect(self.init_add_friend_form)
-        friendsTabLayout.addWidget(self.addFriendButton, 0, 2)
+        friendsTabLayout.addWidget(self.addFriendButton, 0, 3)
 
         self.friendsTable = TableWidget()
         self.friendsTable.setColumnCount(3)
@@ -51,7 +57,7 @@ class FriendsTab(QWidget):
         self.friendsTable.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self.friendsTable.verticalHeader().setHidden(True)
 
-        friendsTabLayout.addWidget(self.friendsTable, 1, 0, 1, 3)
+        friendsTabLayout.addWidget(self.friendsTable, 1, 0, 1, 4)
 
         boxShadow = QGraphicsDropShadowEffect()
         boxShadow.setBlurRadius(20)
@@ -184,3 +190,8 @@ class FriendsTab(QWidget):
             InfoBar.error(title="", content=data["message"], parent=self.mainWindow,orient=Qt.Horizontal, isClosable=True, position=InfoBarPosition.TOP_RIGHT, duration=5000)
         elif data["status"] == 404:
             InfoBar.warning(title="", content=data["message"], parent=self.mainWindow,orient=Qt.Horizontal, isClosable=True, position=InfoBarPosition.TOP_RIGHT, duration=5000)
+
+    def refresh_friends(self):
+        InfoBar.info(title="", content="Refreshing friends...", parent=self.mainWindow, orient=Qt.Horizontal, isClosable=True, position=InfoBarPosition.TOP_RIGHT, duration=2000)
+        self.refreshFriendsButton.setDisabled(True)
+        self.mainWindow.update_friends()

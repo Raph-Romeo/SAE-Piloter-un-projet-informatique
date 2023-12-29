@@ -33,6 +33,7 @@ class TopMenu(QMainWindow):
         self.addTaskButton.setText("＋")
         self.addTaskButton.setFixedWidth(38)
         self.addTaskButton.setFixedHeight(28)
+        self.addTaskButton.setFocusPolicy(Qt.NoFocus)
         self.addTaskButton.setCursor(QCursor(Qt.PointingHandCursor))
         self.addTaskButton.setToolTip("Create new task")
         self.addTaskButton.clicked.connect(lambda: self.tasksTab.contentWindow.create_task())
