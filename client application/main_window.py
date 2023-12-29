@@ -206,6 +206,7 @@ class MainWindow(FramelessWindow):
         self.current_view_task_dialog = None
         self.workers = []
         self.threads = []
+        self.friends = []
         self.user = None
         self.create_task_dialog = None
         self.view_task_dialogs = []

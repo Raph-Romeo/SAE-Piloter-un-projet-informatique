@@ -236,4 +236,3 @@ class ViewTask(MessageBoxBase):
         self.exportButton.setHidden(False)
         self.saveButton.setHidden(True)
         self.cancelEditButton.setHidden(True)
-
