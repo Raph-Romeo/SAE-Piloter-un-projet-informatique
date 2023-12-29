@@ -459,7 +459,7 @@ class MainWindow(FramelessWindow):
         self.number_of_friend_requests = 0
         self.friends.clear()
         self.mainTabWidget.friendsTab.clear_friends()
-        self.mainTabWidget.tasksTab.set_tasks([])
+        self.mainTabWidget.tasksTab.set_tasks()
         self.login_page.fadeIn()
 
     def attempt_connection(self):
