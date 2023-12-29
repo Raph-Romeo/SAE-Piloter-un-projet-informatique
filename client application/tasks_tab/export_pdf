@@ -114,7 +114,7 @@ class TaskPDF:
             self.add_header()
 
         is_complete = task.get('is_complete', 0)
-        self.logo_path = '../icons/false.png' if is_complete == 0 else '../icons/trueee.jpg'
+        self.logo_path = '../icons/false.png' if is_complete == 0 else '../icons/true.jpg'
         logo_x = self.margin_left
         logo_y = self.current_y_position - self.logo_height + 39
         self.c.drawInlineImage(self.logo_path, logo_x, logo_y, width=30, height=30)
