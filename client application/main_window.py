@@ -7,10 +7,12 @@ from tab_widgets import MainTabWidget
 from titlebar import TitleBar
 from qframelesswindow import FramelessWindow, StandardTitleBar
 from login import Login
-from qfluentwidgets import setTheme, Theme
+from qfluentwidgets import setTheme, Theme, InfoBar, InfoBarPosition
 from datetime import datetime, timedelta
 from PyQt5.QtGui import QImage
+from PyQt5.QtCore import Qt
 from view_task import ViewTask
+import errno
 import threading
 import time
 import socket
@@ -32,17 +34,42 @@ class SendMessageWorker(QObject):
     def run(self):
         try:
             remote_ip, remote_port = self.connection.getpeername()
-            conn = socket.socket()
+            conn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             conn.connect((remote_ip, remote_port))
+            conn.setblocking(False)
             conn.send(self.msg)
-            response = conn.recv(4096)
-            self.message.emit(response)
+            data = b""
+            while True:
+                try:
+                    chunk = conn.recv(1024)  # Receive data in chunks
+                    data += chunk
+                    if data != b"" and chunk is None:
+                        self.raise_socket_error()
+                        break
+                except socket.error as e:
+                    err_code = e.errno
+                    if err_code == errno.WSAEWOULDBLOCK:
+                        pass
+                    else:
+                        self.raise_socket_error()
+                        break
+                try:
+                    if data != b"":
+                        json.loads(data.decode())
+                        self.message.emit(data)
+                        break
+                except:
+                    pass
             conn.close()
-        except:
-            self.error.emit()
-            response = json.dumps({"status": 0}).encode()
-            self.message.emit(response)
+        except Exception as err:
+            print(err)
+            self.raise_socket_error()
         return self.finished.emit()
+
+    def raise_socket_error(self):
+        self.error.emit()
+        response = json.dumps({"status": 0}).encode()
+        self.message.emit(response)
 
 
 class ClockThread(QObject):
@@ -143,9 +170,12 @@ class User:
 class MainWindow(FramelessWindow):
     def __init__(self, connection, lw):
         super().__init__()
+        self.current_view_task_dialog = None
         self.workers = []
         self.threads = []
         self.user = None
+        self.create_task_dialog = None
+        self.view_task_dialogs = []
         self.stb = StandardTitleBar(self)
         self.stb.setTitle("Taskmaster PRO")
         self.stb.setIcon(QIcon('icons/taskmasterpro.png'))
@@ -214,6 +244,29 @@ class MainWindow(FramelessWindow):
         message = json.dumps({"url": "/tasks", "method": "GET", "token": self.user.auth_token})
         self.init_send(message.encode(), self.set_tasks)
 
+    # This method is subject to change. Only a temporary solution
+    def remove_tasks(self, task_ids: list):
+        tasks = []
+        for task in self.tasks:
+            if task.id not in task_ids:
+                tasks.append(task)
+        self.tasks = tasks
+        self.mainTabWidget.tasksTab.set_tasks(self.tasks)
+        self.mainTabWidget.calendarTab.refreshCalendar()
+
+    def add_task(self, task):
+        try:
+            deadline = datetime.strptime(task["DL"], "%Y-%m-%d %H:%M:%S")
+        except:
+            deadline = None
+        self.tasks.insert(0,
+            Task(task["id"], task["N"], task["T"],
+                 datetime.strptime(task["SD"], "%Y-%m-%d %H:%M:%S"),
+                 deadline, User(task["ow"]["u"], task["ow"]["e"]),
+                 is_owner=task["io"], public=task["pu"], is_completed=task["IC"]))
+        self.mainTabWidget.tasksTab.set_tasks(self.tasks)
+        self.mainTabWidget.calendarTab.refreshCalendar()
+
     def set_tasks(self, response: bytes):
         try:
             data = json.loads(response.decode())
@@ -243,12 +296,28 @@ class MainWindow(FramelessWindow):
     def set_task_completed_response(self, e):
         response = json.loads(e.decode())
         if response["status"] == 200:
+            if response["data"]["is_completed"]:
+                InfoBar.info(title="", content="Set task to completed", parent=self, orient=Qt.Horizontal, isClosable=False, position=InfoBarPosition.TOP_RIGHT, duration=1000)
+            else:
+                InfoBar.info(title="", content="Set task to incomplete", parent=self, orient=Qt.Horizontal, isClosable=False, position=InfoBarPosition.TOP_RIGHT, duration=1000)
             for i in self.tasks:
                 if i.id == int(response["data"]["task_id"]):
                     i.is_completed = response["data"]["is_completed"]
-                    self.update_tasks()
+                    break
+            self.update_tasks()
+            if self.current_view_task_dialog is not None:
+                try:
+                    if self.current_view_task_dialog.isActiveWindow():
+                        if self.current_view_task_dialog.task_id == int(response["data"]["task_id"]):
+                            self.current_view_task_dialog.disableStatusUpdate = True
+                            self.current_view_task_dialog.changeStatus(response["data"]["is_completed"])
+                except:
+                    pass
         elif response["status"] == 403:
             self.logout()
+        elif response["status"] == 404:
+            self.remove_tasks([response["data"]["task_id"]])
+            InfoBar.warning(title="404", content="Task not found", parent=self, orient=Qt.Horizontal, isClosable=True, position=InfoBarPosition.TOP_RIGHT, duration=5000)
 
     def delete_task(self, pk: int):
         message = json.dumps({"url": "/delete_task", "method": "POST", "token": self.user.auth_token, "data": {"task_id": pk}})
@@ -257,12 +326,13 @@ class MainWindow(FramelessWindow):
     def delete_task_response(self, e):
         response = json.loads(e.decode())
         if response["status"] == 200:
-            for i in self.tasks:
-                if i.id == int(response["data"]["task_id"]):
-                    message = json.dumps({"url": "/tasks", "method": "GET", "token": self.user.auth_token})
-                    self.init_send(message.encode(), self.set_tasks)
+            InfoBar.info(title="", content="Deleted task", parent=self, orient=Qt.Horizontal, isClosable=False, position=InfoBarPosition.TOP_RIGHT, duration=1000)
+            self.remove_tasks([int(response["data"]["task_id"])])
         elif response["status"] == 403:
             self.logout()
+        elif response["status"] == 404:
+            self.remove_tasks([int(response["data"]["task_id"])])
+            InfoBar.warning(title="404", content="Task not found", parent=self, orient=Qt.Horizontal, isClosable=True, position=InfoBarPosition.TOP_RIGHT, duration=5000)
 
     def delete_tasks(self, pk_list: list):
         message = json.dumps({"url": "/delete_tasks", "method": "POST", "token": self.user.auth_token, "data": {"task_ids": pk_list}})
@@ -271,8 +341,12 @@ class MainWindow(FramelessWindow):
     def delete_tasks_response(self, e):
         response = json.loads(e.decode())
         if response["status"] == 200:
-            message = json.dumps({"url": "/tasks", "method": "GET", "token": self.user.auth_token})
-            self.init_send(message.encode(), self.set_tasks)
+            for task in response["data"]["tasks"]:
+                if task["status"] == 200:
+                    InfoBar.info(title="", content="Deleted task", parent=self, orient=Qt.Horizontal, isClosable=False, position=InfoBarPosition.TOP_RIGHT, duration=1000)
+                elif task["status"] == 404:
+                    InfoBar.warning(title="404", content="Task not found", parent=self, orient=Qt.Horizontal, isClosable=True, position=InfoBarPosition.TOP_RIGHT, duration=5000)
+            self.remove_tasks(response["data"]["task_ids"])
         elif response["status"] == 403:
             self.logout()
 
@@ -289,10 +363,10 @@ class MainWindow(FramelessWindow):
     def create_task_response(self, e):
         response = json.loads(e.decode())
         if response["status"] == 200:
-            message = json.dumps({"url": "/tasks", "method": "GET", "token": self.user.auth_token})
+            InfoBar.success(title="Created task", content=f'{response["data"]["task"]["N"]}', parent=self, orient=Qt.Horizontal, isClosable=True, position=InfoBarPosition.TOP_RIGHT, duration=5000)
             if self.create_task_dialog is not None and self.create_task_dialog.isActiveWindow():
                 self.create_task_dialog.close()
-            self.init_send(message.encode(), self.set_tasks)
+            self.add_task(response["data"]["task"])
         elif response["status"] == 403:
             if self.create_task_dialog is not None and self.create_task_dialog.isActiveWindow():
                 self.create_task_dialog.close()
@@ -303,6 +377,9 @@ class MainWindow(FramelessWindow):
         elif response["status"] == 400:
             self.create_task_dialog.formError(response["message"])
             self.create_task_dialog.nextB.setDisabled(False)
+        elif response["status"] == 0:
+            if self.create_task_dialog is not None and self.create_task_dialog.isActiveWindow():
+                self.create_task_dialog.nextB.setDisabled(False)
 
     def create_user(self, data: dict, func):
         message = {"url": "/create_user", "method": "POST"}
@@ -347,10 +424,36 @@ class MainWindow(FramelessWindow):
         response = json.loads(response.decode())
         if response["status"] == 200:
             try:
-                self.view_task_dialog = ViewTask(self, response["data"][0])
+                if "not_found" in response["data"][0].keys():
+                    self.remove_tasks([response["data"][0]["id"]])
+                    return InfoBar.warning(title="404", content="Task not found", parent=self, orient=Qt.Horizontal, isClosable=True, position=InfoBarPosition.TOP_RIGHT, duration=5000)
+                self.view_task_dialogs.append(ViewTask(self, response["data"][0]))
+                view_task_dialog = self.view_task_dialogs[len(self.view_task_dialogs) - 1]
+                self.current_view_task_dialog = view_task_dialog
+                view_task_dialog.exec()
             except:
-                return print("Task doesn't exist")
-            self.view_task_dialog.exec()
+                return InfoBar.error(title="Error", content="Could not fetch task details", parent=self, orient=Qt.Horizontal, isClosable=True, position=InfoBarPosition.TOP_RIGHT, duration=5000)
+        elif response["status"] == 403:
+            self.logout()
+
+    def init_edit_task_window(self, task_id):
+        message = json.dumps({"url": "/task_details", "method": "POST", "token": self.user.auth_token, "data": [task_id]})
+        self.init_send(message.encode(), self.edit_task)
+
+    def edit_task(self, response):
+        response = json.loads(response.decode())
+        if response["status"] == 200:
+            try:
+                if "not_found" in response["data"][0].keys():
+                    self.remove_tasks([response["data"][0]["id"]])
+                    return InfoBar.warning(title="404", content="Task not found", parent=self, orient=Qt.Horizontal, isClosable=True, position=InfoBarPosition.TOP_RIGHT, duration=5000)
+                self.view_task_dialogs.append(ViewTask(self, response["data"][0]))
+                view_task_dialog = self.view_task_dialogs[len(self.view_task_dialogs) - 1]
+                self.current_view_task_dialog = view_task_dialog
+                view_task_dialog.exec()
+            except:
+                return InfoBar.error(title="Error", content="Could not fetch task details", parent=self,orient=Qt.Horizontal, isClosable=True, position=InfoBarPosition.TOP_RIGHT,duration=5000)
+
         elif response["status"] == 403:
             self.logout()
 
@@ -387,6 +490,12 @@ class MainWindow(FramelessWindow):
             self.clockThread.exit()
             self.clockWorker.deleteLater()
             self.clockThread.deleteLater()
+            #for worker in self.workers:
+            #    try:
+            #        worker.quit()
+            #    except Exception as err:
+            #        print(f"Failed to close worker {worker}")
+            #        print(f"with error {err}")
         except:
             pass
         event.accept()

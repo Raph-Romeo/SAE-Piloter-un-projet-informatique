@@ -54,7 +54,7 @@ class TaskItem(QWidget):
 
 
 class CalendarTab(QWidget):
-    def __init__(self, mainwindow):
+    def __init__(self, mainWindow):
         super().__init__()
         self.setContentsMargins(0, 0, 0, 30)
         self.grid = QGridLayout(self)
@@ -98,7 +98,8 @@ class CalendarTab(QWidget):
         self.calendarControllerGrid.addWidget(self.nextWeek, 0, 3)
 
         self.calendarView = QTableWidget(24, 7)
-        self.mainwindow = mainwindow
+        self.calendarView.setFocusPolicy(Qt.NoFocus)
+        self.mainWindow = mainWindow
         self.calendarView.setHorizontalHeaderLabels(["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"])
         self.calendarView.setVerticalHeaderLabels(["12 AM", "1 AM", "2 AM", "3 AM", "4 AM", "5 AM", "6 AM", "7 AM", "8 AM", "9 AM", "10 AM", "11 AM", "12 PM", "1 PM", "2 PM","3 PM","4 PM","5 PM","6 PM","7 PM","8 PM","9 PM","10 PM","11 PM"])
         self.calendarView.verticalHeader().setDefaultAlignment(Qt.AlignCenter)
@@ -208,7 +209,7 @@ class CalendarTab(QWidget):
                 else:
                     if current_date.strftime("%B") not in years_months[current_date.year]:
                         years_months[current_date.year].append(current_date.strftime("%B"))
-                for task in self.mainwindow.tasks:
+                for task in self.mainWindow.tasks:
                     if task.deadline is not None:
                         if task.start_date.date() <= current_date <= task.deadline.date():
                             task_duration = task.deadline - task.start_date
@@ -256,9 +257,9 @@ class CalendarTab(QWidget):
 
     def add_task_calendar(self, day, hour, task, type=0):
         if self.calendarView.cellWidget(hour, day) is not None:
-            self.calendarView.cellWidget(hour, day).append_task(task, type, self.mainwindow.init_view_task_window)
+            self.calendarView.cellWidget(hour, day).append_task(task, type, self.mainWindow.init_view_task_window)
         else:
-            self.calendarView.setCellWidget(hour, day, TaskItem(task, type, self.mainwindow.init_view_task_window))
+            self.calendarView.setCellWidget(hour, day, TaskItem(task, type, self.mainWindow.init_view_task_window))
 
     def toPreviousWeekFunction(self):
         if self.selectedDate is not None:
@@ -299,4 +300,4 @@ class CalendarTab(QWidget):
             print("waiting for init...")
 
     def create_task(self, date=None):
-        self.mainwindow.create_task_form(date)
+        self.mainWindow.create_task_form(date)

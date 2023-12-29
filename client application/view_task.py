@@ -35,8 +35,10 @@ def format_date(input_string, include_date=True):
 
 
 class ViewTask(MessageBoxBase):
-    def __init__(self, parent, data):
+    def __init__(self, parent, data, edit_mode: bool = False):
         super().__init__(parent)
+        self.disableStatusUpdate = False
+        self.data = data
         self.mainWindow = parent
         self.formHeader = QWidget()
         self.titleLabel = SubtitleLabel(f'View task details [ {data["name"]} ]', self)
@@ -69,6 +71,7 @@ class ViewTask(MessageBoxBase):
         self.statusLayout = QWidget()
         layout2 = QHBoxLayout(self.statusLayout)
         layout2.setSpacing(0)
+        layout2.setStretch(1, 2)
         layout2.setContentsMargins(15, 0, 0, 0)
 
         self.taskName = QLabel(f"Task name: {data['name']}")
@@ -79,7 +82,8 @@ class ViewTask(MessageBoxBase):
         self.completeCheckbox = CheckBox()
         if data['is_complete']:
             self.completeCheckbox.setChecked(True)
-        self.completeCheckbox.setFixedWidth(40)
+        self.completeCheckbox.toggled.connect(self.completeCheckboxToggled)
+        self.completeCheckbox.setFixedWidth(20)
         self.status = QLabel(f"Task is {status[data['is_complete']]}")
         self.status.setStyleSheet("font-size:14px;font-family:verdana;color:gray")
         self.taskTag.setStyleSheet("font-size:14px;font-family:verdana;")
@@ -149,19 +153,35 @@ class ViewTask(MessageBoxBase):
         self.editButton = PushButton()
         self.editButton.setText("Edit")
         self.editButton.setIcon(FluentIcon.EDIT)
-        #self.editButton.clicked.connect(lambda: self.mainWindow.delete_task(data["id"]))
-
+        self.editButton.clicked.connect(self.activateEditMode)
         self.exportButton = PushButton()
         self.exportButton.setText("Export")
         self.exportButton.setIcon(FluentIcon.SAVE_AS)
         self.exportButton.clicked.connect(lambda: self.mainWindow.mainTabWidget.tasksTab.contentWindow.export(None, task_id=self.task_id))
-
+        self.saveButton = PushButton()
+        self.saveButton.setText("Save changes")
+        self.saveButton.setHidden(True)
+        self.saveButton.setIcon(FluentIcon.SAVE)
+        self.cancelEditButton = PushButton()
+        self.cancelEditButton.setText("Cancel changes")
+        self.cancelEditButton.setHidden(True)
+        if not edit_mode:
+            self.cancelEditButton.clicked.connect(self.activateViewMode)
+            self.cancelEditButton.setIcon(FluentIcon.CANCEL)
+        else:
+            self.cancelEditButton.clicked.connect(self.close)
+            self.cancelEditButton.setIcon(FluentIcon.CLOSE)
         footer_layout.addWidget(self.deleteButton)
         footer_layout.addWidget(self.editButton)
         footer_layout.addWidget(self.exportButton)
+        footer_layout.addWidget(self.cancelEditButton)
+        footer_layout.addWidget(self.saveButton)
         self.viewLayout.addWidget(self.footer)
 
         self.buttonGroup.setHidden(True)
+
+        if edit_mode:
+            self.activateEditMode()
 
     def cancelEvent(self, e):
         self.close()
@@ -169,3 +189,48 @@ class ViewTask(MessageBoxBase):
     def deleteSelf(self):
         self.mainWindow.delete_task(self.task_id)
         self.close()
+
+    def completeCheckboxToggled(self):
+        if not self.disableStatusUpdate:
+            self.completeCheckbox.setDisabled(True)
+            self.disableStatusUpdate = True
+            self.mainWindow.set_task_completed(self.task_id, self.completeCheckbox.isChecked())
+            if self.completeCheckbox.isChecked():
+                self.completeCheckbox.setChecked(False)
+            else:
+                self.completeCheckbox.setChecked(True)
+
+    def changeStatus(self, is_complete: bool):
+        status = ["incomplete", "completed"]
+        self.completeCheckbox.setDisabled(False)
+        self.data["is_complete"] = is_complete
+        self.completeCheckbox.setChecked(is_complete)
+        self.disableStatusUpdate = False
+        self.status.setText(f"Task is {status[is_complete]}")
+
+    def activateEditMode(self):
+        self.titleLabel.setText(f"Editing task : {self.data['name']}")
+        if self.data["description"] is None:
+            self.taskDescription.setHidden(False)
+            self.taskDescriptionText.setHidden(False)
+            self.descriptionSeparator.setHidden(False)
+        self.taskDescriptionText.setReadOnly(False)
+        self.editButton.setHidden(True)
+        self.deleteButton.setHidden(True)
+        self.exportButton.setHidden(True)
+        self.saveButton.setHidden(False)
+        self.cancelEditButton.setHidden(False)
+
+    def activateViewMode(self):
+        self.titleLabel.setText(f"View task details [ {self.data['name']} ]")
+        if self.data["description"] is None:
+            self.taskDescription.setHidden(True)
+            self.taskDescriptionText.setHidden(True)
+            self.descriptionSeparator.setHidden(True)
+        self.taskDescriptionText.setReadOnly(True)
+        self.editButton.setHidden(False)
+        self.deleteButton.setHidden(False)
+        self.exportButton.setHidden(False)
+        self.saveButton.setHidden(True)
+        self.cancelEditButton.setHidden(True)
+

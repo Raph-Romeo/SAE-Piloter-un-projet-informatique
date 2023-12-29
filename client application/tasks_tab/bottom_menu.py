@@ -1,9 +1,22 @@
-from PyQt5.QtWidgets import QWidget, QGridLayout, QPushButton, QFileDialog, QApplication, QMainWindow, QHBoxLayout, QSpacerItem, QSizePolicy, QLineEdit, QLabel, QScrollArea, QHeaderView, QTableWidget, QTableWidgetItem, QAbstractItemView
-from PyQt5.QtGui import QCursor, QIcon, QColor, QPixmap, QFont
+from PyQt5.QtWidgets import QWidget, QGridLayout, QStyleOptionViewItem, QPushButton, QFileDialog, QApplication, QMainWindow, QHBoxLayout, QSpacerItem, QSizePolicy, QLineEdit, QLabel, QScrollArea, QHeaderView, QTableWidget, QTableWidgetItem, QAbstractItemView, QStyle, QStyledItemDelegate
+from PyQt5.QtGui import QCursor, QIcon, QColor, QPixmap, QFont, QPainter, QPen
 from color_icon import color_pixmap
-from PyQt5.QtCore import Qt, QSize, QDate
+from PyQt5.QtCore import Qt, QSize, QDate, QEvent, QModelIndex
 from qfluentwidgets import IconWidget, FluentIcon, InfoBarIcon, ProgressBar, AvatarWidget, CalendarPicker, ToolButton, InfoBar, InfoBarPosition, MenuAnimationType, RoundMenu, Action
 import json
+
+
+class NoFocusDelegate(QStyledItemDelegate):
+    def paint(self, painter: QPainter, option: QStyleOptionViewItem, index: QModelIndex) -> None:
+        itemOption = QStyleOptionViewItem(option)
+        if option.state & QStyle.State_HasFocus:
+            itemOption.state = itemOption.state ^ QStyle.State_HasFocus
+        super().paint(painter, itemOption, index)
+        top_border_rect = option.rect.adjusted(0, 0, 0, -1)  # Adjust the rect to exclude the bottom pixel
+        pen = QPen(QColor(150, 150, 150, 80))
+        pen.setWidth(1)  # Set the width of the border
+        painter.setPen(pen)
+        painter.drawLine(top_border_rect.topLeft(), top_border_rect.topRight())
 
 
 class User(QWidget):
@@ -194,11 +207,15 @@ class BottomMenu(QMainWindow):
         searchBarLayout.addWidget(self.searchBarIcon, 0, 0)
 
         self.tasksTableWidget = QTableWidget(0, 6)
+        # self.tasksTableWidget.setFocusPolicy(Qt.NoFocus)
+        self.tasksTableWidget.setItemDelegate(NoFocusDelegate())
+        self.tasksTableWidget.setStyleSheet("QTableWidget::item:selected { border: none; }")
         self.tasksTableWidget.setHorizontalHeaderLabels(["Task name", "Tag", "User", "Status", "Time left", "Progress"])
         self.tasksTableWidget.horizontalHeader().setStyleSheet("QHeaderView::section{border-bottom:none}")
         font = QFont()
         font.setFamily("verdana")
         font.setPointSize(10)
+        self.tasksTableWidget.keyPressEvent = self.customKeyPressEvent
         self.tasksTableWidget.horizontalHeader().setFont(font)
         self.tasksTableWidget.setFont(font)
         self.tasksTableWidget.setEditTriggers(QAbstractItemView.NoEditTriggers)
@@ -235,6 +252,7 @@ class BottomMenu(QMainWindow):
             self.tasksTableWidget.setCellWidget(self.tasksTableWidget.rowCount() - 1, 5, progressBar(0))
             self.tasksTableWidget.setRowHeight(self.tasksTableWidget.rowCount() - 1, 40)
         self.parent.topMenu.setTaskNumber(len(task_list))
+        self.apply_filter()
 
     def date_tasks_filter(self, date):
         self.parent.topMenu.setTab(None)
@@ -299,43 +317,46 @@ class BottomMenu(QMainWindow):
         try:
             data = json.loads(response.decode())
         except:
-            return print(f"error decoding tasks message : {response.decode()}")
+            return InfoBar.error(title="Cancelled export", content="Invalid json response from server", parent=self.mainWindow, orient=Qt.Horizontal, isClosable=True, position=InfoBarPosition.TOP_RIGHT, duration=5000)
         if data["status"] == 200:
             try:
-                # ELMIRRRRR C'EST ICI C'EST ICI QUE TU VAS METTRE TA CLASSEEEEE
                 # TaskPDF(data["data"], self.file)
-                InfoBar.success(title="Export successful",content=f"Exported task(s) to {self.file}",parent=self.parent,orient=Qt.Horizontal,isClosable=True,position=InfoBarPosition.TOP_RIGHT,duration=5000)
+                InfoBar.success(title="Export successful", content=f"Exported task(s) to {self.file}",parent=self.mainWindow,orient=Qt.Horizontal,isClosable=True,position=InfoBarPosition.TOP_RIGHT,duration=5000)
             except Exception as err:
                 print(err)
-                InfoBar.error(title="Cancelled export",content="Something went wrong while creating PDF file",parent=self.parent,orient=Qt.Horizontal,isClosable=True,position=InfoBarPosition.TOP_RIGHT,duration=5000)
+                InfoBar.error(title="Cancelled export", content="Something went wrong while creating PDF file",parent=self.mainWindow,orient=Qt.Horizontal,isClosable=True,position=InfoBarPosition.TOP_RIGHT,duration=5000)
         elif data["status"] == 403:
             self.mainWindow.logout()
         else:
-            InfoBar.error(title="Server error",content=data["message"],parent=self.parent,orient=Qt.Horizontal,isClosable=True,position=InfoBarPosition.TOP_RIGHT,duration=5000)
+            InfoBar.error(title="Server error",content=data["message"],parent=self.mainWindow,orient=Qt.Horizontal,isClosable=True,position=InfoBarPosition.TOP_RIGHT,duration=5000)
 
     def tasks_to_csv(self, response):
         try:
             data = json.loads(response.decode())
-            print(data)
         except:
-            return print(f"error decoding tasks message : {response.decode()}")
+            return InfoBar.error(title="Cancelled export", content="Invalid json response from server", parent=self.mainWindow, orient=Qt.Horizontal, isClosable=True, position=InfoBarPosition.TOP_RIGHT, duration=5000)
         if data["status"] == 200:
             try:
-                content = "Task name,Tag\n"
-                status = ["Upcoming", "Active", "Complete", "Expired"]
+                header_elements = ["task name", "tag", "description", "is task completed", "priority", "start date", "task deadline", "user username", "user email", "creator username", "creator email", "creation date"]
+                content = ",".join(header_elements) + "\n" # Add header with header_elements to file content
                 for task in data["data"]:
-                    content += f"{task['name']},{task['tag']}\n"
+                    if task["description"] is not None:
+                        description = task["description"]
+                    else:
+                        description = 'None'
+                    task_data = [task["name"], task["tag"], '"' + description + '"', str(task["is_complete"]), str(task["importance"]), task["start_date"], task["deadline"], task["user"]["u"], task["user"]["e"], task["creator"]["u"], task["creator"]["e"], task["creation_date"]]
+                    content += ",".join(task_data) + "\n"
                 with open(self.file, "w") as f:
                     f.write(content)
                 f.close()
-                InfoBar.success(title="Export successful",content=f"Exported task(s) to {self.file}",parent=self.parent,orient=Qt.Horizontal,isClosable=True,position=InfoBarPosition.TOP_RIGHT,duration=5000)
+                InfoBar.success(title="Export successful", content=f"Exported task(s) to {self.file}", parent=self.mainWindow, orient=Qt.Horizontal, isClosable=True, position=InfoBarPosition.TOP_RIGHT, duration=5000)
             except Exception as err:
                 print(err)
-                InfoBar.error(title="Cancelled export",content="Something went wrong while creating CSV file",parent=self.parent,orient=Qt.Horizontal,isClosable=True,position=InfoBarPosition.TOP_RIGHT,duration=5000)
+                InfoBar.error(title="Cancelled export", content="Something went wrong while creating CSV file", parent=self.mainWindow, orient=Qt.Horizontal, isClosable=True, position=InfoBarPosition.TOP_RIGHT, duration=5000)
         elif data["status"] == 403:
             self.mainWindow.logout()
         else:
-            InfoBar.error(title="Server error",content=data["message"],parent=self.parent,orient=Qt.Horizontal,isClosable=True,position=InfoBarPosition.TOP_RIGHT,duration=5000)
+            InfoBar.error(title="Server error",content=data["message"],parent=self.mainWindow,orient=Qt.Horizontal,isClosable=True,position=InfoBarPosition.TOP_RIGHT,duration=5000)
 
     def export(self, tasks, task_id=None):
         try:
@@ -343,13 +364,13 @@ class BottomMenu(QMainWindow):
             if file is not None:
                 # Determine the selected file extension
                 if file.endswith(".pdf"):
-                    InfoBar.info(title="Export", content=f"Exporting tasks to PDF...", parent=self.parent, orient=Qt.Horizontal, isClosable=True, position=InfoBarPosition.TOP_RIGHT,duration=5000)
+                    InfoBar.info(title="Export", content=f"Exporting tasks to PDF...", parent=self.mainWindow, orient=Qt.Horizontal, isClosable=True, position=InfoBarPosition.TOP_RIGHT,duration=5000)
                     file_format = "PDF"
                 elif file.endswith(".csv"):
-                    InfoBar.info(title="Export", content=f"Exporting tasks to CSV...", parent=self.parent, orient=Qt.Horizontal, isClosable=True, position=InfoBarPosition.TOP_RIGHT,duration=5000)
+                    InfoBar.info(title="Export", content=f"Exporting tasks to CSV...", parent=self.mainWindow, orient=Qt.Horizontal, isClosable=True, position=InfoBarPosition.TOP_RIGHT,duration=5000)
                     file_format = "CSV"
                 else:
-                    return InfoBar.error(title="Cancelled export", content="No file selected", parent=self.parent, orient=Qt.Horizontal, isClosable=True, position=InfoBarPosition.TOP_RIGHT, duration=5000)
+                    return InfoBar.error(title="Cancelled export", content="No file selected", parent=self.mainWindow, orient=Qt.Horizontal, isClosable=True, position=InfoBarPosition.TOP_RIGHT, duration=5000)
                 self.file = file
                 task_ids = []
                 if tasks is not None:
@@ -359,7 +380,7 @@ class BottomMenu(QMainWindow):
                     task_ids.append(task_id)
                 self.get_tasks(task_ids, file_format)
         except Exception as err:
-            InfoBar.error(title="Cancelled export",content="Something went wrong",parent=self.parent,orient=Qt.Horizontal,isClosable=True,position=InfoBarPosition.TOP_RIGHT,duration=5000)
+            InfoBar.error(title="Cancelled export",content="Something went wrong",parent=self.mainWindow,orient=Qt.Horizontal,isClosable=True,position=InfoBarPosition.TOP_RIGHT,duration=5000)
             print(err)
 
     def __focus_search(self, event):
@@ -434,6 +455,7 @@ class BottomMenu(QMainWindow):
     def update_tasks(self, change):
         if change:
             self.task_list = self.mainWindow.tasks
+            self.apply_filter()
         for row in range(self.tasksTableWidget.rowCount()):
             self.tasksTableWidget.cellWidget(row, 4).setTime(self.task_list[row].time_left())
             if change:
@@ -446,37 +468,52 @@ class BottomMenu(QMainWindow):
         menu = RoundMenu(parent=self)
         selected_tasks = []
         for row in self.tasksTableWidget.selectionModel().selectedRows():
-            selected_tasks.append(self.task_list[row.row()])
+            if not self.tasksTableWidget.isRowHidden(row.row()):
+                selected_tasks.append(self.task_list[row.row()])
         if len(selected_tasks) == 1:
             menu.addAction(Action(FluentIcon.MORE, 'View Task'))
             if selected_tasks[0].is_completed:
-                menu.addAction(Action(FluentIcon.RETURN, 'Set uncompleted'))
-                menu.menuActions()[1].triggered.connect(lambda: self.mainWindow.set_task_completed(selected_tasks[0].id,False))
+                menu.addAction(Action(FluentIcon.CLOSE, 'Set uncompleted'))
+                menu.menuActions()[1].triggered.connect(lambda: self.mainWindow.set_task_completed(selected_tasks[0].id, False))
             else:
                 menu.addAction(Action(FluentIcon.COMPLETED, 'Set completed'))
-                menu.menuActions()[1].triggered.connect(lambda: self.mainWindow.set_task_completed(selected_tasks[0].id,True))
-            menu.addAction(Action(FluentIcon.DELETE, 'Delete Task'))
+                menu.menuActions()[1].triggered.connect(lambda: self.mainWindow.set_task_completed(selected_tasks[0].id, True))
             menu.addAction(Action(FluentIcon.EDIT, 'Edit Task'))
             menu.addAction(Action(FluentIcon.SAVE_AS, 'Export Task'))
+            menu.addAction(Action(FluentIcon.DELETE, 'Delete Task'))
             menu.addSeparator()
             menu.addAction(Action(FluentIcon.ADD, 'Create Task'))
             menu.menuActions()[0].triggered.connect(lambda: self.mainWindow.init_view_task_window(selected_tasks[0].id)) # View task
-            menu.menuActions()[2].triggered.connect(lambda: self.mainWindow.delete_task(selected_tasks[0].id)) # DELETE SINGLE TASK
-            #menu.menuActions()[3].triggered.connect(lambda: self.editTask(selected_tasks[0].id)) # EDIT TASK
-            menu.menuActions()[4].triggered.connect(lambda: self.export(selected_tasks)) # Export tasks
+            menu.menuActions()[2].triggered.connect(lambda: self.mainWindow.init_edit_task_window(selected_tasks[0].id)) # EDIT TASK
+            menu.menuActions()[3].triggered.connect(lambda: self.export(selected_tasks)) # Export tasks
+            menu.menuActions()[4].triggered.connect(lambda: self.mainWindow.delete_task(selected_tasks[0].id))  # DELETE SINGLE TASK
             menu.menuActions()[5].triggered.connect(lambda: self.create_task()) # Create task
         elif len(selected_tasks) > 1:
-            menu.addAction(Action(FluentIcon.DELETE, 'Delete Tasks'))
             menu.addAction(Action(FluentIcon.SAVE_AS, 'Export Tasks'))
+            menu.addAction(Action(FluentIcon.DELETE, 'Delete Tasks'))
             menu.addSeparator()
             menu.addAction(Action(FluentIcon.ADD, 'Create Task'))
             task_ids = []
             for i in selected_tasks:
                 task_ids.append(i.id)
-            menu.menuActions()[0].triggered.connect(lambda: self.mainWindow.delete_tasks(task_ids))  # DELETE MULTIPLE TASK
-            menu.menuActions()[1].triggered.connect(lambda: self.export(selected_tasks))  # Export tasks
+            menu.menuActions()[0].triggered.connect(lambda: self.export(selected_tasks))  # Export tasks
+            menu.menuActions()[1].triggered.connect(lambda: self.mainWindow.delete_tasks(task_ids))  # DELETE MULTIPLE TASK
             menu.menuActions()[2].triggered.connect(lambda: self.create_task())  # Create task
         else:
             menu.addAction(Action(FluentIcon.ADD, 'Create Task'))
             menu.menuActions()[0].triggered.connect(lambda: self.create_task())  # Create task
         menu.exec(e.globalPos(), aniType=MenuAnimationType.NONE)
+
+    def customKeyPressEvent(self, event):
+        if event.key() == Qt.Key_Delete:
+            selected_tasks = []
+            for row in self.tasksTableWidget.selectionModel().selectedRows():
+                if not self.tasksTableWidget.isRowHidden(row.row()):
+                    selected_tasks.append(self.task_list[row.row()])
+            if len(selected_tasks) > 0:
+                task_ids = []
+                for i in selected_tasks:
+                    task_ids.append(i.id)
+                self.mainWindow.delete_tasks(task_ids)
+        else:
+            super(QTableWidget, self.tasksTableWidget).keyPressEvent(event)

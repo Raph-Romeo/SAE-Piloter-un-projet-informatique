@@ -160,7 +160,6 @@ class CreateTaskForm(MessageBoxBase):
         footer_layout.addWidget(self.backB)
         footer_layout.addWidget(self.nextB)
         self.viewLayout.addWidget(self.footer)
-
         self.buttonGroup.setHidden(True)
 
     def toggle_deadline(self, e):
