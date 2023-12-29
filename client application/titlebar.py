@@ -71,6 +71,7 @@ class TitleBar(QWidget):
         menu = RoundMenu(parent=self)
         card = ProfileCard(self.user.profile_picture, self.user.username, self.user.email, menu)
         menu.addWidget(card, selectable=False)
+        menu.addAction(Action(FluentIcon.ALBUM, 'My profile'))
         menu.addSeparator()
         menu.addActions([
             Action(FluentIcon.PEOPLE, 'Friends'),
@@ -78,9 +79,10 @@ class TitleBar(QWidget):
         ])
         menu.addSeparator()
         menu.addAction(Action(FluentIcon.PAGE_LEFT, 'Sign-out'))
-        menu.menuActions()[1].triggered.connect(lambda: self.mainwindow.navbar.setTab(3))
-        menu.menuActions()[2].triggered.connect(self.edit_profile)
-        menu.menuActions()[3].triggered.connect(lambda: self.mainwindow.logout())
+        menu.menuActions()[1].triggered.connect(lambda: self.mainwindow.view_account_profile(self.mainwindow.user))
+        menu.menuActions()[2].triggered.connect(lambda: self.mainwindow.navbar.setTab(3))
+        menu.menuActions()[3].triggered.connect(self.edit_profile)
+        menu.menuActions()[4].triggered.connect(lambda: self.mainwindow.logout())
         menu.exec(e.globalPos(), aniType=MenuAnimationType.NONE)
 
     def edit_profile(self):

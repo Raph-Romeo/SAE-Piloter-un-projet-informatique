@@ -4,7 +4,7 @@ from PyQt5.QtCore import Qt, QDate, QTime
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QApplication, QWidget, QHBoxLayout, QLineEdit, QTextEdit, QComboBox, QStackedWidget, QVBoxLayout, QLabel, QGridLayout, QPlainTextEdit
 import json
-from qfluentwidgets import MessageBoxBase, HorizontalSeparator, SubtitleLabel, LineEdit, PushButton, setTheme, Theme, CalendarPicker, CheckBox, TimePicker, DatePicker, FluentIcon, ToolButton, ComboBox, InfoBar, InfoBarPosition
+from qfluentwidgets import LineEdit, CaptionLabel, MessageBoxBase, HorizontalSeparator, SubtitleLabel, LineEdit, PushButton, setTheme, Theme, CalendarPicker, CheckBox, TimePicker, DatePicker, FluentIcon, ToolButton, ComboBox, InfoBar, InfoBarPosition
 from datetime import datetime
 
 class AddFriendForm(MessageBoxBase):
@@ -30,7 +30,7 @@ class AddFriendForm(MessageBoxBase):
         l1 = QLabel("Account username : ")
         l1.setStyleSheet("font-size:12px;font-family:verdana;")
 
-        self.friendNameInput = QLineEdit()
+        self.friendNameInput = LineEdit()
         self.friendNameInput.setPlaceholderText("Username")
         self.friendNameInput.setProperty("create_task_form", True)
         self.friendNameInput.returnPressed.connect(self.add_friend)

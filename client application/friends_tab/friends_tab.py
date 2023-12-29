@@ -1,10 +1,30 @@
 from PyQt5.QtWidgets import QTabWidget, QLabel, QTableWidget, QMainWindow, QHeaderView, QWidget, QGridLayout, QPushButton, QGraphicsDropShadowEffect, QApplication, QStyleOptionViewItem, QTableWidget, QTableWidgetItem, QWidget, QHBoxLayout
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QColor
-from qfluentwidgets import MessageBoxBase, TableWidget, InfoBarIcon, HorizontalSeparator, SubtitleLabel, LineEdit, PushButton, setTheme, Theme, CalendarPicker, CheckBox, TimePicker, DatePicker, FluentIcon, ToolButton, ComboBox, InfoBar, InfoBarPosition
+from PyQt5.QtGui import QColor, QIcon
+from qfluentwidgets import MessageBoxBase, IconWidget, TableWidget, InfoBarIcon, HorizontalSeparator, SubtitleLabel, LineEdit, PushButton, setTheme, Theme, CalendarPicker, CheckBox, TimePicker, DatePicker, FluentIcon, ToolButton, ComboBox, InfoBar, InfoBarPosition
 import json
 from .add_friend_form import AddFriendForm
 from .friend_request_menu import FriendRequestMenu
+
+
+class Friend(QWidget):
+    def __init__(self, username):
+        super().__init__()
+        # self.avatar = AvatarWidget()
+        # self.avatar.setImage(user.profile_picture)
+        # self.avatar.setRadius(12)
+        # User avatar causes major lag to the application.
+        self.icon = IconWidget(QIcon("icons/default.png"))
+        self.icon.setFixedHeight(24)
+        self.icon.setFixedWidth(24)
+        self.username = QLabel(username)
+        self.username.setStyleSheet("font-family:verdana;margin:0px;font-size:12px")
+        layout = QHBoxLayout(self)
+        layout.setSpacing(0)
+        layout.setContentsMargins(10, 0, 0, 0)
+        # layout.addWidget(self.avatar)
+        layout.addWidget(self.icon)
+        layout.addWidget(self.username)
 
 
 class FriendsTab(QWidget):
@@ -47,17 +67,25 @@ class FriendsTab(QWidget):
         self.addFriendButton.clicked.connect(self.init_add_friend_form)
         friendsTabLayout.addWidget(self.addFriendButton, 0, 3)
 
+        self.noFriendsLabel = QLabel("You currently have no friends.")
+        self.noFriendsLabel.setStyleSheet("font-family:verdana;font-size:14px;margin-top:20px;")
+        self.noFriendsLabel.setAlignment(Qt.AlignCenter)
+        self.noFriendsLabel.setHidden(True)
+        friendsTabLayout.addWidget(self.noFriendsLabel, 1, 0, 1, 4)
+
         self.friendsTable = TableWidget()
-        self.friendsTable.setColumnCount(3)
+        self.friendsTable.setColumnCount(2)
         self.friendsTable.setRowCount(0)
         self.friendsTable.setSelectionMode(QTableWidget.SingleSelection)
-        self.friendsTable.setHorizontalHeaderLabels(["Username", "First name", "Last name"])
+        self.friendsTable.setHorizontalHeaderLabels(["Username", "First name"])
         self.friendsTable.setWordWrap(False)
 
-        self.friendsTable.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        self.friendsTable.horizontalHeader().setSectionResizeMode(1, QHeaderView.Stretch)
         self.friendsTable.verticalHeader().setHidden(True)
+        self.friendsTable.horizontalHeader().setHidden(True)
+        self.friendsTable.doubleClicked.connect(self.friendDoubleClicked)
 
-        friendsTabLayout.addWidget(self.friendsTable, 1, 0, 1, 4)
+        friendsTabLayout.addWidget(self.friendsTable, 2, 0, 1, 4)
 
         boxShadow = QGraphicsDropShadowEffect()
         boxShadow.setBlurRadius(20)
@@ -72,17 +100,14 @@ class FriendsTab(QWidget):
             first_name = "null"
         if last_name is None:
             last_name = "null"
-        username_label = QLabel(username)
+        username_label = Friend(username)
         username_label.setStyleSheet("font-family:verdana;font-size:12px;font-weight:bold")
-        first_name_label = QLabel(first_name)
-        first_name_label.setStyleSheet("font-family:verdana;font-size:12px;")
-        last_name_label = QLabel(last_name)
-        last_name_label.setStyleSheet("font-family:verdana;font-size:12px;")
+        name_label = QLabel(f"{first_name} {last_name}")
+        name_label.setStyleSheet("font-family:verdana;font-size:12px;font-style: italic;opacity:50%")
         row = self.friendsTable.rowCount()
         self.friendsTable.setRowCount(row + 1)
         self.friendsTable.setCellWidget(row, 0, username_label)
-        self.friendsTable.setCellWidget(row, 1, first_name_label)
-        self.friendsTable.setCellWidget(row, 2, last_name_label)
+        self.friendsTable.setCellWidget(row, 1, name_label)
 
     def set_friend_requests(self, num):
         if num > 0:
@@ -99,7 +124,13 @@ class FriendsTab(QWidget):
         self.friendsTable.setRowCount(0)
         for friend in friend_list:
             self.addFriendToTable(friend.username, friend.first_name, friend.last_name)
-        self.friendsTable.resizeRowsToContents()
+        if len(friend_list) == 0:
+            self.noFriendsLabel.setHidden(False)
+        else:
+            self.noFriendsLabel.setHidden(True)
+            self.friendsTable.resizeRowsToContents()
+            self.friendsTable.resizeColumnToContents(0)
+            self.friendsTable.setColumnWidth(0, self.friendsTable.columnWidth(0) + 5)
 
     def clear_friends(self):
         self.friendsTable.clearContents()
@@ -196,3 +227,6 @@ class FriendsTab(QWidget):
         InfoBar.info(title="", content="Refreshing friends...", parent=self.mainWindow, orient=Qt.Horizontal, isClosable=True, position=InfoBarPosition.TOP_RIGHT, duration=2000)
         self.refreshFriendsButton.setDisabled(True)
         self.mainWindow.update_friends()
+
+    def friendDoubleClicked(self):
+        self.mainWindow.view_account_profile(self.mainWindow.friends[self.friendsTable.selectedIndexes()[0].row()])

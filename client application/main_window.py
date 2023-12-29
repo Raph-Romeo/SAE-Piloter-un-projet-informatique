@@ -7,20 +7,19 @@ from tab_widgets import MainTabWidget
 from titlebar import TitleBar
 from qframelesswindow import FramelessWindow, StandardTitleBar
 from login import Login
-from qfluentwidgets import setTheme, Theme, InfoBar, InfoBarPosition, setThemeColor
+from qfluentwidgets import setTheme, Theme, InfoBar, InfoBarPosition
 from datetime import datetime, timedelta
 from PyQt5.QtGui import QImage
 from PyQt5.QtCore import Qt
 from view_task import ViewTask
 import errno
-import threading
 import time
 import socket
 import requests
 import json
 from config import create_or_read_config
 from create_task import CreateTaskForm
-
+from user_profile import AccountProfile
 
 class SendMessageWorker(QObject):
     finished = pyqtSignal()
@@ -202,13 +201,13 @@ class Friend:
 class MainWindow(FramelessWindow):
     def __init__(self, connection, lw):
         super().__init__()
+        self.account_profile_dialog = None
         self.fetchingRequests = False
         self.current_view_task_dialog = None
         self.number_of_friend_requests = 0
         self.workers = []
         self.threads = []
         self.friends = []
-        setThemeColor("#5b2efc")
         self.user = None
         self.create_task_dialog = None
         self.view_task_dialogs = []
@@ -225,6 +224,10 @@ class MainWindow(FramelessWindow):
             self.is_dark = True
         elif settings["theme"] == 0:
             self.is_dark = False
+        if settings["auto_resize_columns"] == 1:
+            self.autoResizeColumns = True
+        else:
+            self.autoResizeColumns = False
         self.mainTabWidget = MainTabWidget(self)
         self.tasks = []
         grid = QGridLayout()
@@ -279,7 +282,7 @@ class MainWindow(FramelessWindow):
         setTheme(Theme.LIGHT)
 
     def loadSession(self, data):
-        self.user = User(token=data["token"], username=data["user_data"]["username"], email=data["user_data"]["email"])
+        self.user = User(token=data["token"], username=data["user_data"]["username"], first_name=data["user_data"]["first_name"], last_name=data["user_data"]["last_name"], email=data["user_data"]["email"])
         self.titlebar.setUserPanel(self.user)
         message = json.dumps({"url": "/tasks", "method": "GET", "token": self.user.auth_token})
         self.init_send(message.encode(), self.set_tasks)
@@ -408,6 +411,10 @@ class MainWindow(FramelessWindow):
         self.create_task_dialog = CreateTaskForm(self, date)
         self.create_task_dialog.exec()
 
+    def view_account_profile(self, user):
+        self.account_profile_dialog = AccountProfile(self, user)
+        self.account_profile_dialog.exec()
+
     def create_task(self, data: dict):
         message = {"url": "/create_task", "method": "POST", "token": self.user.auth_token}
         message["data"] = data
@@ -472,7 +479,8 @@ class MainWindow(FramelessWindow):
             if self.isVisible():
                 self.hide()
             self.connection = None
-            self.lw.reconnect()
+            self.lw.reconnect_attempt()
+            self.lw.set_theme()
 
     def init_view_task_window(self, task_id):
         message = json.dumps({"url": "/task_details", "method": "POST", "token": self.user.auth_token, "data": [task_id]})
@@ -505,7 +513,7 @@ class MainWindow(FramelessWindow):
                 if "not_found" in response["data"][0].keys():
                     self.remove_tasks([response["data"][0]["id"]])
                     return InfoBar.warning(title="404", content="Task not found", parent=self, orient=Qt.Horizontal, isClosable=True, position=InfoBarPosition.TOP_RIGHT, duration=5000)
-                self.view_task_dialogs.append(ViewTask(self, response["data"][0]))
+                self.view_task_dialogs.append(ViewTask(self, response["data"][0], edit_mode=True))
                 view_task_dialog = self.view_task_dialogs[len(self.view_task_dialogs) - 1]
                 self.current_view_task_dialog = view_task_dialog
                 view_task_dialog.exec()
@@ -608,3 +616,19 @@ class MainWindow(FramelessWindow):
         self.mainTabWidget.tasksTab.contentWindow.refreshTasksButton.setDisabled(True)
         message = json.dumps({"url": "/tasks", "method": "GET", "token": self.user.auth_token})
         self.init_send(message.encode(), self.set_tasks)
+
+    def unfriend(self, request_id):
+        message = json.dumps({"url": "/unfriend", "method": "POST", "token": self.user.auth_token, "data": {"request_id": request_id}})
+        self.init_send(message.encode(), self.unfriend_response)
+
+    def unfriend_response(self, response):
+        try:
+            data = json.loads(response.decode())
+        except:
+            return print(f"error decoding tasks message : {response.decode()}")
+        if data["status"] == 200:
+            InfoBar.info(title="", content="Removed friend", parent=self, orient=Qt.Horizontal, isClosable=True, position=InfoBarPosition.TOP_RIGHT, duration=2000)
+            self.update_friends()
+        elif data["status"] == 404:
+            InfoBar.info(title="", content="You are not friends with this user", parent=self, orient=Qt.Horizontal, isClosable=True, position=InfoBarPosition.TOP_RIGHT, duration=2000)
+            self.update_friends()

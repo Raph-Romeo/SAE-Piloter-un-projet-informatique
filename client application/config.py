@@ -10,12 +10,13 @@ def create_or_read_config() -> dict:
         config['Settings'] = {
             'server_address': 'task_master_pro_domain.com',
             'server_port': '5240',
-            'theme': '0'
+            'theme': '0',
+            'auto_resize_columns': '0'
         }
         with open(CONFIG_FILE_PATH, 'w') as configfile:
             config.write(configfile)
         print(f"Configuration file created: {CONFIG_FILE_PATH}")
-        return {"server_address": "task_master_pro_domain.com", 'server_port': 5240, "theme": 0}
+        return {"server_address": "task_master_pro_domain.com", 'server_port': 5240, "theme": 0, "auto_resize_columns": 0}
     else:
         # Read the configuration file
         config.read(CONFIG_FILE_PATH)
@@ -29,7 +30,15 @@ def create_or_read_config() -> dict:
             theme = int(config['Settings']['theme'])
         except:
             theme = 0
-        return {"server_address": server_address, 'server_port': server_port, "theme": theme}
+        if theme != 1 and theme != 0:
+            theme = 0
+        try:
+            auto_resize_columns = int(config['Settings']['auto_resize_columns'])
+        except:
+            auto_resize_columns = 0
+        if auto_resize_columns != 1 and auto_resize_columns != 0:
+            auto_resize_columns = 0
+        return {"server_address": server_address, 'server_port': server_port, "theme": theme, "auto_resize_columns": auto_resize_columns}
 
 
 def edit_config(parameter, new_value):

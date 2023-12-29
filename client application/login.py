@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import QMainWindow, QGraphicsOpacityEffect, QPushButton, QHBoxLayout, QGraphicsDropShadowEffect, QGridLayout, QVBoxLayout, QLineEdit, QLabel, QSizePolicy, QSpacerItem, QWidget
 from PyQt5.QtGui import QColor, QCursor, QIcon
 from PyQt5.QtCore import Qt, QPropertyAnimation
-from qfluentwidgets import InfoBar, InfoBarPosition, FluentIcon, Theme, AvatarWidget
+from qfluentwidgets import InfoBar, InfoBarPosition, FluentIcon, Theme, AvatarWidget, LineEdit, PasswordLineEdit
 import json
 from create_user import CreateUserForm
 import hashlib

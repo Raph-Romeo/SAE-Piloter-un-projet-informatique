@@ -2,9 +2,8 @@ from PyQt5.QtWidgets import QWidget, QGridLayout, QStyleOptionViewItem, QPushBut
 from PyQt5.QtGui import QCursor, QIcon, QColor, QPixmap, QFont, QPainter, QPen
 from color_icon import color_pixmap
 from PyQt5.QtCore import Qt, QSize, QDate, QEvent, QModelIndex
-from qfluentwidgets import IconWidget, FluentIcon, InfoBarIcon, ProgressBar, AvatarWidget, CalendarPicker, ToolButton, InfoBar, InfoBarPosition, MenuAnimationType, RoundMenu, Action
+from qfluentwidgets import InfoBadge, TableWidget, IconWidget, FluentIcon, InfoBarIcon, ProgressBar, AvatarWidget, CalendarPicker, ToolButton, InfoBar, InfoBarPosition, MenuAnimationType, RoundMenu, Action
 import json
-
 
 class NoFocusDelegate(QStyledItemDelegate):
     def paint(self, painter: QPainter, option: QStyleOptionViewItem, index: QModelIndex) -> None:
@@ -45,37 +44,45 @@ class Status(QWidget):
         self.layout = QHBoxLayout(self)
         self.layout.setAlignment(Qt.AlignCenter | Qt.AlignVCenter)
         self.layout.setContentsMargins(0, 0, 0, 0)
-        self.status_card = QLabel()
+        self.status_card = InfoBadge()
         self.layout.addWidget(self.status_card)
         if status == 0:
             self.status_card.setText("Upcoming")
             self.status_card.setProperty("status0", True)
+            self.status_card.setCustomBackgroundColor(light="#222", dark="#EEE")
         elif status == 1:
             self.status_card.setText("Active")
             self.status_card.setProperty("status1", True)
+            self.status_card.setCustomBackgroundColor(light="#5b2efc", dark="#916cee")
         elif status == 2:
-            self.status_card.setText("Complete")
+            self.status_card.setText("Completed")
             self.status_card.setProperty("status2", True)
+            self.status_card.setCustomBackgroundColor(light="#3bd16f", dark="#6ccb5f")
         else:
             self.status_card.setText("Expired")
             self.status_card.setProperty("status3", True)
+            self.status_card.setCustomBackgroundColor(light="#c42b1c", dark="#ff99a4")
 
     def setStatus(self, status):
         self.status_card.deleteLater()
-        self.status_card = QLabel()
+        self.status_card = InfoBadge()
         self.layout.addWidget(self.status_card)
         if status == 0:
             self.status_card.setText("Upcoming")
             self.status_card.setProperty("status0", True)
+            self.status_card.setCustomBackgroundColor(light="#222", dark="#EEE")
         elif status == 1:
             self.status_card.setText("Active")
             self.status_card.setProperty("status1", True)
+            self.status_card.setCustomBackgroundColor(light="#5b2efc", dark="#916cee")
         elif status == 2:
-            self.status_card.setText("Complete")
+            self.status_card.setText("Completed")
             self.status_card.setProperty("status2", True)
+            self.status_card.setCustomBackgroundColor(light="#3bd16f", dark="#6ccb5f")
         else:
             self.status_card.setText("Expired")
             self.status_card.setProperty("status3", True)
+            self.status_card.setCustomBackgroundColor(light="#c42b1c", dark="#ff99a4")
         self.layout.addWidget(self.status_card)
 
 
@@ -86,6 +93,7 @@ class TimeLeft(QWidget):
         self.grid.setContentsMargins(10, 0, 0, 0)
         self.grid.setSpacing(0)
         self.label = QLabel(timeleft_item[0])
+        self.label.setStyleSheet("font-family:verdana")
         self.label.setAlignment(Qt.AlignLeft)
         self.setProperty("TimeLeft", True)
         if timeleft_item[1] == 0:
@@ -208,21 +216,23 @@ class BottomMenu(QMainWindow):
         searchBarLayout.addWidget(self.searchBarQlineEdit, 0, 1)
         searchBarLayout.addWidget(self.searchBarIcon, 0, 0)
 
-        self.tasksTableWidget = QTableWidget(0, 6)
-        # self.tasksTableWidget.setFocusPolicy(Qt.NoFocus)
-        self.tasksTableWidget.setItemDelegate(NoFocusDelegate())
+        self.tasksTableWidget = TableWidget(self)
+        self.tasksTableWidget.setRowCount(0)
+        self.tasksTableWidget.setColumnCount(6)
         self.tasksTableWidget.setStyleSheet("QTableWidget::item:selected { border: none; }")
         self.tasksTableWidget.setHorizontalHeaderLabels(["Task name", "Tag", "User", "Status", "Time left", "Progress"])
-        self.tasksTableWidget.horizontalHeader().setStyleSheet("QHeaderView::section{border-bottom:none}")
+        self.tasksTableWidget.horizontalHeader().setStyleSheet("QHeaderView::section{border-bottom:none;border-top:none}")
         font = QFont()
         font.setFamily("verdana")
         font.setPointSize(10)
         self.tasksTableWidget.keyPressEvent = self.customKeyPressEvent
+        # self.tasksTableWidget.setColumnHidden(5, True)
         self.tasksTableWidget.horizontalHeader().setFont(font)
         self.tasksTableWidget.setFont(font)
         self.tasksTableWidget.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.tasksTableWidget.verticalHeader().setVisible(False)
         self.tasksTableWidget.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.tasksTableWidget.setSelectRightClickedRow(True)
         self.tasksTableWidget.setShowGrid(False)
         self.tasksTableWidget.setVerticalScrollMode(QAbstractItemView.ScrollPerPixel)
         self.tasksTableWidget.setHorizontalScrollMode(QAbstractItemView.ScrollPerPixel)
@@ -253,8 +263,12 @@ class BottomMenu(QMainWindow):
         self.clearTasks()
         for i in self.mainWindow.tasks:
             self.tasksTableWidget.setRowCount(self.tasksTableWidget.rowCount() + 1)
-            self.tasksTableWidget.setItem(self.tasksTableWidget.rowCount() - 1, 0, QTableWidgetItem(i.name))
-            self.tasksTableWidget.setItem(self.tasksTableWidget.rowCount() - 1, 1, QTableWidgetItem(i.tag))
+            name_label = QLabel(i.name)
+            name_label.setStyleSheet("font-family:verdana;margin:0px;font-size:12px")
+            tag_label = QLabel(i.tag)
+            tag_label.setStyleSheet("font-family:verdana;margin:0px;font-size:12px")
+            self.tasksTableWidget.setCellWidget(self.tasksTableWidget.rowCount() - 1, 0, name_label)
+            self.tasksTableWidget.setCellWidget(self.tasksTableWidget.rowCount() - 1, 1, tag_label)
             self.tasksTableWidget.setCellWidget(self.tasksTableWidget.rowCount() - 1, 2, User(i.user))
             self.tasksTableWidget.setCellWidget(self.tasksTableWidget.rowCount() - 1, 3, Status(i.status))
             self.tasksTableWidget.setCellWidget(self.tasksTableWidget.rowCount() - 1, 4, TimeLeft(i.time_left()))
@@ -265,7 +279,20 @@ class BottomMenu(QMainWindow):
             self.tasksTableWidget.setRowHeight(self.tasksTableWidget.rowCount() - 1, 40)
         self.parent.topMenu.setTaskNumber(len(self.mainWindow.tasks))
         self.apply_filter()
+        self.tasksTableWidget.resizeRowsToContents()
         self.refreshTasksButton.setDisabled(False)
+
+    def fixTableColumnWidth(self):
+        if self.mainWindow.autoResizeColumns:
+            self.tasksTableWidget.resizeColumnToContents(0)
+            self.tasksTableWidget.resizeColumnToContents(1)
+            self.tasksTableWidget.resizeColumnToContents(2)
+        return
+
+    def defaultColumnWidth(self):
+        self.tasksTableWidget.setColumnWidth(0, 100)
+        self.tasksTableWidget.setColumnWidth(1, 100)
+        self.tasksTableWidget.setColumnWidth(3, 100)
 
     def remove_tasks(self, task_ids):
         task_indexes_to_remove = []
@@ -274,14 +301,20 @@ class BottomMenu(QMainWindow):
                 task_indexes_to_remove.append(i)
         task_indexes_to_remove.sort()
         task_indexes_to_remove.reverse()
+        self.tasksTableWidget.clearSelection()
         for row in task_indexes_to_remove:
             self.tasksTableWidget.removeRow(row)
         self.parent.topMenu.setTaskNumber(len(self.mainWindow.tasks) - len(task_ids))
+        self.fixTableColumnWidth()
 
     def add_task(self, task):
         self.tasksTableWidget.insertRow(0)
-        self.tasksTableWidget.setItem(0, 0, QTableWidgetItem(task.name))
-        self.tasksTableWidget.setItem(0, 1, QTableWidgetItem(task.tag))
+        name_label = QLabel(task.name)
+        name_label.setStyleSheet("font-family:verdana;margin:0px;font-size:12px")
+        tag_label = QLabel(task.tag)
+        tag_label.setStyleSheet("font-family:verdana;margin:0px;font-size:12px")
+        self.tasksTableWidget.setCellWidget(0, 0, name_label)
+        self.tasksTableWidget.setCellWidget(0, 1, tag_label)
         self.tasksTableWidget.setCellWidget(0, 2, User(task.user))
         self.tasksTableWidget.setCellWidget(0, 3, Status(task.status))
         self.tasksTableWidget.setCellWidget(0, 4, TimeLeft(task.time_left()))
@@ -289,6 +322,7 @@ class BottomMenu(QMainWindow):
         self.tasksTableWidget.setRowHeight(0, 40)
         self.parent.topMenu.setTaskNumber(len(self.mainWindow.tasks))
         self.searchFilter(self.searchBarQlineEdit.text())
+        self.tasksTableWidget.resizeRowsToContents()
 
     def date_tasks_filter(self, date):
         self.parent.topMenu.setTab(None)
@@ -430,7 +464,7 @@ class BottomMenu(QMainWindow):
         self.reset_date()
         if text != "":
             for row in range(self.tasksTableWidget.rowCount()):
-                if text.lower() in self.tasksTableWidget.item(row, 0).text().lower() or text.lower() in self.tasksTableWidget.item(row, 1).text().lower():
+                if text.lower() in self.tasksTableWidget.cellWidget(row, 0).text().lower() or text.lower() in self.tasksTableWidget.cellWidget(row, 1).text().lower():
                     self.tasksTableWidget.showRow(row)
                 else:
                     self.tasksTableWidget.hideRow(row)
@@ -452,6 +486,7 @@ class BottomMenu(QMainWindow):
             for i in range(0, len(self.mainWindow.tasks)):
                 if not self.mainWindow.tasks[i].is_completed:
                     self.tasksTableWidget.hideRow(i)
+        self.fixTableColumnWidth()
 
     def create_task(self):
         self.mainWindow.create_task_form()
@@ -487,6 +522,7 @@ class BottomMenu(QMainWindow):
                     pass
                 else:
                     self.tasksTableWidget.hideRow(row)
+        self.fixTableColumnWidth()
 
     def update_tasks(self, change):
         if change:

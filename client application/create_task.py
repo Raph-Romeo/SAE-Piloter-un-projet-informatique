@@ -3,7 +3,7 @@ from PyQt5.QtCore import Qt, QDate, QTime
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QApplication, QWidget, QHBoxLayout, QLineEdit, QTextEdit, QComboBox, QStackedWidget, QVBoxLayout, QLabel, QGridLayout, QPlainTextEdit
 import json
-from qfluentwidgets import MessageBoxBase, SubtitleLabel, LineEdit, PushButton, setTheme, Theme, CalendarPicker, CheckBox, TimePicker, DatePicker, FluentIcon, ToolButton, ComboBox, InfoBar, InfoBarPosition
+from qfluentwidgets import MessageBoxBase, SubtitleLabel, LineEdit, TextEdit, PushButton, setTheme, Theme, CalendarPicker, CheckBox, TimePicker, DatePicker, FluentIcon, ToolButton, ComboBox, InfoBar, InfoBarPosition
 from datetime import datetime, timedelta
 
 def user_format(users) -> list:
@@ -41,15 +41,18 @@ class CreateTaskForm(MessageBoxBase):
         self.formPage1 = QWidget()
         self.formPage1.setContentsMargins(0, 0, 0, 0)
         layout1 = QVBoxLayout(self.formPage1)
-        self.taskName = QLineEdit()
+        self.taskName = LineEdit()
         self.taskName.setProperty("create_task_form", True)
-        self.taskName.setPlaceholderText('Task name')
-        self.taskTag = QLineEdit()
+        self.taskName.setPlaceholderText('Task name*')
+        self.taskName.setMaxLength(20)
+        self.taskTag = LineEdit()
+        self.taskTag.setMaxLength(20)
         self.taskTag.setProperty("create_task_form", True)
-        self.taskTag.setPlaceholderText('Task tag')
-        self.taskDescription = QTextEdit()
+        self.taskTag.setPlaceholderText('Task tag*')
+        self.taskDescription = TextEdit()
         self.taskDescription.setProperty("create_task_form", True)
         self.taskDescription.setPlaceholderText('Task description')
+        #self.taskDescription.setAcceptRichText(False)
 
         layout1.addWidget(self.taskName)
         layout1.addWidget(self.taskTag)
