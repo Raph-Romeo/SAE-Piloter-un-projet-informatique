@@ -204,7 +204,6 @@ class MainWindow(FramelessWindow):
         self.fetchingRequests = False
         self.current_view_task_dialog = None
         self.number_of_friend_requests = 0
-        self.number_of_pending_requests = 0
         self.workers = []
         self.threads = []
         self.friends = []
@@ -589,10 +588,8 @@ class MainWindow(FramelessWindow):
                         return InfoBar.info(title="Friend request", content=f"You have {self.number_of_friend_requests} pending friend requests !", parent=self, orient=Qt.Horizontal, isClosable=True, position=InfoBarPosition.TOP_RIGHT, duration=10000)
                     else:
                         return
-                if self.number_of_pending_requests != int(data["data"]["pending_num"]):
-                    if self.number_of_pending_requests > int(data["data"]["pending_num"]):
-                        self.update_friends()
-                    self.number_of_pending_requests = int(data["data"]["pending_num"])
+                if len(self.friends) != int(data["data"]["number_of_friends"]):
+                    self.update_friends()
                     return
             elif data["status"] == 400:
                 return
