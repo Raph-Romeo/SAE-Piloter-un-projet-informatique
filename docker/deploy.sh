@@ -25,7 +25,7 @@ docker network prune -f
 
 docker build -t task_master_pro_backend ../backend-server
 
-docker-compose up -d
+docker-compose up 
 
 
 echo "Le déploiement est terminé."
