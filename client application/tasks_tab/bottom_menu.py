@@ -226,6 +226,7 @@ class BottomMenu(QMainWindow):
         self.tasksTableWidget.horizontalHeader().setSectionsClickable(False)
         self.tasksTableWidget.contextMenuEvent = self.contextMenuEvent_table
         self.tasksTableWidget.cellDoubleClicked.connect(self.doubleClick)
+
         for col in range(3, self.tasksTableWidget.columnCount()):
             self.tasksTableWidget.horizontalHeader().setSectionResizeMode(col, QHeaderView.Stretch)
         layout.addWidget(self.searchBar, 0, 0)

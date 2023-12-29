@@ -7,7 +7,7 @@ from tab_widgets import MainTabWidget
 from titlebar import TitleBar
 from qframelesswindow import FramelessWindow, StandardTitleBar
 from login import Login
-from qfluentwidgets import setTheme, Theme, InfoBar, InfoBarPosition
+from qfluentwidgets import setTheme, Theme, InfoBar, InfoBarPosition, setThemeColor
 from datetime import datetime, timedelta
 from PyQt5.QtGui import QImage
 from PyQt5.QtCore import Qt
@@ -207,6 +207,7 @@ class MainWindow(FramelessWindow):
         self.workers = []
         self.threads = []
         self.friends = []
+        setThemeColor("#5b2efc")
         self.user = None
         self.create_task_dialog = None
         self.view_task_dialogs = []
