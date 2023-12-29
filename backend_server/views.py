@@ -309,3 +309,75 @@ def friends(request) -> bytes:
             return json.dumps(message).encode()
         except:
             return json.dumps({"status": 400, "message": "Could get data from database"}).encode()
+
+def friend_request(request) -> bytes:
+    if request.method == "GET":
+        user_id = request.user.data[0]
+        try:
+            cursor = request.client.database_connection.cursor()
+            query = f"SELECT * FROM friendships WHERE user2_id = {user_id} AND status = '0'"
+            cursor.execute(query)
+            result = cursor.fetchall()
+            cursor.close()
+            message = {"status": 200, "data": {"friend_requests": [], "pending_requests": []}}
+            for i in result:
+                if i[1] == user_id:
+                    friend_request = get_user(request, i[2])
+                else:
+                    friend_request = get_user(request, i[1])
+                friend_request["request_id"] = i[0]
+                message["data"]["friend_requests"].append(friend_request)
+            cursor = request.client.database_connection.cursor()
+            query = f"SELECT * FROM friendships WHERE user1_id = {user_id} AND status = '0'"
+            cursor.execute(query)
+            result = cursor.fetchall()
+            cursor.close()
+            for i in result:
+                if i[1] == user_id:
+                    friend_request = get_user(request, i[2])
+                else:
+                    friend_request = get_user(request, i[1])
+                friend_request["request_id"] = i[0]
+                message["data"]["pending_requests"].append(friend_request)
+            return json.dumps(message).encode()
+        except:
+            return json.dumps({"status": 400, "message": "Could get data from database"}).encode()
+    elif request.method == "POST":
+        user_id = request.user.data[0]
+        try:
+            username = request.data["username"]
+        except KeyError:
+            return json.dumps({"status": 400, "message": "Bad request"}).encode()
+        friend_id = get_user_from_username(request, username)
+        if friend_id is not None:
+            if friend_id != user_id:
+                cursor = request.client.database_connection.cursor()
+                query = f"SELECT * FROM friendships WHERE user1_id = {user_id} OR user2_id = {user_id}"
+                cursor.execute(query)
+                result = cursor.fetchall()
+                cursor.close()
+                for i in result:
+                    if i[1] == friend_id or i[2] == friend_id:
+                        if i[3] == 1:
+                            return json.dumps({"status": 400, "message": "You are already friends with this user !"}).encode()
+                        else:
+                            if i[2] == user_id:
+                                cursor = request.client.database_connection.cursor()
+                                query = f"UPDATE friendships SET status = '1' WHERE friendships_id = {i[0]}"
+                                cursor.execute(query)
+                                request.client.database_connection.commit()
+                                cursor.close()
+                                return json.dumps({"status": 200, "message": "Friend request accepted !"}).encode()
+                            else:
+                                return json.dumps({"status": 400, "message": "A friend request is already pending with this user !"}).encode()
+                # CREATE FRIEND REQUEST
+                cursor = request.client.database_connection.cursor()
+                query = f"INSERT INTO friendships (user1_id, user2_id, status) VALUES (%s, %s, %s)"
+                cursor.execute(query, (user_id, friend_id, 0))
+                request.client.database_connection.commit()
+                cursor.close()
+                return json.dumps({"status": 200, "message": "Friend request sent !"}).encode()
+            else:
+                return json.dumps({"status": 400, "message": "You cannot send a friend request to yourself !"}).encode()
+        else:
+            return json.dumps({"status": 404, "message": "No user was found with matching username"}).encode()

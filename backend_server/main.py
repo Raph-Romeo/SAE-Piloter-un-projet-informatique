@@ -164,7 +164,7 @@ class Server:
             # Friends system
             "/fetch_requests": View(views.fetch_requests, protected=True),
             "/friend_request": View(views.friend_request, protected=True),
-            #"/friends": View(views.friends, protected=True),
+            "/friends": View(views.friends, protected=True),
             #"/deny_friend_request": View(views.deny_friend_request, protected=True),
             #"/cancel_friend_request": View(views.cancel_friend_request, protected=True),
             #"/accept_friend_request": View(views.accept_friend_request, protected=True),
