@@ -27,7 +27,7 @@
 # Getting started.
 
 ## Server (Back end)
-### ⚠️ All of the following actions are performed within the 📁 backend_server directory from this repository.
+### ⚠️ All of the following actions are performed within the 📁 docker directory from this repository.
 
 System requirements :
  - **Docker**
@@ -50,7 +50,6 @@ sudo chmod +x deploy.sh
 The server should be up and running.
 
 ## Application (Front end)
-
 ```bat
 git clone "https://github.com/Raph-Romeo/SAE-Piloter-un-projet-informatique"
 ```
