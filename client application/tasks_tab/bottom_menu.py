@@ -194,6 +194,7 @@ class BottomMenu(QMainWindow):
         searchBarLayout.addWidget(self.searchBarIcon, 0, 0)
 
         self.tasksTableWidget = QTableWidget(0, 6)
+        self.tasksTableWidget.setFocusPolicy(Qt.NoFocus)
         self.tasksTableWidget.setHorizontalHeaderLabels(["Task name", "Tag", "User", "Status", "Time left", "Progress"])
         self.tasksTableWidget.horizontalHeader().setStyleSheet("QHeaderView::section{border-bottom:none}")
         font = QFont()
@@ -434,6 +435,7 @@ class BottomMenu(QMainWindow):
     def update_tasks(self, change):
         if change:
             self.task_list = self.mainWindow.tasks
+            self.apply_filter()
         for row in range(self.tasksTableWidget.rowCount()):
             self.tasksTableWidget.cellWidget(row, 4).setTime(self.task_list[row].time_left())
             if change:
@@ -450,31 +452,31 @@ class BottomMenu(QMainWindow):
         if len(selected_tasks) == 1:
             menu.addAction(Action(FluentIcon.MORE, 'View Task'))
             if selected_tasks[0].is_completed:
-                menu.addAction(Action(FluentIcon.RETURN, 'Set uncompleted'))
-                menu.menuActions()[1].triggered.connect(lambda: self.mainWindow.set_task_completed(selected_tasks[0].id,False))
+                menu.addAction(Action(FluentIcon.CLOSE, 'Set uncompleted'))
+                menu.menuActions()[1].triggered.connect(lambda: self.mainWindow.set_task_completed(selected_tasks[0].id, False))
             else:
                 menu.addAction(Action(FluentIcon.COMPLETED, 'Set completed'))
-                menu.menuActions()[1].triggered.connect(lambda: self.mainWindow.set_task_completed(selected_tasks[0].id,True))
-            menu.addAction(Action(FluentIcon.DELETE, 'Delete Task'))
+                menu.menuActions()[1].triggered.connect(lambda: self.mainWindow.set_task_completed(selected_tasks[0].id, True))
             menu.addAction(Action(FluentIcon.EDIT, 'Edit Task'))
             menu.addAction(Action(FluentIcon.SAVE_AS, 'Export Task'))
+            menu.addAction(Action(FluentIcon.DELETE, 'Delete Task'))
             menu.addSeparator()
             menu.addAction(Action(FluentIcon.ADD, 'Create Task'))
             menu.menuActions()[0].triggered.connect(lambda: self.mainWindow.init_view_task_window(selected_tasks[0].id)) # View task
-            menu.menuActions()[2].triggered.connect(lambda: self.mainWindow.delete_task(selected_tasks[0].id)) # DELETE SINGLE TASK
-            #menu.menuActions()[3].triggered.connect(lambda: self.editTask(selected_tasks[0].id)) # EDIT TASK
-            menu.menuActions()[4].triggered.connect(lambda: self.export(selected_tasks)) # Export tasks
+            menu.menuActions()[2].triggered.connect(lambda: self.mainWindow.init_edit_task_window(selected_tasks[0].id)) # EDIT TASK
+            menu.menuActions()[3].triggered.connect(lambda: self.export(selected_tasks)) # Export tasks
+            menu.menuActions()[4].triggered.connect(lambda: self.mainWindow.delete_task(selected_tasks[0].id))  # DELETE SINGLE TASK
             menu.menuActions()[5].triggered.connect(lambda: self.create_task()) # Create task
         elif len(selected_tasks) > 1:
-            menu.addAction(Action(FluentIcon.DELETE, 'Delete Tasks'))
             menu.addAction(Action(FluentIcon.SAVE_AS, 'Export Tasks'))
+            menu.addAction(Action(FluentIcon.DELETE, 'Delete Tasks'))
             menu.addSeparator()
             menu.addAction(Action(FluentIcon.ADD, 'Create Task'))
             task_ids = []
             for i in selected_tasks:
                 task_ids.append(i.id)
-            menu.menuActions()[0].triggered.connect(lambda: self.mainWindow.delete_tasks(task_ids))  # DELETE MULTIPLE TASK
-            menu.menuActions()[1].triggered.connect(lambda: self.export(selected_tasks))  # Export tasks
+            menu.menuActions()[0].triggered.connect(lambda: self.export(selected_tasks))  # Export tasks
+            menu.menuActions()[1].triggered.connect(lambda: self.mainWindow.delete_tasks(task_ids))  # DELETE MULTIPLE TASK
             menu.menuActions()[2].triggered.connect(lambda: self.create_task())  # Create task
         else:
             menu.addAction(Action(FluentIcon.ADD, 'Create Task'))

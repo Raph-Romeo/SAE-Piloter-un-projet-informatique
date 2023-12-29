@@ -114,6 +114,13 @@ light_style_sheet = """
     QLabel[TaskCalendarItemStatus3]{background:#c42b1c;color:white;}
     QLabel[TaskCalendarItemStatus3]:hover{background:rgba(196, 43, 28, 200);color:black;}
     
+    QTableWidget::item:selected {
+                outline: none; /* Remove the selection border */
+            }
+    QTableWidget::item:focus {
+                outline: none; /* Remove the focus indicator */
+            }
+    
     QPushButton[weekArrow]{color:black;border-radius:11px;font-size:12px;}
     QPushButton[weekArrow]:pressed{margin-right:1px;}
     
@@ -234,6 +241,13 @@ dark_style_sheet = """
     QLabel[TaskCalendarItemStatus2]:hover{background:rgba(108, 203, 95, 200);color:white;}
     QLabel[TaskCalendarItemStatus3]{background:#ff99a4;color:black;}
     QLabel[TaskCalendarItemStatus3]:hover{background:rgba(255, 153, 164, 200);color:white;}
+    
+    QTableWidget::item:selected {
+                outline: none; /* Remove the selection border */
+            }
+    QTableWidget::item:focus {
+                outline: none; /* Remove the focus indicator */
+            }
     
     QPushButton[weekArrow]{color:white;border-radius:11px;font-size:12px;}
     QPushButton[weekArrow]:pressed{margin-right:1px;}

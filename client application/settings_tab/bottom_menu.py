@@ -34,7 +34,6 @@ class ApplicationSettings(QWidget):
             self.button.setIcon(QIcon("icons/moon.png"))
 
 
-
 class AccountSettings(QWidget):
     def __init__(self, mainWindow):
         super().__init__()

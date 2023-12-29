@@ -365,6 +365,25 @@ class MainWindow(FramelessWindow):
         elif response["status"] == 403:
             self.logout()
 
+    def init_edit_task_window(self, task_id):
+        message = json.dumps({"url": "/task_details", "method": "POST", "token": self.user.auth_token, "data": [task_id]})
+        self.init_send(message.encode(), self.edit_task)
+
+    def edit_task(self, response):
+        response = json.loads(response.decode())
+        if response["status"] == 200:
+            try:
+                if self.view_task_dialog is not None and self.view_task_dialog.isActiveWindow():
+                    return print("task view dialog is already opened")
+                else:
+                    self.view_task_dialog = ViewTask(self, response["data"][0], edit_mode=True)
+                    self.view_task_dialog.destroyed.connect(self.handleViewTaskDestroyed)
+            except:
+                return print("Task doesn't exist ?")
+            self.view_task_dialog.exec()
+        elif response["status"] == 403:
+            self.logout()
+
     def clockThreadInit(self):
         self.clockThread = QThread()
         self.clockWorker = ClockThread()
@@ -398,6 +417,12 @@ class MainWindow(FramelessWindow):
             self.clockThread.exit()
             self.clockWorker.deleteLater()
             self.clockThread.deleteLater()
+            #for worker in self.workers:
+            #    try:
+            #        worker.quit()
+            #    except Exception as err:
+            #        print(f"Failed to close worker {worker}")
+            #        print(f"with error {err}")
         except:
             pass
         event.accept()
