@@ -31,13 +31,35 @@
 
 System requirements :
  - **Docker**
+ - **git**
  - **Operating system** : Linux
 
+**Start by cloning the git repository**
+```bash
+git clone https://github.com/Raph-Romeo/SAE-Piloter-un-projet-informatique
+cd SAE-Piloter-un-projet-informatique/docker
+```
+**Give permission to the auto deploy docker script**
+```bash
+sudo chmod +x deploy.sh
+```
+**Run the deploy bash script**
+```bash
+./deploy.sh
+```
+The server should be up and running.
+
 ## Application (Front end)
+
+```bat
+git clone "https://github.com/Raph-Romeo/SAE-Piloter-un-projet-informatique"
+```
+
 ### ⚠️ All of the following actions are performed within the 📁 client application directory from this repository.
 
 System requirements :
  - **Python** : version 3.9 or greater
+ - **git**
  - **Operating system** : Windows 10/11
  - **Storage** : 160Mb
 
