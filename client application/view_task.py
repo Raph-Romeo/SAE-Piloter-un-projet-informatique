@@ -37,6 +37,7 @@ def format_date(input_string, include_date=True):
 class ViewTask(MessageBoxBase):
     def __init__(self, parent, data):
         super().__init__(parent)
+        self.disableStatusUpdate = False
         self.mainWindow = parent
         self.formHeader = QWidget()
         self.titleLabel = SubtitleLabel(f'View task details [ {data["name"]} ]', self)
@@ -79,6 +80,7 @@ class ViewTask(MessageBoxBase):
         self.completeCheckbox = CheckBox()
         if data['is_complete']:
             self.completeCheckbox.setChecked(True)
+        self.completeCheckbox.toggled.connect(self.completeCheckboxToggled)
         self.completeCheckbox.setFixedWidth(40)
         self.status = QLabel(f"Task is {status[data['is_complete']]}")
         self.status.setStyleSheet("font-size:14px;font-family:verdana;color:gray")
@@ -150,7 +152,6 @@ class ViewTask(MessageBoxBase):
         self.editButton.setText("Edit")
         self.editButton.setIcon(FluentIcon.EDIT)
         #self.editButton.clicked.connect(lambda: self.mainWindow.delete_task(data["id"]))
-
         self.exportButton = PushButton()
         self.exportButton.setText("Export")
         self.exportButton.setIcon(FluentIcon.SAVE_AS)
@@ -169,3 +170,20 @@ class ViewTask(MessageBoxBase):
     def deleteSelf(self):
         self.mainWindow.delete_task(self.task_id)
         self.close()
+
+    def completeCheckboxToggled(self):
+        if not self.disableStatusUpdate:
+            self.completeCheckbox.setDisabled(True)
+            self.disableStatusUpdate = True
+            self.mainWindow.set_task_completed(self.task_id, self.completeCheckbox.isChecked())
+            if self.completeCheckbox.isChecked():
+                self.completeCheckbox.setChecked(False)
+            else:
+                self.completeCheckbox.setChecked(True)
+
+    def changeStatus(self, is_complete: bool):
+        status = ["incomplete", "completed"]
+        self.completeCheckbox.setDisabled(False)
+        self.completeCheckbox.setChecked(is_complete)
+        self.disableStatusUpdate = False
+        self.status.setText(f"Task is {status[is_complete]}")

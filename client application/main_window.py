@@ -146,6 +146,8 @@ class MainWindow(FramelessWindow):
         self.workers = []
         self.threads = []
         self.user = None
+        self.create_task_dialog = None
+        self.view_task_dialog = None
         self.stb = StandardTitleBar(self)
         self.stb.setTitle("Taskmaster PRO")
         self.stb.setIcon(QIcon('icons/taskmasterpro.png'))
@@ -247,6 +249,8 @@ class MainWindow(FramelessWindow):
                 if i.id == int(response["data"]["task_id"]):
                     i.is_completed = response["data"]["is_completed"]
                     self.update_tasks()
+                    if self.view_task_dialog is not None and self.view_task_dialog.isActiveWindow():
+                        self.view_task_dialog.changeStatus(response["data"]["is_completed"])
         elif response["status"] == 403:
             self.logout()
 
@@ -343,13 +347,20 @@ class MainWindow(FramelessWindow):
         message = json.dumps({"url": "/task_details", "method": "POST", "token": self.user.auth_token, "data": [task_id]})
         self.init_send(message.encode(), self.view_task)
 
+    def handleViewTaskDestroyed(self):
+        self.view_task_dialog = None
+
     def view_task(self, response):
         response = json.loads(response.decode())
         if response["status"] == 200:
             try:
-                self.view_task_dialog = ViewTask(self, response["data"][0])
+                if self.view_task_dialog is not None and self.view_task_dialog.isActiveWindow():
+                    return print("task view dialog is already opened")
+                else:
+                    self.view_task_dialog = ViewTask(self, response["data"][0])
+                    self.view_task_dialog.destroyed.connect(self.handleViewTaskDestroyed)
             except:
-                return print("Task doesn't exist")
+                return print("Task doesn't exist ?")
             self.view_task_dialog.exec()
         elif response["status"] == 403:
             self.logout()
