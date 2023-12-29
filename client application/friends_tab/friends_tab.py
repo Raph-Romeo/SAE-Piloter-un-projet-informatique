@@ -1,9 +1,11 @@
-from PyQt5.QtWidgets import QTabWidget, QLabel, QMainWindow, QHeaderView, QWidget, QGridLayout, QPushButton, QGraphicsDropShadowEffect, QApplication, QStyleOptionViewItem, QTableWidget, QTableWidgetItem, QWidget, QHBoxLayout
+from PyQt5.QtWidgets import QTabWidget, QLabel, QTableWidget, QMainWindow, QHeaderView, QWidget, QGridLayout, QPushButton, QGraphicsDropShadowEffect, QApplication, QStyleOptionViewItem, QTableWidget, QTableWidgetItem, QWidget, QHBoxLayout
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QColor
 from qfluentwidgets import MessageBoxBase, TableWidget, InfoBarIcon, HorizontalSeparator, SubtitleLabel, LineEdit, PushButton, setTheme, Theme, CalendarPicker, CheckBox, TimePicker, DatePicker, FluentIcon, ToolButton, ComboBox, InfoBar, InfoBarPosition
 import json
 from .add_friend_form import AddFriendForm
+from .friend_request_menu import FriendRequestMenu
+
 
 class FriendsTab(QWidget):
     def __init__(self, mainWindow):
@@ -29,7 +31,7 @@ class FriendsTab(QWidget):
         self.requestsButton.setText("Friend requests")
         self.requestsButton.setIcon(None)
         self.requestsButton.setFixedWidth(150)
-        # self.requestsButton.clicked.connect(OPEN FRIEND REQUEST MENU)
+        self.requestsButton.clicked.connect(self.init_friend_requests_menu)
         friendsTabLayout.addWidget(self.requestsButton, 0, 1)
 
         self.addFriendButton = PushButton()
@@ -42,6 +44,7 @@ class FriendsTab(QWidget):
         self.friendsTable = TableWidget()
         self.friendsTable.setColumnCount(3)
         self.friendsTable.setRowCount(0)
+        self.friendsTable.setSelectionMode(QTableWidget.SingleSelection)
         self.friendsTable.setHorizontalHeaderLabels(["Username", "First name", "Last name"])
         self.friendsTable.setWordWrap(False)
 
@@ -123,3 +126,63 @@ class FriendsTab(QWidget):
             self.add_friend_form.confirmButton.setDisabled(False)
             self.add_friend_form.friendNameInput.setDisabled(False)
 
+    def init_friend_requests_menu(self):
+        message = json.dumps({"url": "/friend_request", "method": "GET", "token": self.mainWindow.user.auth_token})
+        return self.mainWindow.init_send(message.encode(), self.build_friend_requests_menu)
+
+    def build_friend_requests_menu(self, response):
+        data = json.loads(response.decode())
+        if data["status"] == 200:
+            self.friend_request_menu = FriendRequestMenu(self.mainWindow, self, data["data"])
+            self.friend_request_menu.exec()
+        else:
+            print(data)
+
+    def accept_friend_request(self, request_id: int):
+        message = json.dumps({"url": "/accept_friend_request", "method": "POST", "token": self.mainWindow.user.auth_token, "data": {"request_id": request_id}})
+        return self.mainWindow.init_send(message.encode(), self.accept_friend_request_response)
+
+    def accept_friend_request_response(self, response):
+        data = json.loads(response.decode())
+        if data["status"] == 200:
+            InfoBar.info(title="", content=data["message"], parent=self.mainWindow,orient=Qt.Horizontal, isClosable=True, position=InfoBarPosition.TOP_RIGHT, duration=5000)
+            if data["message"] == "Friend request accepted !":
+                self.mainWindow.update_friends()
+                self.mainWindow.number_of_friend_requests -= 1
+                self.set_friend_requests(self.mainWindow.number_of_friend_requests)
+            return
+        elif data["status"] == 400:
+            InfoBar.error(title="", content=data["message"], parent=self.mainWindow,orient=Qt.Horizontal, isClosable=True, position=InfoBarPosition.TOP_RIGHT, duration=5000)
+        elif data["status"] == 404:
+            InfoBar.warning(title="", content=data["message"], parent=self.mainWindow,orient=Qt.Horizontal, isClosable=True, position=InfoBarPosition.TOP_RIGHT, duration=5000)
+
+    def deny_friend_request(self, request_id: int):
+        message = json.dumps({"url": "/deny_friend_request", "method": "POST", "token": self.mainWindow.user.auth_token, "data": {"request_id": request_id}})
+        return self.mainWindow.init_send(message.encode(), self.deny_friend_request_response)
+
+    def deny_friend_request_response(self, response):
+        data = json.loads(response.decode())
+        if data["status"] == 200:
+            InfoBar.info(title="", content=data["message"], parent=self.mainWindow,orient=Qt.Horizontal, isClosable=True, position=InfoBarPosition.TOP_RIGHT, duration=5000)
+            if data["message"] == "Friend request accepted !":
+                self.mainWindow.update_friends()
+                self.mainWindow.number_of_friend_requests -= 1
+                self.set_friend_requests(self.mainWindow.number_of_friend_requests)
+            return
+        elif data["status"] == 400:
+            InfoBar.error(title="", content=data["message"], parent=self.mainWindow,orient=Qt.Horizontal, isClosable=True, position=InfoBarPosition.TOP_RIGHT, duration=5000)
+        elif data["status"] == 404:
+            InfoBar.warning(title="", content=data["message"], parent=self.mainWindow,orient=Qt.Horizontal, isClosable=True, position=InfoBarPosition.TOP_RIGHT, duration=5000)
+
+    def cancel_friend_request(self, request_id: int):
+        message = json.dumps({"url": "/cancel_friend_request", "method": "POST", "token": self.mainWindow.user.auth_token, "data": {"request_id": request_id}})
+        return self.mainWindow.init_send(message.encode(), self.cancel_friend_request_response)
+
+    def cancel_friend_request_response(self, response):
+        data = json.loads(response.decode())
+        if data["status"] == 200:
+            return InfoBar.info(title="", content=data["message"], parent=self.mainWindow,orient=Qt.Horizontal, isClosable=True, position=InfoBarPosition.TOP_RIGHT, duration=5000)
+        elif data["status"] == 400:
+            InfoBar.error(title="", content=data["message"], parent=self.mainWindow,orient=Qt.Horizontal, isClosable=True, position=InfoBarPosition.TOP_RIGHT, duration=5000)
+        elif data["status"] == 404:
+            InfoBar.warning(title="", content=data["message"], parent=self.mainWindow,orient=Qt.Horizontal, isClosable=True, position=InfoBarPosition.TOP_RIGHT, duration=5000)
