@@ -170,11 +170,12 @@ class User:
 class MainWindow(FramelessWindow):
     def __init__(self, connection, lw):
         super().__init__()
+        self.current_view_task_dialog = None
         self.workers = []
         self.threads = []
         self.user = None
         self.create_task_dialog = None
-        self.view_task_dialog = None
+        self.view_task_dialogs = []
         self.stb = StandardTitleBar(self)
         self.stb.setTitle("Taskmaster PRO")
         self.stb.setIcon(QIcon('icons/taskmasterpro.png'))
@@ -295,18 +296,28 @@ class MainWindow(FramelessWindow):
     def set_task_completed_response(self, e):
         response = json.loads(e.decode())
         if response["status"] == 200:
-            InfoBar.success(title="OK", content="Deleted task", parent=self, orient=Qt.Horizontal, isClosable=True, position=InfoBarPosition.TOP_RIGHT, duration=1000)
+            if response["data"]["is_completed"]:
+                InfoBar.info(title="", content="Set task to completed", parent=self, orient=Qt.Horizontal, isClosable=False, position=InfoBarPosition.TOP_RIGHT, duration=1000)
+            else:
+                InfoBar.info(title="", content="Set task to incomplete", parent=self, orient=Qt.Horizontal, isClosable=False, position=InfoBarPosition.TOP_RIGHT, duration=1000)
             for i in self.tasks:
                 if i.id == int(response["data"]["task_id"]):
                     i.is_completed = response["data"]["is_completed"]
-                    self.update_tasks()
-                    if self.view_task_dialog is not None and self.view_task_dialog.isActiveWindow():
-                        self.view_task_dialog.changeStatus(response["data"]["is_completed"])
+                    break
+            self.update_tasks()
+            if self.current_view_task_dialog is not None:
+                try:
+                    if self.current_view_task_dialog.isActiveWindow():
+                        if self.current_view_task_dialog.task_id == int(response["data"]["task_id"]):
+                            self.current_view_task_dialog.disableStatusUpdate = True
+                            self.current_view_task_dialog.changeStatus(response["data"]["is_completed"])
+                except:
+                    pass
         elif response["status"] == 403:
             self.logout()
         elif response["status"] == 404:
             self.remove_tasks([response["data"]["task_id"]])
-            InfoBar.warning(title="404", content="Task not found", parent=self, orient=Qt.Horizontal, isClosable=True, position=InfoBarPosition.TOP_RIGHT, duration=1000)
+            InfoBar.warning(title="404", content="Task not found", parent=self, orient=Qt.Horizontal, isClosable=True, position=InfoBarPosition.TOP_RIGHT, duration=5000)
 
     def delete_task(self, pk: int):
         message = json.dumps({"url": "/delete_task", "method": "POST", "token": self.user.auth_token, "data": {"task_id": pk}})
@@ -315,13 +326,13 @@ class MainWindow(FramelessWindow):
     def delete_task_response(self, e):
         response = json.loads(e.decode())
         if response["status"] == 200:
-            InfoBar.success(title="OK", content="Deleted task", parent=self, orient=Qt.Horizontal, isClosable=True, position=InfoBarPosition.TOP_RIGHT, duration=1000)
+            InfoBar.info(title="", content="Deleted task", parent=self, orient=Qt.Horizontal, isClosable=False, position=InfoBarPosition.TOP_RIGHT, duration=1000)
             self.remove_tasks([int(response["data"]["task_id"])])
         elif response["status"] == 403:
             self.logout()
         elif response["status"] == 404:
             self.remove_tasks([int(response["data"]["task_id"])])
-            InfoBar.warning(title="404", content="Task not found", parent=self, orient=Qt.Horizontal, isClosable=True, position=InfoBarPosition.TOP_RIGHT, duration=1000)
+            InfoBar.warning(title="404", content="Task not found", parent=self, orient=Qt.Horizontal, isClosable=True, position=InfoBarPosition.TOP_RIGHT, duration=5000)
 
     def delete_tasks(self, pk_list: list):
         message = json.dumps({"url": "/delete_tasks", "method": "POST", "token": self.user.auth_token, "data": {"task_ids": pk_list}})
@@ -332,9 +343,9 @@ class MainWindow(FramelessWindow):
         if response["status"] == 200:
             for task in response["data"]["tasks"]:
                 if task["status"] == 200:
-                    InfoBar.success(title="OK", content="Deleted task", parent=self, orient=Qt.Horizontal, isClosable=True, position=InfoBarPosition.TOP_RIGHT, duration=1000)
+                    InfoBar.info(title="", content="Deleted task", parent=self, orient=Qt.Horizontal, isClosable=False, position=InfoBarPosition.TOP_RIGHT, duration=1000)
                 elif task["status"] == 404:
-                    InfoBar.warning(title="404", content="Task not found", parent=self, orient=Qt.Horizontal, isClosable=True, position=InfoBarPosition.TOP_RIGHT, duration=1000)
+                    InfoBar.warning(title="404", content="Task not found", parent=self, orient=Qt.Horizontal, isClosable=True, position=InfoBarPosition.TOP_RIGHT, duration=5000)
             self.remove_tasks(response["data"]["task_ids"])
         elif response["status"] == 403:
             self.logout()
@@ -352,7 +363,7 @@ class MainWindow(FramelessWindow):
     def create_task_response(self, e):
         response = json.loads(e.decode())
         if response["status"] == 200:
-            InfoBar.success(title="OK", content="Created task", parent=self, orient=Qt.Horizontal,isClosable=True, position=InfoBarPosition.TOP_RIGHT, duration=1000)
+            InfoBar.success(title="Created task", content=f'{response["data"]["task"]["N"]}', parent=self, orient=Qt.Horizontal, isClosable=True, position=InfoBarPosition.TOP_RIGHT, duration=5000)
             if self.create_task_dialog is not None and self.create_task_dialog.isActiveWindow():
                 self.create_task_dialog.close()
             self.add_task(response["data"]["task"])
@@ -409,24 +420,19 @@ class MainWindow(FramelessWindow):
         message = json.dumps({"url": "/task_details", "method": "POST", "token": self.user.auth_token, "data": [task_id]})
         self.init_send(message.encode(), self.view_task)
 
-    def handleViewTaskDestroyed(self):
-        self.view_task_dialog = None
-
     def view_task(self, response):
         response = json.loads(response.decode())
         if response["status"] == 200:
             try:
-                if self.view_task_dialog is not None and self.view_task_dialog.isActiveWindow():
-                    return print("view_task_dialog is already opened !")
-                else:
-                    if "not_found" in response["data"][0].keys():
-                        self.remove_tasks([response["data"][0]["id"]])
-                        return InfoBar.warning(title="404", content="Task not found", parent=self, orient=Qt.Horizontal, isClosable=True, position=InfoBarPosition.TOP_RIGHT, duration=1000)
-                    self.view_task_dialog = ViewTask(self, response["data"][0])
-                    self.view_task_dialog.destroyed.connect(self.handleViewTaskDestroyed)
+                if "not_found" in response["data"][0].keys():
+                    self.remove_tasks([response["data"][0]["id"]])
+                    return InfoBar.warning(title="404", content="Task not found", parent=self, orient=Qt.Horizontal, isClosable=True, position=InfoBarPosition.TOP_RIGHT, duration=5000)
+                self.view_task_dialogs.append(ViewTask(self, response["data"][0]))
+                view_task_dialog = self.view_task_dialogs[len(self.view_task_dialogs) - 1]
+                self.current_view_task_dialog = view_task_dialog
+                view_task_dialog.exec()
             except:
-                return InfoBar.error(title="Error", content="Could not fetch task details", parent=self, orient=Qt.Horizontal, isClosable=True, position=InfoBarPosition.TOP_RIGHT, duration=1000)
-            self.view_task_dialog.exec()
+                return InfoBar.error(title="Error", content="Could not fetch task details", parent=self, orient=Qt.Horizontal, isClosable=True, position=InfoBarPosition.TOP_RIGHT, duration=5000)
         elif response["status"] == 403:
             self.logout()
 
@@ -438,17 +444,16 @@ class MainWindow(FramelessWindow):
         response = json.loads(response.decode())
         if response["status"] == 200:
             try:
-                if self.view_task_dialog is not None and self.view_task_dialog.isActiveWindow():
-                    return print("view_task_dialog is already opened !")
-                else:
-                    if "not_found" in response["data"][0].keys():
-                        self.remove_tasks([response["data"]["id"]])
-                        return InfoBar.warning(title="404", content="Task doesn't exist", parent=self,orient=Qt.Horizontal, isClosable=True, position=InfoBarPosition.TOP_RIGHT,duration=1000)
-                    self.view_task_dialog = ViewTask(self, response["data"][0], edit_mode=True)
-                    self.view_task_dialog.destroyed.connect(self.handleViewTaskDestroyed)
+                if "not_found" in response["data"][0].keys():
+                    self.remove_tasks([response["data"][0]["id"]])
+                    return InfoBar.warning(title="404", content="Task not found", parent=self, orient=Qt.Horizontal, isClosable=True, position=InfoBarPosition.TOP_RIGHT, duration=5000)
+                self.view_task_dialogs.append(ViewTask(self, response["data"][0]))
+                view_task_dialog = self.view_task_dialogs[len(self.view_task_dialogs) - 1]
+                self.current_view_task_dialog = view_task_dialog
+                view_task_dialog.exec()
             except:
-                return InfoBar.error(title="Error", content="Could not fetch task details", parent=self,orient=Qt.Horizontal, isClosable=True, position=InfoBarPosition.TOP_RIGHT,duration=1000)
-            self.view_task_dialog.exec()
+                return InfoBar.error(title="Error", content="Could not fetch task details", parent=self,orient=Qt.Horizontal, isClosable=True, position=InfoBarPosition.TOP_RIGHT,duration=5000)
+
         elif response["status"] == 403:
             self.logout()
 
