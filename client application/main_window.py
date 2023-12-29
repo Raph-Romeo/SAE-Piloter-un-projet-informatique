@@ -11,6 +11,7 @@ from qfluentwidgets import setTheme, Theme
 from datetime import datetime, timedelta
 from PyQt5.QtGui import QImage
 from view_task import ViewTask
+import errno
 import threading
 import time
 import socket
@@ -32,17 +33,42 @@ class SendMessageWorker(QObject):
     def run(self):
         try:
             remote_ip, remote_port = self.connection.getpeername()
-            conn = socket.socket()
+            conn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             conn.connect((remote_ip, remote_port))
+            conn.setblocking(False)
             conn.send(self.msg)
-            response = conn.recv(4096)
-            self.message.emit(response)
+            data = b""
+            while True:
+                try:
+                    chunk = conn.recv(1024)  # Receive data in chunks
+                    data += chunk
+                    if data != b"" and chunk is None:
+                        self.raise_socket_error()
+                        break
+                except socket.error as e:
+                    err_code = e.errno
+                    if err_code == errno.WSAEWOULDBLOCK:
+                        pass
+                    else:
+                        self.raise_socket_error()
+                        break
+                try:
+                    if data != b"":
+                        json.loads(data.decode())
+                        self.message.emit(data)
+                        break
+                except:
+                    pass
             conn.close()
-        except:
-            self.error.emit()
-            response = json.dumps({"status": 0}).encode()
-            self.message.emit(response)
+        except Exception as err:
+            print(err)
+            self.raise_socket_error()
         return self.finished.emit()
+
+    def raise_socket_error(self):
+        self.error.emit()
+        response = json.dumps({"status": 0}).encode()
+        self.message.emit(response)
 
 
 class ClockThread(QObject):
@@ -307,6 +333,9 @@ class MainWindow(FramelessWindow):
         elif response["status"] == 400:
             self.create_task_dialog.formError(response["message"])
             self.create_task_dialog.nextB.setDisabled(False)
+        elif response["status"] == 0:
+            if self.create_task_dialog is not None and self.create_task_dialog.isActiveWindow():
+                self.create_task_dialog.nextB.setDisabled(False)
 
     def create_user(self, data: dict, func):
         message = {"url": "/create_user", "method": "POST"}

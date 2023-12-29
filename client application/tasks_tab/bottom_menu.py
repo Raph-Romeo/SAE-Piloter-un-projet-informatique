@@ -236,6 +236,7 @@ class BottomMenu(QMainWindow):
             self.tasksTableWidget.setCellWidget(self.tasksTableWidget.rowCount() - 1, 5, progressBar(0))
             self.tasksTableWidget.setRowHeight(self.tasksTableWidget.rowCount() - 1, 40)
         self.parent.topMenu.setTaskNumber(len(task_list))
+        self.apply_filter()
 
     def date_tasks_filter(self, date):
         self.parent.topMenu.setTab(None)
@@ -300,15 +301,14 @@ class BottomMenu(QMainWindow):
         try:
             data = json.loads(response.decode())
         except:
-            return print(f"error decoding tasks message : {response.decode()}")
+            return InfoBar.error(title="Cancelled export", content="Invalid json response from server", parent=self.parent, orient=Qt.Horizontal, isClosable=True, position=InfoBarPosition.TOP_RIGHT, duration=5000)
         if data["status"] == 200:
             try:
-                # ELMIRRRRR C'EST ICI C'EST ICI QUE TU VAS METTRE TA CLASSEEEEE
                 # TaskPDF(data["data"], self.file)
-                InfoBar.success(title="Export successful",content=f"Exported task(s) to {self.file}",parent=self.parent,orient=Qt.Horizontal,isClosable=True,position=InfoBarPosition.TOP_RIGHT,duration=5000)
+                InfoBar.success(title="Export successful", content=f"Exported task(s) to {self.file}",parent=self.parent,orient=Qt.Horizontal,isClosable=True,position=InfoBarPosition.TOP_RIGHT,duration=5000)
             except Exception as err:
                 print(err)
-                InfoBar.error(title="Cancelled export",content="Something went wrong while creating PDF file",parent=self.parent,orient=Qt.Horizontal,isClosable=True,position=InfoBarPosition.TOP_RIGHT,duration=5000)
+                InfoBar.error(title="Cancelled export", content="Something went wrong while creating PDF file",parent=self.parent,orient=Qt.Horizontal,isClosable=True,position=InfoBarPosition.TOP_RIGHT,duration=5000)
         elif data["status"] == 403:
             self.mainWindow.logout()
         else:
@@ -317,22 +317,26 @@ class BottomMenu(QMainWindow):
     def tasks_to_csv(self, response):
         try:
             data = json.loads(response.decode())
-            print(data)
         except:
-            return print(f"error decoding tasks message : {response.decode()}")
+            return InfoBar.error(title="Cancelled export", content="Invalid json response from server", parent=self.parent, orient=Qt.Horizontal, isClosable=True, position=InfoBarPosition.TOP_RIGHT, duration=5000)
         if data["status"] == 200:
             try:
-                content = "Task name,Tag\n"
-                status = ["Upcoming", "Active", "Complete", "Expired"]
+                header_elements = ["task name", "tag", "description", "is task completed", "priority", "start date", "task deadline", "user username", "user email", "creator username", "creator email", "creation date"]
+                content = ",".join(header_elements) + "\n" # Add header with header_elements to file content
                 for task in data["data"]:
-                    content += f"{task['name']},{task['tag']}\n"
+                    if task["description"] is not None:
+                        description = task["description"]
+                    else:
+                        description = 'None'
+                    task_data = [task["name"], task["tag"], '"' + description + '"', str(task["is_complete"]), str(task["importance"]), task["start_date"], task["deadline"], task["user"]["u"], task["user"]["e"], task["creator"]["u"], task["creator"]["e"], task["creation_date"]]
+                    content += ",".join(task_data) + "\n"
                 with open(self.file, "w") as f:
                     f.write(content)
                 f.close()
-                InfoBar.success(title="Export successful",content=f"Exported task(s) to {self.file}",parent=self.parent,orient=Qt.Horizontal,isClosable=True,position=InfoBarPosition.TOP_RIGHT,duration=5000)
+                InfoBar.success(title="Export successful", content=f"Exported task(s) to {self.file}", parent=self.parent, orient=Qt.Horizontal, isClosable=True, position=InfoBarPosition.TOP_RIGHT, duration=5000)
             except Exception as err:
                 print(err)
-                InfoBar.error(title="Cancelled export",content="Something went wrong while creating CSV file",parent=self.parent,orient=Qt.Horizontal,isClosable=True,position=InfoBarPosition.TOP_RIGHT,duration=5000)
+                InfoBar.error(title="Cancelled export", content="Something went wrong while creating CSV file", parent=self.parent, orient=Qt.Horizontal, isClosable=True, position=InfoBarPosition.TOP_RIGHT, duration=5000)
         elif data["status"] == 403:
             self.mainWindow.logout()
         else:
@@ -448,7 +452,8 @@ class BottomMenu(QMainWindow):
         menu = RoundMenu(parent=self)
         selected_tasks = []
         for row in self.tasksTableWidget.selectionModel().selectedRows():
-            selected_tasks.append(self.task_list[row.row()])
+            if not self.tasksTableWidget.isRowHidden(row.row()):
+                selected_tasks.append(self.task_list[row.row()])
         if len(selected_tasks) == 1:
             menu.addAction(Action(FluentIcon.MORE, 'View Task'))
             if selected_tasks[0].is_completed:
