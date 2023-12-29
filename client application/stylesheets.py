@@ -13,7 +13,7 @@ light_style_sheet = """
     QTabBar::tab:hover {background:rgb(10,10,10);color:white;}
     QTabBar::tab:selected {background:rgb(23,23,23);color:white;}
     QScrollArea{border:none;}
-    QToolButton{background:transparent;border:none;font-family:verdana;font-weight:999;text-align:left;color:#777;font-size:12px;padding-left:15px;margin-top:14px;margin-bottom:14px}
+    QToolButton{background:transparent;border:none;font-family:verdana;font-weight:999;text-align:left;color:#555;font-size:12px;padding-left:15px;margin-top:14px;margin-bottom:14px}
     QToolButton[lastButton="true"]{margin-bottom:44px;margin-top:14px}
     QToolButton[firstButton="true"]{margin-top:44px;margin-bottom:14px}
     QToolButton[selected="true"]{border-left:3px solid #5b2efc;padding-left:12px;color:#5b2efc}

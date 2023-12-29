@@ -193,8 +193,6 @@ class CreateTaskForm(MessageBoxBase):
                     task_tag = self.taskTag.text()
                     if len(self.taskDescription.toPlainText()) > 0:
                         task_description = self.taskDescription.toPlainText()
-                        if len(self.taskDescription.toPlainText()) > 500:
-                            return self.formError("Task description cannot be longer than 500 characters !")
                     else:
                         task_description = None
                     start_date = self.startDatePicker.getDate().toPyDate()
@@ -204,10 +202,6 @@ class CreateTaskForm(MessageBoxBase):
                         deadline = datetime(deadline.year, deadline.month, deadline.day, self.deadlineTimePicker.getTime().hour(), self.deadlineTimePicker.getTime().minute())
                     else:
                         deadline = None
-                    if len(task_name) > 20:
-                        return self.formError("Task name cannot be longer than 20 characters !")
-                    if len(task_tag) > 20:
-                        return self.formError("Task tag cannot be longer than 20 characters !")
                     user = self.users[self.selectUser.currentIndex()]
                     message = {"name": task_name, "tag": task_tag, "description": task_description,
                                "start_date": str(start_date), "deadline": str(deadline), "user": user, "public": self.publicCheckbox.isChecked(), "importance": (self.selectImportance.currentIndex() + 1)}
@@ -225,6 +219,15 @@ class CreateTaskForm(MessageBoxBase):
                     if self.startDatetimePicker.getTime().minute() == self.deadlineTimePicker.getTime().minute():
                         self.formError("Deadline date and time cannot be equal to start date.")
                         return False
+        if len(self.taskDescription.toPlainText()) > 500:
+            self.formError("Task description cannot be longer than 500 characters !")
+            return False
+        if len(self.taskName.text()) > 20:
+            self.formError("Task name cannot be longer than 20 characters !")
+            return False
+        if len(self.taskTag.text()) > 20:
+            self.formError("Task tag cannot be longer than 20 characters !")
+            return False
         return True
 
     def previousPage(self):

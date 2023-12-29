@@ -23,6 +23,8 @@ class TopMenu(QMainWindow):
         self.innerLeft = QWidget()
         self.leftWrapper.verticalScrollBar().hide()
         self.leftWrapper.verticalScrollBar().setEnabled(False)
+        self.leftWrapper.horizontalScrollBar().hide()
+        self.leftWrapper.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.leftWrapper.setWidget(self.innerLeft)
         self.innerLeft.setFixedHeight(58)
         self.innerLeft.setContentsMargins(0, 0, 0, 0)
@@ -61,16 +63,7 @@ class TopMenu(QMainWindow):
 
     def resizeEvent(self, event):
         super().resizeEvent(event)
-        if self.widget.width() >= 360:
-            self.innerLeft.setFixedWidth(self.leftWrapper.width())
-            if not self.leftWrapper.horizontalScrollBar().isHidden():
-                self.leftWrapper.horizontalScrollBar().hide()
-                self.leftWrapper.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        else:
-            self.innerLeft.setFixedWidth(280)
-            if self.leftWrapper.horizontalScrollBar().isHidden():
-                self.leftWrapper.horizontalScrollBar().show()
-                self.leftWrapper.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
+        self.innerLeft.setFixedWidth(self.leftWrapper.width())
 
     def setTab(self, index: int):
         if self.currentIndex is not index:

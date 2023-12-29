@@ -79,11 +79,14 @@ class MainNavbar(QScrollArea):
         iconSize.setWidth(22)
         iconSize.setHeight(22)
         button = QToolButton()
+        if index == 1:
+            button.setDisabled(True)
+            button.setStyleSheet("color:gray")
         button.setToolButtonStyle(Qt.Qt.ToolButtonTextBesideIcon)
         button.iconPath = icon_path
         button.setIconSize(iconSize)
         button.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
-        button.setToolTip(toolTip)
+        # button.setToolTip(toolTip)
         button.setFocusPolicy(QtCore.Qt.NoFocus)
         button.setFixedWidth(128)
         button.setFixedHeight(60)

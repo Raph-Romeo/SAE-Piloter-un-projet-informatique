@@ -145,6 +145,9 @@ class progressBar(QWidget):
         self.progress_bar.setValue(percentage)
         self.grid.addWidget(self.progress_bar)
 
+    def set_progress(self, v):
+        self.progress_bar.setValue(v)
+
 
 class searchBarQLineEdit(QLineEdit):
     def __init__(self, parent, mainWindow):
@@ -221,6 +224,8 @@ class BottomMenu(QMainWindow):
         self.tasksTableWidget.verticalHeader().setVisible(False)
         self.tasksTableWidget.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.tasksTableWidget.setShowGrid(False)
+        self.tasksTableWidget.setVerticalScrollMode(QAbstractItemView.ScrollPerPixel)
+        self.tasksTableWidget.setHorizontalScrollMode(QAbstractItemView.ScrollPerPixel)
         self.tasksTableWidget.horizontalHeader().setMinimumSectionSize(100)
         self.tasksTableWidget.horizontalHeader().setSectionsClickable(False)
         self.tasksTableWidget.contextMenuEvent = self.contextMenuEvent_table
@@ -253,7 +258,10 @@ class BottomMenu(QMainWindow):
             self.tasksTableWidget.setCellWidget(self.tasksTableWidget.rowCount() - 1, 2, User(i.user))
             self.tasksTableWidget.setCellWidget(self.tasksTableWidget.rowCount() - 1, 3, Status(i.status))
             self.tasksTableWidget.setCellWidget(self.tasksTableWidget.rowCount() - 1, 4, TimeLeft(i.time_left()))
-            self.tasksTableWidget.setCellWidget(self.tasksTableWidget.rowCount() - 1, 5, progressBar(0))
+            if i.status == 2:
+                self.tasksTableWidget.setCellWidget(self.tasksTableWidget.rowCount() - 1, 5, progressBar(100))
+            else:
+                self.tasksTableWidget.setCellWidget(self.tasksTableWidget.rowCount() - 1, 5, progressBar(0))
             self.tasksTableWidget.setRowHeight(self.tasksTableWidget.rowCount() - 1, 40)
         self.parent.topMenu.setTaskNumber(len(self.mainWindow.tasks))
         self.apply_filter()
@@ -268,6 +276,7 @@ class BottomMenu(QMainWindow):
         task_indexes_to_remove.reverse()
         for row in task_indexes_to_remove:
             self.tasksTableWidget.removeRow(row)
+        self.parent.topMenu.setTaskNumber(len(self.mainWindow.tasks) - len(task_ids))
 
     def add_task(self, task):
         self.tasksTableWidget.insertRow(0)
@@ -279,6 +288,7 @@ class BottomMenu(QMainWindow):
         self.tasksTableWidget.setCellWidget(0, 5, progressBar(0))
         self.tasksTableWidget.setRowHeight(0, 40)
         self.parent.topMenu.setTaskNumber(len(self.mainWindow.tasks))
+        self.searchFilter(self.searchBarQlineEdit.text())
 
     def date_tasks_filter(self, date):
         self.parent.topMenu.setTab(None)
@@ -485,6 +495,10 @@ class BottomMenu(QMainWindow):
             self.tasksTableWidget.cellWidget(row, 4).setTime(self.mainWindow.tasks[row].time_left())
             if change:
                 self.tasksTableWidget.cellWidget(row, 3).setStatus(self.mainWindow.tasks[row].status)
+                if self.mainWindow.tasks[row].status == 2:
+                    self.tasksTableWidget.cellWidget(row, 5).set_progress(100)
+                else:
+                    self.tasksTableWidget.cellWidget(row, 5).set_progress(0)
 
     def doubleClick(self, e):
         return self.mainWindow.init_view_task_window(self.mainWindow.tasks[e].id)

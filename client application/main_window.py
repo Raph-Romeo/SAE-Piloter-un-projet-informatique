@@ -18,6 +18,7 @@ import time
 import socket
 import requests
 import json
+from config import create_or_read_config
 from create_task import CreateTaskForm
 
 
@@ -219,7 +220,11 @@ class MainWindow(FramelessWindow):
         self.setProperty("MainWindow", True)
         self.resize(820, 534)
         self.setMinimumSize(520, 274)
-        self.is_dark = False
+        settings = create_or_read_config()
+        if settings["theme"] == 1:
+            self.is_dark = True
+        elif settings["theme"] == 0:
+            self.is_dark = False
         self.mainTabWidget = MainTabWidget(self)
         self.tasks = []
         grid = QGridLayout()

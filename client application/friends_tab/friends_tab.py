@@ -19,7 +19,7 @@ class FriendsTab(QWidget):
         self.friendsTab.setCentralWidget(friends_tab_widget)
         friendsTabLayout = QGridLayout(friends_tab_widget)
         friendsTabLayout.setAlignment(Qt.AlignTop)
-        friendsTabLayout.setContentsMargins(10, 20, 30, 0)
+        friendsTabLayout.setContentsMargins(10, 5, 30, 0)
         self.friendsTab.setProperty("tasksTopMenu", True)
         self.grid.addWidget(self.friendsTab)
 
@@ -99,6 +99,7 @@ class FriendsTab(QWidget):
         self.friendsTable.setRowCount(0)
         for friend in friend_list:
             self.addFriendToTable(friend.username, friend.first_name, friend.last_name)
+        self.friendsTable.resizeRowsToContents()
 
     def clear_friends(self):
         self.friendsTable.clearContents()

@@ -108,6 +108,8 @@ class CalendarTab(QWidget):
         font.setFamily("verdana")
         font.setPointSize(10)
         self.calendarView.horizontalHeader().setFont(font)
+        self.calendarView.setVerticalScrollMode(QAbstractItemView.ScrollPerPixel)
+        self.calendarView.setHorizontalScrollMode(QAbstractItemView.ScrollPerPixel)
         self.calendarView.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.calendarView.setSelectionMode(QAbstractItemView.NoSelection)
         self.calendarView.contextMenuEvent = self.contextMenuEvent_table

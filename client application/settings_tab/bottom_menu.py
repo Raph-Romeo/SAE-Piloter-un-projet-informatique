@@ -3,6 +3,7 @@ from PyQt5.QtGui import QCursor, QIcon, QColor, QPixmap, QFont
 from color_icon import color_pixmap
 from PyQt5.QtCore import Qt, QSize
 from qfluentwidgets import IconWidget, FluentIcon, InfoBarIcon, ProgressBar
+from config import edit_config
 
 class ApplicationSettings(QWidget):
     def __init__(self, mainWindow):
@@ -29,10 +30,11 @@ class ApplicationSettings(QWidget):
         if self.parent.is_dark:
             self.button.setText("Set theme to Light mode")
             self.button.setIcon(QIcon("icons/sun.png"))
+            edit_config("Settings.theme", '1')
         else:
             self.button.setText("Set theme to Dark mode")
             self.button.setIcon(QIcon("icons/moon.png"))
-
+            edit_config("Settings.theme", '0')
 
 class AccountSettings(QWidget):
     def __init__(self, mainWindow):
