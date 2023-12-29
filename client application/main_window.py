@@ -62,7 +62,7 @@ class SendMessageWorker(QObject):
                     pass
             conn.close()
         except Exception as err:
-            print(err)
+            print("CONNECTION ERROR WITH SERVER : ", err)
             self.raise_socket_error()
         return self.finished.emit()
 
@@ -72,14 +72,47 @@ class SendMessageWorker(QObject):
         self.message.emit(response)
 
 
+class TestConnectionWorker(QObject):
+    finished = pyqtSignal()
+    message = pyqtSignal(bytes)
+    error = pyqtSignal()
+
+    def __init__(self, connection):
+        super().__init__()
+        self.connection = connection
+
+    def run(self):
+        try:
+            message = json.dumps({"t": 1})
+            self.connection.send(message.encode())
+            data = self.connection.recv(1024)
+            self.message.emit(data)
+        except Exception as err:
+            print("Testing conn error : ", err)
+            self.raise_socket_error()
+        return self.finished.emit()
+
+    def raise_socket_error(self):
+        self.error.emit()
+        response = json.dumps({"status": 0}).encode()
+        self.message.emit(response)
+
+
+
 class ClockThread(QObject):
     finished = pyqtSignal()
     update = pyqtSignal()
+    testConnection = pyqtSignal()
+    count = 0
 
     def run(self):
         while True:
             time.sleep(1)
+            self.count += 1
             self.update.emit()
+            if self.count == 5:
+                self.testConnection.emit()
+                self.count = 0
 
 
 class Task:
@@ -401,7 +434,7 @@ class MainWindow(FramelessWindow):
                 print("error was raised in the update_tasks function")
 
     def silent(self, e):
-        print(e)
+        print("[ KEEP ALIVE ] - Testing conn")
         pass
 
     def logout(self):
@@ -411,10 +444,11 @@ class MainWindow(FramelessWindow):
         self.login_page.fadeIn()
 
     def attempt_connection(self):
-        if self.isVisible():
-            self.hide()
-        self.connection = None
-        self.lw.reconnect()
+        if self.connection is not None:
+            if self.isVisible():
+                self.hide()
+            self.connection = None
+            self.lw.reconnect()
 
     def init_view_task_window(self, task_id):
         message = json.dumps({"url": "/task_details", "method": "POST", "token": self.user.auth_token, "data": [task_id]})
@@ -467,22 +501,24 @@ class MainWindow(FramelessWindow):
         self.clockWorker.finished.connect(self.clockWorker.deleteLater)
         self.clockThread.finished.connect(self.clockThread.deleteLater)
         self.clockWorker.update.connect(self.update_tasks)
+        self.clockWorker.testConnection.connect(self.testConnection)
         self.clockThread.start()
 
     def init_send(self, message: bytes, return_function):
-        self.threads.append(QThread())
-        self.workers.append(SendMessageWorker(self.connection, message))
-        thread = self.threads[len(self.threads) - 1]
-        worker = self.workers[len(self.workers) - 1]
-        worker.moveToThread(thread)
-        thread.started.connect(worker.run)
-        worker.finished.connect(thread.quit)
-        worker.finished.connect(thread.exit)
-        worker.finished.connect(worker.deleteLater)
-        thread.finished.connect(thread.deleteLater)
-        worker.message.connect(return_function)
-        worker.error.connect(self.attempt_connection)
-        thread.start()
+        if self.connection is not None:
+            self.threads.append(QThread())
+            self.workers.append(SendMessageWorker(self.connection, message))
+            thread = self.threads[len(self.threads) - 1]
+            worker = self.workers[len(self.workers) - 1]
+            worker.moveToThread(thread)
+            thread.started.connect(worker.run)
+            worker.finished.connect(thread.quit)
+            worker.finished.connect(thread.exit)
+            worker.finished.connect(worker.deleteLater)
+            thread.finished.connect(thread.deleteLater)
+            worker.message.connect(return_function)
+            worker.error.connect(self.attempt_connection)
+            thread.start()
 
     def closeEvent(self, event):
         try:
@@ -499,3 +535,19 @@ class MainWindow(FramelessWindow):
         except:
             pass
         event.accept()
+
+    def testConnection(self):
+        if self.connection is not None:
+            self.threads.append(QThread())
+            self.workers.append(TestConnectionWorker(self.connection))
+            thread = self.threads[len(self.threads) - 1]
+            worker = self.workers[len(self.workers) - 1]
+            worker.moveToThread(thread)
+            thread.started.connect(worker.run)
+            worker.finished.connect(thread.quit)
+            worker.finished.connect(thread.exit)
+            worker.finished.connect(worker.deleteLater)
+            thread.finished.connect(thread.deleteLater)
+            worker.message.connect(self.silent)
+            worker.error.connect(self.attempt_connection)
+            thread.start()

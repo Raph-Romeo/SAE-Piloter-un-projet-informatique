@@ -188,6 +188,9 @@ class ViewTask(MessageBoxBase):
 
     def deleteSelf(self):
         self.mainWindow.delete_task(self.task_id)
+        self.deleteButton.setDisabled(True)
+        self.editButton.setDisabled(True)
+        self.exportButton.setDisabled(True)
         self.close()
 
     def completeCheckboxToggled(self):
