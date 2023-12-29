@@ -1,9 +1,22 @@
-from PyQt5.QtWidgets import QWidget, QGridLayout, QPushButton, QFileDialog, QApplication, QMainWindow, QHBoxLayout, QSpacerItem, QSizePolicy, QLineEdit, QLabel, QScrollArea, QHeaderView, QTableWidget, QTableWidgetItem, QAbstractItemView
-from PyQt5.QtGui import QCursor, QIcon, QColor, QPixmap, QFont
+from PyQt5.QtWidgets import QWidget, QGridLayout, QStyleOptionViewItem, QPushButton, QFileDialog, QApplication, QMainWindow, QHBoxLayout, QSpacerItem, QSizePolicy, QLineEdit, QLabel, QScrollArea, QHeaderView, QTableWidget, QTableWidgetItem, QAbstractItemView, QStyle, QStyledItemDelegate
+from PyQt5.QtGui import QCursor, QIcon, QColor, QPixmap, QFont, QPainter, QPen
 from color_icon import color_pixmap
-from PyQt5.QtCore import Qt, QSize, QDate
+from PyQt5.QtCore import Qt, QSize, QDate, QEvent, QModelIndex
 from qfluentwidgets import IconWidget, FluentIcon, InfoBarIcon, ProgressBar, AvatarWidget, CalendarPicker, ToolButton, InfoBar, InfoBarPosition, MenuAnimationType, RoundMenu, Action
 import json
+
+
+class NoFocusDelegate(QStyledItemDelegate):
+    def paint(self, painter: QPainter, option: QStyleOptionViewItem, index: QModelIndex) -> None:
+        itemOption = QStyleOptionViewItem(option)
+        if option.state & QStyle.State_HasFocus:
+            itemOption.state = itemOption.state ^ QStyle.State_HasFocus
+        super().paint(painter, itemOption, index)
+        top_border_rect = option.rect.adjusted(0, 0, 0, -1)  # Adjust the rect to exclude the bottom pixel
+        pen = QPen(QColor(150, 150, 150, 80))
+        pen.setWidth(1)  # Set the width of the border
+        painter.setPen(pen)
+        painter.drawLine(top_border_rect.topLeft(), top_border_rect.topRight())
 
 
 class User(QWidget):
@@ -194,12 +207,15 @@ class BottomMenu(QMainWindow):
         searchBarLayout.addWidget(self.searchBarIcon, 0, 0)
 
         self.tasksTableWidget = QTableWidget(0, 6)
-        self.tasksTableWidget.setFocusPolicy(Qt.NoFocus)
+        # self.tasksTableWidget.setFocusPolicy(Qt.NoFocus)
+        self.tasksTableWidget.setItemDelegate(NoFocusDelegate())
+        self.tasksTableWidget.setStyleSheet("QTableWidget::item:selected { border: none; }")
         self.tasksTableWidget.setHorizontalHeaderLabels(["Task name", "Tag", "User", "Status", "Time left", "Progress"])
         self.tasksTableWidget.horizontalHeader().setStyleSheet("QHeaderView::section{border-bottom:none}")
         font = QFont()
         font.setFamily("verdana")
         font.setPointSize(10)
+        self.tasksTableWidget.keyPressEvent = self.customKeyPressEvent
         self.tasksTableWidget.horizontalHeader().setFont(font)
         self.tasksTableWidget.setFont(font)
         self.tasksTableWidget.setEditTriggers(QAbstractItemView.NoEditTriggers)
@@ -487,3 +503,17 @@ class BottomMenu(QMainWindow):
             menu.addAction(Action(FluentIcon.ADD, 'Create Task'))
             menu.menuActions()[0].triggered.connect(lambda: self.create_task())  # Create task
         menu.exec(e.globalPos(), aniType=MenuAnimationType.NONE)
+
+    def customKeyPressEvent(self, event):
+        if event.key() == Qt.Key_Delete:
+            selected_tasks = []
+            for row in self.tasksTableWidget.selectionModel().selectedRows():
+                if not self.tasksTableWidget.isRowHidden(row.row()):
+                    selected_tasks.append(self.task_list[row.row()])
+            if len(selected_tasks) > 0:
+                task_ids = []
+                for i in selected_tasks:
+                    task_ids.append(i.id)
+                self.mainWindow.delete_tasks(task_ids)
+        else:
+            super(QTableWidget, self.tasksTableWidget).keyPressEvent(event)
