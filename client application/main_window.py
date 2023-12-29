@@ -7,7 +7,7 @@ from tab_widgets import MainTabWidget
 from titlebar import TitleBar
 from qframelesswindow import FramelessWindow, StandardTitleBar
 from login import Login
-from qfluentwidgets import setTheme, Theme, InfoBar, InfoBarPosition
+from qfluentwidgets import setTheme, Theme, InfoBar, InfoBarPosition, setThemeColor
 from datetime import datetime, timedelta
 from PyQt5.QtGui import QImage
 from PyQt5.QtCore import Qt
@@ -26,83 +26,68 @@ class SendMessageWorker(QObject):
     message = pyqtSignal(bytes)
     error = pyqtSignal()
 
-    def __init__(self, connection, message: bytes):
+    def __init__(self, connection, message: bytes, use_original_socket=False):
         super().__init__()
         self.connection = connection
         self.msg = message
+        self.use_original_socket = use_original_socket
 
     def run(self):
         try:
-            remote_ip, remote_port = self.connection.getpeername()
-            conn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            conn.connect((remote_ip, remote_port))
-            conn.setblocking(False)
-            conn.send(self.msg)
-            data = b""
-            while True:
+            if self.use_original_socket:
                 try:
-                    chunk = conn.recv(1024)  # Receive data in chunks
-                    data += chunk
-                    if data != b"" and chunk is None:
-                        self.raise_socket_error()
-                        break
-                except socket.error as e:
-                    err_code = e.errno
-                    if err_code == errno.WSAEWOULDBLOCK:
+                    self.connection.send(self.msg)
+                    data = self.connection.recv(1024)
+                    self.message.emit(data)
+                except Exception as err:
+                    print("Testing conn error : ", err)
+                    self.raise_socket_error()
+                return self.finished.emit()
+            else:
+                remote_ip, remote_port = self.connection.getpeername()
+                conn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                conn.connect((remote_ip, remote_port))
+                conn.setblocking(False)
+                conn.send(self.msg)
+                data = b""
+                while True:
+                    try:
+                        chunk = conn.recv(1024)  # Receive data in chunks
+                        data += chunk
+                        if data != b"" and chunk is None:
+                            self.raise_socket_error()
+                            break
+                    except socket.error as e:
+                        err_code = e.errno
+                        if err_code == errno.WSAEWOULDBLOCK:
+                            pass
+                        else:
+                            self.raise_socket_error()
+                            break
+                    try:
+                        if data != b"":
+                            json.loads(data.decode())
+                            self.message.emit(data)
+                            break
+                    except:
                         pass
-                    else:
-                        self.raise_socket_error()
-                        break
-                try:
-                    if data != b"":
-                        json.loads(data.decode())
-                        self.message.emit(data)
-                        break
-                except:
-                    pass
-            conn.close()
+                conn.close()
         except Exception as err:
             print("CONNECTION ERROR WITH SERVER : ", err)
             self.raise_socket_error()
-        return self.finished.emit()
+            return self.finished.emit()
 
     def raise_socket_error(self):
         self.error.emit()
         response = json.dumps({"status": 0}).encode()
         self.message.emit(response)
-
-
-class TestConnectionWorker(QObject):
-    finished = pyqtSignal()
-    message = pyqtSignal(bytes)
-    error = pyqtSignal()
-
-    def __init__(self, connection):
-        super().__init__()
-        self.connection = connection
-
-    def run(self):
-        try:
-            message = json.dumps({"t": 1})
-            self.connection.send(message.encode())
-            data = self.connection.recv(1024)
-            self.message.emit(data)
-        except Exception as err:
-            print("Testing conn error : ", err)
-            self.raise_socket_error()
-        return self.finished.emit()
-
-    def raise_socket_error(self):
-        self.error.emit()
-        response = json.dumps({"status": 0}).encode()
-        self.message.emit(response)
-
 
 
 class ClockThread(QObject):
     finished = pyqtSignal()
     update = pyqtSignal()
     testConnection = pyqtSignal()
+    fetchRequests = pyqtSignal()
     count = 0
 
     def run(self):
@@ -110,8 +95,10 @@ class ClockThread(QObject):
             time.sleep(1)
             self.count += 1
             self.update.emit()
-            if self.count == 5:
+            if self.count == 5 or self.count == 10:
                 self.testConnection.emit()
+            elif self.count == 15:
+                self.fetchRequests.emit()
                 self.count = 0
 
 
@@ -185,7 +172,7 @@ class Task:
 
 
 class User:
-    def __init__(self, username, email, profile_picture_url=None, token=None):
+    def __init__(self, username, email, first_name=None, last_name=None, profile_picture_url=None, token=None):
         self.username = username
         image = "icons/default.png"
         if profile_picture_url is not None:
@@ -198,14 +185,29 @@ class User:
         self.profile_picture = image
         self.auth_token = token
         self.email = email
+        self.first_name = first_name
+        self.last_name = last_name
+
+
+class Friend:
+    def __init__(self, username, email, first_name, last_name, request_id):
+        self.id = request_id
+        self.username = username
+        self.email = email
+        self.first_name = first_name
+        self.last_name = last_name
 
 
 class MainWindow(FramelessWindow):
     def __init__(self, connection, lw):
         super().__init__()
+        self.fetchingRequests = False
         self.current_view_task_dialog = None
+        self.number_of_friend_requests = 0
         self.workers = []
         self.threads = []
+        self.friends = []
+        setThemeColor("#5b2efc")
         self.user = None
         self.create_task_dialog = None
         self.view_task_dialogs = []
@@ -276,6 +278,22 @@ class MainWindow(FramelessWindow):
         self.titlebar.setUserPanel(self.user)
         message = json.dumps({"url": "/tasks", "method": "GET", "token": self.user.auth_token})
         self.init_send(message.encode(), self.set_tasks)
+        message = json.dumps({"url": "/friends", "method": "GET", "token": self.user.auth_token})
+        self.init_send(message.encode(), self.set_friends)
+
+    def set_friends(self, response):
+        try:
+            data = json.loads(response.decode())
+        except:
+            return print(f"error decoding tasks message : {response.decode()}")
+        if data["status"] == 200:
+            self.friends = []
+            for i in data["data"]["friends"]:
+                try:
+                    self.friends.append(Friend(username=i["u"], email=i["e"], first_name=i["fn"], last_name=i["ln"], request_id=i["request_id"]))
+                except Exception as err:
+                    print("failed to create friend object", err)
+            self.mainTabWidget.friendsTab.set_friends(self.friends)
 
     # This method is subject to change. Only a temporary solution
     def remove_tasks(self, task_ids: list):
@@ -440,6 +458,9 @@ class MainWindow(FramelessWindow):
     def logout(self):
         self.user = None
         self.tasks.clear()
+        self.number_of_friend_requests = 0
+        self.friends.clear()
+        self.mainTabWidget.friendsTab.clear_friends()
         self.mainTabWidget.tasksTab.set_tasks([])
         self.login_page.fadeIn()
 
@@ -502,12 +523,13 @@ class MainWindow(FramelessWindow):
         self.clockThread.finished.connect(self.clockThread.deleteLater)
         self.clockWorker.update.connect(self.update_tasks)
         self.clockWorker.testConnection.connect(self.testConnection)
+        self.clockWorker.fetchRequests.connect(self.fetchRequests)
         self.clockThread.start()
 
-    def init_send(self, message: bytes, return_function):
+    def init_send(self, message: bytes, return_function, use_original_socket=False):
         if self.connection is not None:
             self.threads.append(QThread())
-            self.workers.append(SendMessageWorker(self.connection, message))
+            self.workers.append(SendMessageWorker(self.connection, message, use_original_socket))
             thread = self.threads[len(self.threads) - 1]
             worker = self.workers[len(self.workers) - 1]
             worker.moveToThread(thread)
@@ -538,16 +560,42 @@ class MainWindow(FramelessWindow):
 
     def testConnection(self):
         if self.connection is not None:
-            self.threads.append(QThread())
-            self.workers.append(TestConnectionWorker(self.connection))
-            thread = self.threads[len(self.threads) - 1]
-            worker = self.workers[len(self.workers) - 1]
-            worker.moveToThread(thread)
-            thread.started.connect(worker.run)
-            worker.finished.connect(thread.quit)
-            worker.finished.connect(thread.exit)
-            worker.finished.connect(worker.deleteLater)
-            thread.finished.connect(thread.deleteLater)
-            worker.message.connect(self.silent)
-            worker.error.connect(self.attempt_connection)
-            thread.start()
+            self.init_send(json.dumps({"t": 1}).encode(), self.silent, True)
+
+    def fetchRequests(self):
+        if self.connection is not None:
+            if self.user is not None and not self.fetchingRequests:
+                self.fetchingRequests = True
+                message = json.dumps({"url": "/fetch_requests", "method": "GET", "token": self.user.auth_token})
+                return self.init_send(message.encode(), self.fetchRequestsResponse, True)
+            else:
+                return self.testConnection()
+
+    def fetchRequestsResponse(self, response: bytes):
+        self.fetchingRequests = False
+        try:
+            data = json.loads(response.decode())
+        except:
+            return print(f"error decoding tasks message : {response.decode()}")
+        if self.user is not None:
+            if data["status"] == 200:
+                if self.number_of_friend_requests != int(data["data"]["request_num"]):
+                    if self.number_of_friend_requests > int(data["data"]["request_num"]):
+                        self.update_friends()
+                    self.number_of_friend_requests = int(data["data"]["request_num"])
+                    self.mainTabWidget.friendsTab.set_friend_requests(self.number_of_friend_requests)
+                    if self.number_of_friend_requests > 0:
+                        return InfoBar.info(title="Friend request", content=f"You have {self.number_of_friend_requests} pending friend requests !", parent=self, orient=Qt.Horizontal, isClosable=True, position=InfoBarPosition.TOP_RIGHT, duration=10000)
+                    else:
+                        return
+                if len(self.friends) != int(data["data"]["number_of_friends"]):
+                    self.update_friends()
+                    return
+            elif data["status"] == 400:
+                return
+        else:
+            return
+
+    def update_friends(self):
+        message = json.dumps({"url": "/friends", "method": "GET", "token": self.user.auth_token})
+        self.init_send(message.encode(), self.set_friends)
