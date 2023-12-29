@@ -161,6 +161,14 @@ class Server:
             "/create_task": View(views.create_task, protected=True),
             "/task_details": View(views.task_details, protected=True),
             # "/update_task": View(views.update_task, protected=True),
+            # Friends system
+            "/fetch_requests": View(views.fetch_requests, protected=True),
+            "/friend_request": View(views.friend_request, protected=True),
+            "/friends": View(views.friends, protected=True),
+            "/deny_friend_request": View(views.deny_friend_request, protected=True),
+            "/cancel_friend_request": View(views.cancel_friend_request, protected=True),
+            "/accept_friend_request": View(views.accept_friend_request, protected=True),
+            # "/unfriend": View(views.remove_friend, protected=True),
         }
 
     def close(self) -> None:
