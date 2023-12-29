@@ -22,25 +22,19 @@ def login(request) -> bytes:
             # The token contains the username, and date and be encrypted with the secret key.
             # token : username + "," + md5_password + "," + time Encrypted secret key
             token = request.client.generate_token(username, password).decode()
-            return json.dumps({"status": 200, "message": "Success", "data": {"token": token, "user_data": {"username": result[1], "email": result[3]}}}).encode()
+            return json.dumps({"status": 200, "message": "Success", "data": {"token": token, "user_data": {"username": result[1], "email": result[3], "first_name": result[6], "last_name": result[5]}}}).encode()
 
 
-def get_user(request, pk: int, friend=False):
+def get_user(request, pk: int):
     cursor = request.client.database_connection.cursor()
     query = "SELECT * FROM User WHERE id = %s"
     cursor.execute(query, (pk,))
     result = cursor.fetchone()
     cursor.close()
     if result is not None:
-        if not friend:
-            return {"u": result[1], "e": result[3]}
-        else:
-            return {"u": result[1], "e": result[3], "fn": result[6], "ln": result[5]}
+        return {"u": result[1], "e": result[3], "fn": result[6], "ln": result[5]}
     else:
-        if friend:
-            return {"u": f"deleted_user_{pk}", "e": "null", "fn": "null", "ln": "null"}
-        else:
-            return {"u": f"deleted_user_{pk}", "e": "null"}
+        return {"u": f"deleted_user_{pk}", "e": "null", "fn": "null", "ln": "null"}
 
 def get_user_from_username(request, username: str):
     cursor = request.client.database_connection.cursor()
@@ -299,11 +293,11 @@ def friends(request) -> bytes:
             message = {"status": 200, "data": {"friends": []}}
             for i in result:
                 if i[1] == user_id:
-                    friend = get_user(request, i[2], True)
+                    friend = get_user(request, i[2])
                     friend["request_id"] = i[0]
                     message["data"]["friends"].append(friend)
                 else:
-                    friend = get_user(request, i[1], True)
+                    friend = get_user(request, i[1])
                     friend["request_id"] = i[0]
                     message["data"]["friends"].append(friend)
             return json.dumps(message).encode()
@@ -448,3 +442,25 @@ def deny_friend_request(request) -> bytes:
                 return json.dumps({"status": 403, "message": "You are not allowed to perform this action"}).encode()
         else:
             return json.dumps({"status": 404, "message": "Friend request is no longer available"}).encode()
+
+def remove_friend(request) -> bytes:
+    if request.method == "POST":
+        user_id = request.user.data[0]
+        request_id = request.data["request_id"]
+        cursor = request.client.database_connection.cursor()
+        query = "SELECT * FROM friendships WHERE friendships_id = %s AND status = '1'"
+        cursor.execute(query, (request_id,))
+        result = cursor.fetchone()
+        cursor.close()
+        if result is not None:
+            if result[2] == user_id or result[1] == user_id:
+                cursor = request.client.database_connection.cursor()
+                query = f"DELETE FROM friendships WHERE friendships_id = {result[0]}"
+                cursor.execute(query)
+                request.client.database_connection.commit()
+                cursor.close()
+                return json.dumps({"status": 200, "message": "Removed friend"}).encode()
+            else:
+                return json.dumps({"status": 403, "message": "You are not allowed to perform this action"}).encode()
+        else:
+            return json.dumps({"status": 404, "message": "You are not friends with this user"}).encode()

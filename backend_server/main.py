@@ -168,7 +168,7 @@ class Server:
             "/deny_friend_request": View(views.deny_friend_request, protected=True),
             "/cancel_friend_request": View(views.cancel_friend_request, protected=True),
             "/accept_friend_request": View(views.accept_friend_request, protected=True),
-            # "/unfriend": View(views.remove_friend, protected=True),
+            "/unfriend": View(views.remove_friend, protected=True),
         }
 
     def close(self) -> None:
