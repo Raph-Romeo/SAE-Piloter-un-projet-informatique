@@ -1,4 +1,3 @@
-#!/bin/bash
 if ! command -v docker &> /dev/null
 then
     echo "Docker n'est pas installé. Installation en cours..."
