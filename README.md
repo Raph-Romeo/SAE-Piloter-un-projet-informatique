@@ -66,13 +66,13 @@ _This will create a virtual environment containing the application's essential m
 You may then run the created executable located at **packaged_application/TaskMasterPro.exe**
 
 # Our team :
- - **Raphael ROMEO** - raphael.romeo@uha.fr
- - **Emir ERASLAN** - emir.eraslan@uha.fr
- - **Elmir BATJARI** - elmir.batjari@uha.fr
- - **Elias LAMINE** - elias.lamine@uha.fr
- - **Khalil DAOUDI** - khalil.daoudi@uha.fr
- - **Mehdi REHM** - medhi.rehm@uha.fr
- - **Shpend RASHITI** - shpend.rashiti@uha.fr
+ - **Raphael ROMEO** - 📧 raphael.romeo@uha.fr
+ - **Emir ERASLAN** - 📧 emir.eraslan@uha.fr
+ - **Elmir BATJARI** - 📧 elmir.batjari@uha.fr
+ - **Elias LAMINE** - 📧 elias.lamine@uha.fr
+ - **Khalil DAOUDI** - 📧 khalil.daoudi@uha.fr
+ - **Mehdi REHM** - 📧 medhi.rehm@uha.fr
+ - **Shpend RASHITI** - 📧 shpend.rashiti@uha.fr
 
 ### Backend : 
  - **Shpend RASHITI** (Backend developper and database) 
