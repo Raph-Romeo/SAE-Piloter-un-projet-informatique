@@ -110,11 +110,13 @@ class FriendsTab(QWidget):
     def send_friend_request_response(self, response):
         data = json.loads(response.decode())
         if data["status"] == 200:
-            InfoBar.info(title="", content=data["message"], parent=self.mainWindow,orient=Qt.Horizontal, isClosable=True, position=InfoBarPosition.TOP_RIGHT, duration=5000)
+            InfoBar.info(title="", content=data["message"], parent=self.mainWindow, orient=Qt.Horizontal, isClosable=True, position=InfoBarPosition.TOP_RIGHT, duration=5000)
             if data["message"] == "Friend request accepted !":
                 self.mainWindow.update_friends()
                 self.mainWindow.number_of_friend_requests -= 1
                 self.set_friend_requests(self.mainWindow.number_of_friend_requests)
+            else:
+                self.mainWindow.number_of_pending_requests += 1
             if self.add_friend_form is not None and self.add_friend_form.isActiveWindow():
                 self.add_friend_form.close()
             return
@@ -146,10 +148,9 @@ class FriendsTab(QWidget):
         data = json.loads(response.decode())
         if data["status"] == 200:
             InfoBar.info(title="", content=data["message"], parent=self.mainWindow,orient=Qt.Horizontal, isClosable=True, position=InfoBarPosition.TOP_RIGHT, duration=5000)
-            if data["message"] == "Friend request accepted !":
-                self.mainWindow.update_friends()
-                self.mainWindow.number_of_friend_requests -= 1
-                self.set_friend_requests(self.mainWindow.number_of_friend_requests)
+            self.mainWindow.update_friends()
+            self.mainWindow.number_of_friend_requests -= 1
+            self.set_friend_requests(self.mainWindow.number_of_friend_requests)
             return
         elif data["status"] == 400:
             InfoBar.error(title="", content=data["message"], parent=self.mainWindow,orient=Qt.Horizontal, isClosable=True, position=InfoBarPosition.TOP_RIGHT, duration=5000)
@@ -164,10 +165,8 @@ class FriendsTab(QWidget):
         data = json.loads(response.decode())
         if data["status"] == 200:
             InfoBar.info(title="", content=data["message"], parent=self.mainWindow,orient=Qt.Horizontal, isClosable=True, position=InfoBarPosition.TOP_RIGHT, duration=5000)
-            if data["message"] == "Friend request accepted !":
-                self.mainWindow.update_friends()
-                self.mainWindow.number_of_friend_requests -= 1
-                self.set_friend_requests(self.mainWindow.number_of_friend_requests)
+            self.mainWindow.number_of_friend_requests -= 1
+            self.set_friend_requests(self.mainWindow.number_of_friend_requests)
             return
         elif data["status"] == 400:
             InfoBar.error(title="", content=data["message"], parent=self.mainWindow,orient=Qt.Horizontal, isClosable=True, position=InfoBarPosition.TOP_RIGHT, duration=5000)
@@ -181,7 +180,9 @@ class FriendsTab(QWidget):
     def cancel_friend_request_response(self, response):
         data = json.loads(response.decode())
         if data["status"] == 200:
-            return InfoBar.info(title="", content=data["message"], parent=self.mainWindow,orient=Qt.Horizontal, isClosable=True, position=InfoBarPosition.TOP_RIGHT, duration=5000)
+            InfoBar.info(title="", content=data["message"], parent=self.mainWindow,orient=Qt.Horizontal, isClosable=True, position=InfoBarPosition.TOP_RIGHT, duration=5000)
+            self.mainWindow.number_of_pending_requests -= 1
+            return
         elif data["status"] == 400:
             InfoBar.error(title="", content=data["message"], parent=self.mainWindow,orient=Qt.Horizontal, isClosable=True, position=InfoBarPosition.TOP_RIGHT, duration=5000)
         elif data["status"] == 404:
