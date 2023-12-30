@@ -4,6 +4,7 @@ from color_icon import color_pixmap
 from PyQt5.QtCore import Qt, QSize, QDate, QEvent, QModelIndex
 from qfluentwidgets import InfoBadge, TableWidget, IconWidget, FluentIcon, InfoBarIcon, ProgressBar, AvatarWidget, CalendarPicker, ToolButton, InfoBar, InfoBarPosition, MenuAnimationType, RoundMenu, Action
 import json
+from . export_pdf import TaskPDF
 
 class NoFocusDelegate(QStyledItemDelegate):
     def paint(self, painter: QPainter, option: QStyleOptionViewItem, index: QModelIndex) -> None:
@@ -390,7 +391,9 @@ class BottomMenu(QMainWindow):
             return InfoBar.error(title="Cancelled export", content="Invalid json response from server", parent=self.mainWindow, orient=Qt.Horizontal, isClosable=True, position=InfoBarPosition.TOP_RIGHT, duration=5000)
         if data["status"] == 200:
             try:
-                # TaskPDF(data["data"], self.file)
+                tasks_data = data.get("data", [])
+                task_pdf = TaskPDF(tasks_data, self.file)
+                task_pdf.create_pdf()
                 InfoBar.success(title="Export successful", content=f"Exported task(s) to {self.file}",parent=self.mainWindow,orient=Qt.Horizontal,isClosable=True,position=InfoBarPosition.TOP_RIGHT,duration=5000)
             except Exception as err:
                 print(err)
