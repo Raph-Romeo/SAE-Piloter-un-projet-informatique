@@ -178,12 +178,12 @@ class TaskPDF:
                 text = f"{label}{value}"
                 self.add_normal_text(text, text_start_x)  
             elif detail == 'deadline':
-                if value:
+                if value and value.lower() != "none":
                     value = f"Task must be complete before {self.format_date(value)}"
                     text = f"{label}{value}"
-                    self.add_normal_text(text, text_start_x)  
+                    self.add_normal_text(text, text_start_x)
                 else:
-                    self.add_normal_text(f"{label}There is no deadline", text_start_x)  
+                    self.add_normal_text(f"{label}There is no deadline", text_start_x)         
             else:
                 value = value if value else "No information available"
                 text = f"{label}{value}"
