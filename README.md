@@ -5,7 +5,7 @@
   Task Master Pro
 </h1>
 <p align="center">
-  <b>Task Master Pro</b> is a cross-platform <b>task management</b> application designed for Windows (11 and 10). Built using Python and PyQt5, it boasts a modern and intuitive user interface.
+  <b>Task Master Pro</b> is a desktop <b>task management</b> application designed for Windows (11 and 10). Built using Python, PyQt5 and QFluent-Widgets, it boasts a modern and intuitive user interface.
 </p>
 
 <p align="center">
