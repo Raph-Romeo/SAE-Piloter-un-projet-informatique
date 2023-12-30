@@ -15,9 +15,9 @@ class TaskPDF:
         self.margin_bottom = 36
         self.logo_width = 50
         self.logo_height = 50
-        self.user_icon_path = "../icons/per1.png"
-        self.creator_icon_path = "../icons/per1.png"
-        self.importance_icon_path = "../icons/danger.webp"
+        self.user_icon_path = "icons/per1.png"
+        self.creator_icon_path = "icons/per1.png"
+        self.importance_icon_path = "icons/danger.webp"
         self.file_name = file_name if file_name else self.get_file_name()
         self.c = canvas.Canvas(self.file_name, pagesize=letter)
         self.add_header()
@@ -32,7 +32,7 @@ class TaskPDF:
     def add_header(self):
         self.c.saveState()
        
-        self.logo_path = "../icons/logo_task.png"
+        self.logo_path = "icons/logo_task.png"
         logo_x = self.margin_left
         logo_y = self.margin_top - self.logo_height + 20
         self.c.drawInlineImage(self.logo_path, logo_x, logo_y, width=self.logo_width, height=self.logo_height)
@@ -114,7 +114,7 @@ class TaskPDF:
             self.add_header()
 
         is_complete = task.get('is_complete', 0)
-        self.logo_path = '../icons/false.png' if is_complete == 0 else '../icons/true.jpg'
+        self.logo_path = 'icons/false.png' if is_complete == 0 else 'icons/true.jpg'
         logo_x = self.margin_left
         logo_y = self.current_y_position - self.logo_height + 39
         self.c.drawInlineImage(self.logo_path, logo_x, logo_y, width=30, height=30)
