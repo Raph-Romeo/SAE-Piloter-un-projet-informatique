@@ -48,6 +48,8 @@ sudo chmod +x deploy.sh
 ./deploy.sh
 ```
 The server should install itself and be up and running.
+The docker-compose will redirect the server container's port on the host's port. Therefore, to communicate with the server, all you will need to do is put the host's ip address with the default port of **5240**.
+
 
 ## Application (Front end)
 ```bat
