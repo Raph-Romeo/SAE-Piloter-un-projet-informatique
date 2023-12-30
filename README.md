@@ -64,7 +64,7 @@ System requirements :
  - **Operating system** : Windows 10/11
  - **Storage** : 160Mb
 
-There are two methods to run the application.
+There are three methods to run the application.
 ### First method using Python
 
 ```bat
@@ -87,6 +87,20 @@ Please run the **package.bat** file.
 _This will create a virtual environment containing the application's essential modules (from requirements.txt) and then it will create an executable file to run the application. It will be created inside a folder called **packaged_application**_
 
 You may then run the created executable located at **packaged_application/TaskMasterPro.exe**
+
+### Third method -- Conda Environment
+Create the conda environment :
+```bat
+conda env create -f environment.yml
+```
+Activate the conda environment :
+```bat
+conda activate TaskMasterProCondaEnv
+```
+Run the client application :
+```bat
+python main.py
+```
 
 # Our team :
  - **Raphael ROMEO** - 📧 raphael.romeo@uha.fr
