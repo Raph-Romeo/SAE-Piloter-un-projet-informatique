@@ -47,7 +47,7 @@ sudo chmod +x deploy.sh
 ```bash
 ./deploy.sh
 ```
-The server should be up and running.
+The server should install itself and be up and running.
 
 ## Application (Front end)
 ```bat
