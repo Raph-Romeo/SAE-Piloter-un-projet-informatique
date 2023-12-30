@@ -21,9 +21,19 @@ from config import create_or_read_config
 from create_task import CreateTaskForm
 from user_profile import AccountProfile
 
+
 class SendMessageWorker(QObject):
+    """
+    This class is used as a worker for a thread.
+    It essentially handles the message sending through the socket in the server, given that this action is blocking
+    (Waiting for the response) we use a thread to handle this.
+    """
+    # When the thread finishes, the finished signal gets called.
     finished = pyqtSignal()
+    # When the message response is received from the socket, we use the message signal to send it back to the main
+    # thread.
     message = pyqtSignal(bytes)
+    # If an error occurs with the socket, the error signal is used to warn the main thread.
     error = pyqtSignal()
 
     def __init__(self, connection, message: bytes, use_original_socket=False):
@@ -84,6 +94,12 @@ class SendMessageWorker(QObject):
 
 
 class ClockThread(QObject):
+    """
+        This class is used as a worker for a thread.
+        As the name suggests, it acts as a clock for anything in the application.
+        We can calculate the task's time left in real time thanks to this timer, and also, we are initiating connection
+        test every 5 seconds.
+    """
     finished = pyqtSignal()
     update = pyqtSignal()
     testConnection = pyqtSignal()
@@ -103,6 +119,10 @@ class ClockThread(QObject):
 
 
 class Task:
+    """
+        This class is used to create a Task object containing all the task's information.
+        It also includes a few methods to allow us to easily determine the task's status and the time left before the deadline is reached.
+    """
     def __init__(self, pk_id: int, name: str, tag: str, start_date, deadline, user, is_owner: bool = False,
                  public: bool = False, is_completed: bool = False):
         self.id = pk_id
@@ -172,6 +192,10 @@ class Task:
 
 
 class User:
+    """
+     The current user for the application is defined with this class.
+     It contains the auth_token that is necessary to maintain a valid authentication with the server.
+    """
     def __init__(self, username, email, first_name=None, last_name=None, profile_picture_url=None, token=None):
         self.username = username
         image = "icons/default.png"
@@ -199,18 +223,35 @@ class Friend:
 
 
 class MainWindow(FramelessWindow):
+    """
+    Main window of the application.
+    Most of the methods and attributes defined are fundamental for the application.
+    """
     def __init__(self, connection, lw):
         super().__init__()
+        # This attribute contains the dialog window for viewing a user's profile.
         self.account_profile_dialog = None
+        # This boolean attribute indicates whether if we are currently fetching requests or not. This is useful
+        # to avoid a potential crash, where the server response is very delayed.
         self.fetchingRequests = False
+        # This attribute contains the object for the dialog window when viewing a task's details.
         self.current_view_task_dialog = None
+        self.view_task_dialogs = []
+        # This contains the number of current pending received friend requests.
         self.number_of_friend_requests = 0
+        # The following lists are used to store the current running threads.
         self.workers = []
         self.threads = []
+        # This list contains all the active user's tasks as objects from the Task class.
+        self.tasks = []
+        # This list contains all the active user's friends as objects from the Friend class.
         self.friends = []
+        # This attribute contains the active User object from the User class.
         self.user = None
+        # This attribute contains the task creation dialog object.
         self.create_task_dialog = None
-        self.view_task_dialogs = []
+
+        # Creation of the application window
         self.stb = StandardTitleBar(self)
         self.stb.setTitle("Taskmaster PRO")
         self.stb.setIcon(QIcon('icons/taskmasterpro.png'))
@@ -219,49 +260,81 @@ class MainWindow(FramelessWindow):
         self.setProperty("MainWindow", True)
         self.resize(820, 534)
         self.setMinimumSize(520, 274)
+
+        # Obtaining the settings values from the config file.
         settings = create_or_read_config()
+        # Setting the is_dark attribute to true if the config file has dark mode set to true, else to false.
         if settings["theme"] == 1:
             self.is_dark = True
         elif settings["theme"] == 0:
             self.is_dark = False
+        # Applying the column auto resizing if the settings in the config file are set to auto resize.
         if settings["auto_resize_columns"] == 1:
             self.autoResizeColumns = True
         else:
             self.autoResizeColumns = False
+        # Creating the main tab widget tab for the app. This is the widget that holds all the main tabs of the app.
         self.mainTabWidget = MainTabWidget(self)
-        self.tasks = []
+
+        # Defining the grid layout of the main Window.
         grid = QGridLayout()
         grid.setContentsMargins(0, 0, 0, 0)
         grid.setSpacing(0)
-        self.connection = connection
-        self.lw = lw
         self.setLayout(grid)
+
+        # Defining the socket connection attribute.
+        self.connection = connection
+
+        # lw stands for loading window. It is the object reference of the window that appears when the app is loading.
+        self.lw = lw
+
+        # Defining the titlebar widget of the app.
         self.titlebar = TitleBar(self)
         self.titlebar.setFixedHeight(74)
         self.titlebar.setContentsMargins(0, 28, 0, 0)
+
+        # Defining the left side navbar of the app.
         self.navbar = MainNavbar(self.mainTabWidget, self)
         self.navbar.setFixedWidth(148)
+
+        # Applying the dark theme or light theme depending on the state of the self.is_dark attribute
         if self.is_dark:
             self.setDarkMode()
         else:
             self.setLightMode()
+
+        # Adding the widgets to the layout of the window.
         grid.addWidget(self.titlebar, 0, 1)
         grid.addWidget(self.navbar, 0, 0, 2, 1)
         grid.addWidget(self.mainTabWidget, 1, 1, 1, 1)
 
+        # Creating the login page and overlaying it on the main window layout.
         self.login_page = Login(self)
         grid.addWidget(self.login_page, 0, 0, 2, 2)
+
+        # Calling clockThreadInit method.
         self.clockThreadInit()
+
+        # Calling titlebar raise method which initiates the custom titlebar for the Fluent-Frameless-Window object.
         self.titleBar.raise_()
+
+        # Rendering the window once setup is complete
         self.show()
 
     def toggleDarkmode(self):
+        """
+        Simple switch function to toggle dark mode if it is not currently set, or vise versa.
+        """
         if not self.is_dark:
             self.setDarkMode()
         else:
             self.setLightMode()
 
     def setDarkMode(self):
+        """
+        Setting dark theme to the application.
+        Changing style sheet and changing icon colors.
+        """
         self.setStyleSheet(dark_style_sheet)
         self.is_dark = True
         self.navbar.darkModeIcons()
@@ -272,6 +345,10 @@ class MainWindow(FramelessWindow):
         setTheme(Theme.DARK)
 
     def setLightMode(self):
+        """
+        Setting light theme to the application.
+        Changing style sheet and changing icon colors.
+        """
         self.setStyleSheet(light_style_sheet)
         self.is_dark = False
         self.navbar.lightModeIcons()
@@ -282,6 +359,13 @@ class MainWindow(FramelessWindow):
         setTheme(Theme.LIGHT)
 
     def loadSession(self, data):
+        """
+        Loading the user session, handling the authentication process and fetching all the user's data, including:
+         - User's profile.
+         - User's authentication token.
+         - User's tasks.
+         - User's friends.
+        """
         self.user = User(token=data["token"], username=data["user_data"]["username"], first_name=data["user_data"]["first_name"], last_name=data["user_data"]["last_name"], email=data["user_data"]["email"])
         self.titlebar.setUserPanel(self.user)
         message = json.dumps({"url": "/tasks", "method": "GET", "token": self.user.auth_token})
@@ -290,6 +374,9 @@ class MainWindow(FramelessWindow):
         self.init_send(message.encode(), self.set_friends)
 
     def set_friends(self, response):
+        """
+        Sets friends to the server's response of the user's friend list.
+        """
         try:
             data = json.loads(response.decode())
         except:
@@ -304,8 +391,10 @@ class MainWindow(FramelessWindow):
             self.mainTabWidget.friendsTab.set_friends(self.friends)
             self.mainTabWidget.friendsTab.refreshFriendsButton.setDisabled(False)
 
-    # This method is subject to change. Only a temporary solution
     def remove_tasks(self, task_ids: list):
+        """
+        Remove tasks from task list, and from the calendar from a list of task IDs.
+        """
         tasks = []
         for task in self.tasks:
             if task.id not in task_ids:
@@ -315,6 +404,9 @@ class MainWindow(FramelessWindow):
         self.mainTabWidget.calendarTab.refreshCalendar()
 
     def add_task(self, task):
+        """
+        Add task to the calendar and to the task list.
+        """
         try:
             deadline = datetime.strptime(task["DL"], "%Y-%m-%d %H:%M:%S")
         except:
@@ -325,6 +417,9 @@ class MainWindow(FramelessWindow):
         self.mainTabWidget.calendarTab.refreshCalendar()
 
     def set_tasks(self, response: bytes):
+        """
+        Remove all tasks (if any), and set them to the server's response of the user's list of tasks.
+        """
         try:
             data = json.loads(response.decode())
         except:
@@ -347,10 +442,18 @@ class MainWindow(FramelessWindow):
             self.mainTabWidget.calendarTab.refreshCalendar()
 
     def set_task_completed(self, pk: int, is_completed: bool):
+        """
+        Send the request to the server to set a task to completed status or to incomplete status with arguments:
+         - pk > int ID of the task we want to change the completion status of.
+         - is_completed > bool completion status of the task.
+        """
         message = json.dumps({"url": "/set_completed", "method": "POST", "token": self.user.auth_token, "data": {"task_id": pk, "is_completed": is_completed}})
         self.init_send(message.encode(), self.set_task_completed_response)
 
     def set_task_completed_response(self, e):
+        """
+        Handling server response from the completion status change of the task.
+        """
         response = json.loads(e.decode())
         if response["status"] == 200:
             if response["data"]["is_completed"]:
@@ -377,10 +480,17 @@ class MainWindow(FramelessWindow):
             InfoBar.warning(title="404", content="Task not found", parent=self, orient=Qt.Horizontal, isClosable=True, position=InfoBarPosition.TOP_RIGHT, duration=5000)
 
     def delete_task(self, pk: int):
+        """
+        Send the request to the server to delete a task with argument:
+         - pk > int ID of the task.
+        """
         message = json.dumps({"url": "/delete_task", "method": "POST", "token": self.user.auth_token, "data": {"task_id": pk}})
         self.init_send(message.encode(), self.delete_task_response)
 
     def delete_task_response(self, e):
+        """
+        Handling the server response from deleting a task.
+        """
         response = json.loads(e.decode())
         if response["status"] == 200:
             InfoBar.info(title="", content="Deleted task", parent=self, orient=Qt.Horizontal, isClosable=False, position=InfoBarPosition.TOP_RIGHT, duration=1000)
@@ -392,10 +502,17 @@ class MainWindow(FramelessWindow):
             InfoBar.warning(title="404", content="Task not found", parent=self, orient=Qt.Horizontal, isClosable=True, position=InfoBarPosition.TOP_RIGHT, duration=5000)
 
     def delete_tasks(self, pk_list: list):
+        """
+        Send the request to the server to delete multiple tasks with argument:
+         - pk_list > list IDs of the tasks.
+        """
         message = json.dumps({"url": "/delete_tasks", "method": "POST", "token": self.user.auth_token, "data": {"task_ids": pk_list}})
         self.init_send(message.encode(), self.delete_tasks_response)
 
     def delete_tasks_response(self, e):
+        """
+        Handling the server response from deleting multiple tasks.
+        """
         response = json.loads(e.decode())
         if response["status"] == 200:
             for task in response["data"]["tasks"]:
@@ -408,20 +525,34 @@ class MainWindow(FramelessWindow):
             self.logout()
 
     def create_task_form(self, date=None):
+        """
+        Display the create task form dialog. With optional argument:
+        - date > datetime object, default date for the create task form.
+        """
         self.create_task_dialog = CreateTaskForm(self, date)
         self.create_task_dialog.exec()
 
     def view_account_profile(self, user):
+        """
+        Display the active user's profile.
+        """
         self.account_profile_dialog = AccountProfile(self, user)
         self.account_profile_dialog.exec()
 
     def create_task(self, data: dict):
+        """
+        Send the request to the server to create a task with argument:
+         - data > dict object, containing the relevant information for the task we wish to create.
+        """
         message = {"url": "/create_task", "method": "POST", "token": self.user.auth_token}
         message["data"] = data
         message = json.dumps(message)
         self.init_send(message.encode(), self.create_task_response)
 
     def create_task_response(self, e):
+        """
+        Handle the server response from the task creation request.
+        """
         response = json.loads(e.decode())
         if response["status"] == 200:
             InfoBar.success(title="Created task", content=f'{response["data"]["task"]["N"]}', parent=self, orient=Qt.Horizontal, isClosable=True, position=InfoBarPosition.TOP_RIGHT, duration=5000)
@@ -443,12 +574,22 @@ class MainWindow(FramelessWindow):
                 self.create_task_dialog.nextB.setDisabled(False)
 
     def create_user(self, data: dict, func):
+        """
+        Send the request to the server to create a user account with argument:
+         - data > dict object, containing the relevant information for the user account we wish to create.
+        """
         message = {"url": "/create_user", "method": "POST"}
         message["data"] = data
         message = json.dumps(message)
         self.init_send(message.encode(), func)
 
     def update_tasks(self):
+        """
+         Force the tasks to update in the calendar and in the task list.
+         Update consists of :
+         real time -> task time left display.
+         real time -> task current status.
+        """
         if self.user is not None:
             change = False
             try:
@@ -462,10 +603,16 @@ class MainWindow(FramelessWindow):
                 print("error was raised in the update_tasks function")
 
     def silent(self, e):
+        """
+        This method is used to dispose of any unneeded response from the server
+        """
         print("[ KEEP ALIVE ] - Testing conn")
         pass
 
     def logout(self):
+        """
+        This method is used to handle the logout, and clearing all user data.
+        """
         self.user = None
         self.tasks.clear()
         self.number_of_friend_requests = 0
@@ -475,6 +622,10 @@ class MainWindow(FramelessWindow):
         self.login_page.fadeIn()
 
     def attempt_connection(self):
+        """
+        This method is called upon when an error is raised from the sendMessageWorker thread, and it will basically
+        attempt to reconnect to the server.
+        """
         if self.connection is not None:
             if self.isVisible():
                 self.hide()
@@ -483,10 +634,19 @@ class MainWindow(FramelessWindow):
             self.lw.set_theme()
 
     def init_view_task_window(self, task_id):
+        """
+        Before creating the task view dialog (containing all the task's information), we send a request to the server to
+        obtain all the information details from the task using the task_id argument.
+        args :
+        task_id > INT task_id contains the ID of the task.
+        """
         message = json.dumps({"url": "/task_details", "method": "POST", "token": self.user.auth_token, "data": [task_id]})
         self.init_send(message.encode(), self.view_task)
 
     def view_task(self, response):
+        """
+        Creating the task view dialog, handling the server's response containing all the task's information.
+        """
         response = json.loads(response.decode())
         if response["status"] == 200:
             try:
@@ -503,10 +663,19 @@ class MainWindow(FramelessWindow):
             self.logout()
 
     def init_edit_task_window(self, task_id):
+        """
+        Before creating the task edit dialog, we send a request to the server to
+        obtain all the information details from the task thanks to the task_id argument.
+        args :
+        task_id > INT task_id contains the ID value of the task.
+        """
         message = json.dumps({"url": "/task_details", "method": "POST", "token": self.user.auth_token, "data": [task_id]})
         self.init_send(message.encode(), self.edit_task)
 
     def edit_task(self, response):
+        """
+        Creating the task edit dialog, handling the server's response containing all the task's information.
+        """
         response = json.loads(response.decode())
         if response["status"] == 200:
             try:
@@ -524,6 +693,9 @@ class MainWindow(FramelessWindow):
             self.logout()
 
     def clockThreadInit(self):
+        """
+        Creating the application's clock thread object.
+        """
         self.clockThread = QThread()
         self.clockWorker = ClockThread()
         self.clockWorker.moveToThread(self.clockThread)
@@ -538,6 +710,15 @@ class MainWindow(FramelessWindow):
         self.clockThread.start()
 
     def init_send(self, message: bytes, return_function, use_original_socket=False):
+        """
+        INITIATING THE MESSAGE SENDING THREAD TO THE SERVER.
+        Arguments:
+        message -> Bytes,JSON message containing the data that we wish to send to the server (url+data+auth+etc...)
+        return_function -> reference to the return function into which we will provide the server's response.
+        user_original_socket -> Do we wish to create a new connection socket for this message, or not.
+        """
+        # Making sure that the self.connection attribute is not None.
+        # It will be None in the case where we have temporarily lost connection with the server.
         if self.connection is not None:
             self.threads.append(QThread())
             self.workers.append(SendMessageWorker(self.connection, message, use_original_socket))
@@ -554,6 +735,9 @@ class MainWindow(FramelessWindow):
             thread.start()
 
     def closeEvent(self, event):
+        """
+        Handling of the closing of the application's main window.
+        """
         try:
             self.connection.close()
             self.clockThread.exit()
@@ -570,10 +754,22 @@ class MainWindow(FramelessWindow):
         event.accept()
 
     def testConnection(self):
+        """
+        Sending the server a "test" request identified by the json message : {"t": 1} which is essentially only used
+        to keep testing the status of the connection. If the connection to the server is abruptly lost,
+        the application will be aware of this, and instantly attempt to reconnect to the server and keep retrying
+        until it succeeds.
+        Trivia : This behaviour was inspired from the desktop application of discord.
+        """
         if self.connection is not None:
             self.init_send(json.dumps({"t": 1}).encode(), self.silent, True)
 
     def fetchRequests(self):
+        """
+        Sending the server a fetch request in order to test to see if there is a difference between the client's data
+        and the server.
+        This will additionally allow the client to instantly notify the user if a friend request was received.
+        """
         if self.connection is not None:
             if self.user is not None and not self.fetchingRequests:
                 self.fetchingRequests = True
@@ -583,6 +779,9 @@ class MainWindow(FramelessWindow):
                 return self.testConnection()
 
     def fetchRequestsResponse(self, response: bytes):
+        """
+        Handling the fetch request response from the server.
+        """
         self.fetchingRequests = False
         try:
             data = json.loads(response.decode())
@@ -608,20 +807,35 @@ class MainWindow(FramelessWindow):
             return
 
     def update_friends(self):  # refresh friends...
+        """
+        Refreshing client's active user's friends.
+        Sending a request to the server to get all the active user's friends and then setting them to the friend list table.
+        """
         message = json.dumps({"url": "/friends", "method": "GET", "token": self.user.auth_token})
         self.init_send(message.encode(), self.set_friends)
 
     def refresh_tasks(self):
+        """
+        Refreshing client's active user's tasks.
+        Sending a request to the server to get all the active user's tasks and then setting them to the calendar and task list table.
+        """
         InfoBar.info(title="", content="Refreshing tasks...", parent=self, orient=Qt.Horizontal, isClosable=True, position=InfoBarPosition.TOP_RIGHT, duration=2000)
         self.mainTabWidget.tasksTab.contentWindow.refreshTasksButton.setDisabled(True)
         message = json.dumps({"url": "/tasks", "method": "GET", "token": self.user.auth_token})
         self.init_send(message.encode(), self.set_tasks)
 
     def unfriend(self, request_id):
+        """
+        Sending a request to the server to unfriend a user with argument:
+        request_id > INT ID of the friendship request.
+        """
         message = json.dumps({"url": "/unfriend", "method": "POST", "token": self.user.auth_token, "data": {"request_id": request_id}})
         self.init_send(message.encode(), self.unfriend_response)
 
     def unfriend_response(self, response):
+        """
+        Handling the unfriend response from the server.
+        """
         try:
             data = json.loads(response.decode())
         except:
