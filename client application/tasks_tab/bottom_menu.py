@@ -4,7 +4,7 @@ from color_icon import color_pixmap
 from PyQt5.QtCore import Qt, QSize, QDate, QEvent, QModelIndex
 from qfluentwidgets import InfoBadge, TableWidget, IconWidget, FluentIcon, InfoBarIcon, ProgressBar, AvatarWidget, CalendarPicker, ToolButton, InfoBar, InfoBarPosition, MenuAnimationType, RoundMenu, Action
 import json
-from . export_pdf import TaskPDF
+from .export_pdf import TaskPDF
 
 class NoFocusDelegate(QStyledItemDelegate):
     def paint(self, painter: QPainter, option: QStyleOptionViewItem, index: QModelIndex) -> None:
