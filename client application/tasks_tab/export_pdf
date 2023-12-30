@@ -32,7 +32,7 @@ class TaskPDF:
     def add_header(self):
         self.c.saveState()
        
-        self.logo_path = "../icons/taskmasterpro.png"
+        self.logo_path = "../icons/logo_task.png"
         logo_x = self.margin_left
         logo_y = self.margin_top - self.logo_height + 20
         self.c.drawInlineImage(self.logo_path, logo_x, logo_y, width=self.logo_width, height=self.logo_height)
