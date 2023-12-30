@@ -19,8 +19,6 @@ then
 fi
 
 docker-compose down
-docker system prune -a --force --volumes
-
 docker network prune -f
 
 docker build -t task_master_pro_backend ../backend_server
