@@ -103,31 +103,16 @@ python main.py
 ```
 
 # Our team :
-<pre><img align="center" style="height:35px;width:35px;border-radius:50%;" src="https://avatars.githubusercontent.com/u/95073137?s=100" <p><b> • Raph-Romeo </b></p> <a href="mailto:raphael.romeo@uha.fr">Raphael ROMEO</a><br></pre>
-#
-<pre><img align="center" style="height:35px;width:35px;border-radius:50%;" src="https://avatars.githubusercontent.com/u/92865322?s=100" <p><b> • Emir6868 </b></p><a href="mailto:emir.eraslan@uha.fr">Emir ERASLAN</a><br></pre>
-#
-<pre><img align="center" style="height:35px;width:35px;border-radius:50%;" src="https://avatars.githubusercontent.com/u/92865807?s=100" <p><b> • Elmirbtj </b></p><a href="mailto:elmir.batjari@uha.fr">Elmir BATJARI</a><br></pre>
-#
-<pre><img align="center" style="height:35px;width:35px;border-radius:50%;" src="https://avatars.githubusercontent.com/u/92864882?s=100" <p><b> • ZitoouN </b></p><a href="mailto:mehdi.rehm@uha.fr">Mehdi REHM</a><br></pre>
-#
-<pre><img align="center" style="height:35px;width:35px;border-radius:50%;" src="https://avatars.githubusercontent.com/u/92865842?s=100" <p><b> • LAMINE-Lamine </b></p><a href="mailto:elias.lamine@uha.fr">Elias LAMINE</a><br></pre>
-#
-<pre><img align="center" style="height:35px;width:35px;border-radius:50%;" src="https://avatars.githubusercontent.com/u/92827452?s=100" <p><b> • shpendrashiti </b></p><a href="mailto:shpend.rashiti@uha.fr">Shpend RASHITI</a><br></pre>
-#
-<pre><img align="center" style="height:35px;width:35px;border-radius:50%;" src="https://avatars.githubusercontent.com/u/92865016?s=100" <p><b> • JLKayser </b></p><a href="mailto:khalil.daoudi@uha.fr">Khalil DAOUDI</a><br></pre>
+<pre><img align="center" style="height:35px;width:35px;border-radius:50%;" src="https://avatars.githubusercontent.com/u/95073137?s=100" <p><b> • Raph-Romeo </b>  Head of Front end development & app packaging </p><a href="mailto:raphael.romeo@uha.fr">Raphael ROMEO</a><br></pre>
 
-### Backend : 
- - **Shpend RASHITI** (Backend developper and database) 
- - **Elias LAMINE** (Main backend developper)
- - **Mehdi REHM** (Auth + Account security development)
+<pre><img align="center" style="height:35px;width:35px;border-radius:50%;" src="https://avatars.githubusercontent.com/u/92865322?s=100" <p><b> • Emir6868 </b>  Tester & bug fixer & app stability </p><a href="mailto:emir.eraslan@uha.fr">Emir ERASLAN</a><br></pre>
 
-### Front-end :
- - **Emir ERASLAN** (Beta tester and bug fixer)
- - **Raphael ROMEO** (Concept designer and functionality developper)
- - **Khalil DAOUDI** (Application graphics + quality)
- - **Mehdi REHM** (Bug fixer and functionality developper)
- - **Elmir BATJARI** (Data handling developper)
-### Deployment :
- - **Elmir BATJARI** ( Dockerfile + Dockercompose environment for backend service)
- - **Raphael ROMEO** ( Front-end app packaging into .exe)
+<pre><img align="center" style="height:35px;width:35px;border-radius:50%;" src="https://avatars.githubusercontent.com/u/92865807?s=100" <p><b> • Elmirbtj </b>  Data handling developper front-end & Dockerfile + Dockercompose environment for backend server </p><a href="mailto:elmir.batjari@uha.fr">Elmir BATJARI</a><br></pre>
+
+<pre><img align="center" style="height:35px;width:35px;border-radius:50%;" src="https://avatars.githubusercontent.com/u/92864882?s=100" <p><b> • ZitoouN </b>  functionality developper & security & technical documentation generation </p><a href="mailto:mehdi.rehm@uha.fr">Mehdi REHM</a><br></pre>
+
+<pre><img align="center" style="height:35px;width:35px;border-radius:50%;" src="https://avatars.githubusercontent.com/u/92865842?s=100" <p><b> • LAMINE-Lamine </b>  Main backend developper </p><a href="mailto:elias.lamine@uha.fr">Elias LAMINE</a><br></pre>
+
+<pre><img align="center" style="height:35px;width:35px;border-radius:50%;" src="https://avatars.githubusercontent.com/u/92827452?s=100" <p><b> • shpendrashiti </b>  Backend developper & database management </p><a href="mailto:shpend.rashiti@uha.fr">Shpend RASHITI</a><br></pre>
+
+<pre><img align="center" style="height:35px;width:35px;border-radius:50%;" src="https://avatars.githubusercontent.com/u/92865016?s=100" <p><b> • JLKayser </b>  Application graphics & code quality </p><a href="mailto:khalil.daoudi@uha.fr">Khalil DAOUDI</a><br></pre>
