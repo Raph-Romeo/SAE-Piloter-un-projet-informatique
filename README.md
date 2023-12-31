@@ -103,13 +103,19 @@ python main.py
 ```
 
 # Our team :
- - **Raphael ROMEO** - 📧 raphael.romeo@uha.fr
- - **Emir ERASLAN** - 📧 emir.eraslan@uha.fr
- - **Elmir BATJARI** - 📧 elmir.batjari@uha.fr
- - **Elias LAMINE** - 📧 elias.lamine@uha.fr
- - **Khalil DAOUDI** - 📧 khalil.daoudi@uha.fr
- - **Mehdi REHM** - 📧 medhi.rehm@uha.fr
- - **Shpend RASHITI** - 📧 shpend.rashiti@uha.fr
+<pre><img align="center" style="height:35px;width:35px;border-radius:50%;" src="https://avatars.githubusercontent.com/u/95073137?s=100" <p><b> • Raph-Romeo </b></p> <a href="mailto:raphael.romeo@uha.fr">Raphael ROMEO</a><br></pre>
+#
+<pre><img align="center" style="height:35px;width:35px;border-radius:50%;" src="https://avatars.githubusercontent.com/u/92865322?s=100" <p><b> • Emir6868 </b></p><a href="mailto:emir.eraslan@uha.fr">Emir ERASLAN</a><br></pre>
+#
+<pre><img align="center" style="height:35px;width:35px;border-radius:50%;" src="https://avatars.githubusercontent.com/u/92865807?s=100" <p><b> • Elmirbtj </b></p><a href="mailto:elmir.batjari@uha.fr">Elmir BATJARI</a><br></pre>
+#
+<pre><img align="center" style="height:35px;width:35px;border-radius:50%;" src="https://avatars.githubusercontent.com/u/92864882?s=100" <p><b> • ZitoouN </b></p><a href="mailto:mehdi.rehm@uha.fr">Mehdi REHM</a><br></pre>
+#
+<pre><img align="center" style="height:35px;width:35px;border-radius:50%;" src="https://avatars.githubusercontent.com/u/92865842?s=100" <p><b> • LAMINE-Lamine </b></p><a href="mailto:elias.lamine@uha.fr">Elias LAMINE</a><br></pre>
+#
+<pre><img align="center" style="height:35px;width:35px;border-radius:50%;" src="https://avatars.githubusercontent.com/u/92827452?s=100" <p><b> • shpendrashiti </b></p><a href="mailto:shpend.rashiti@uha.fr">Shpend RASHITI</a><br></pre>
+#
+<pre><img align="center" style="height:35px;width:35px;border-radius:50%;" src="https://avatars.githubusercontent.com/u/92865016?s=100" <p><b> • JLKayser </b></p><a href="mailto:khalil.daoudi@uha.fr">Khalil DAOUDI</a><br></pre>
 
 ### Backend : 
  - **Shpend RASHITI** (Backend developper and database) 
