@@ -1,0 +1,7 @@
+tab\_widgets module
+===================
+
+.. automodule:: tab_widgets
+   :members:
+   :undoc-members:
+   :show-inheritance:

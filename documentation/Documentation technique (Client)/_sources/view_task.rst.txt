@@ -1,0 +1,7 @@
+view\_task module
+=================
+
+.. automodule:: view_task
+   :members:
+   :undoc-members:
+   :show-inheritance:

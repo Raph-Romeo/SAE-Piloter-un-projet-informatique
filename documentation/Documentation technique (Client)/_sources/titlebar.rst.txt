@@ -1,0 +1,7 @@
+titlebar module
+===============
+
+.. automodule:: titlebar
+   :members:
+   :undoc-members:
+   :show-inheritance:

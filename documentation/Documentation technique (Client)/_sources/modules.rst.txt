@@ -1,0 +1,20 @@
+src_client
+==========
+
+.. toctree::
+   :maxdepth: 4
+
+   color_icon
+   config
+   connection_window
+   create_task
+   create_user
+   login
+   main
+   main_window
+   navbar
+   stylesheets
+   tab_widgets
+   titlebar
+   user_profile
+   view_task

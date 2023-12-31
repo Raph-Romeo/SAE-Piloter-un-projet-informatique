@@ -1,0 +1,7 @@
+create\_user module
+===================
+
+.. automodule:: create_user
+   :members:
+   :undoc-members:
+   :show-inheritance:

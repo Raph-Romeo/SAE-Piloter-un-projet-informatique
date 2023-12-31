@@ -1,0 +1,7 @@
+color\_icon module
+==================
+
+.. automodule:: color_icon
+   :members:
+   :undoc-members:
+   :show-inheritance:

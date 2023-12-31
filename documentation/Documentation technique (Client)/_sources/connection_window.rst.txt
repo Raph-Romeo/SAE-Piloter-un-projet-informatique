@@ -1,0 +1,7 @@
+connection\_window module
+=========================
+
+.. automodule:: connection_window
+   :members:
+   :undoc-members:
+   :show-inheritance:

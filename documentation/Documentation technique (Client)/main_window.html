@@ -1,0 +1,872 @@
+<!doctype html>
+<html class="no-js" lang="en">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="navbar module" href="navbar.html" /><link rel="prev" title="main module" href="main.html" />
+
+    <!-- Generated with Sphinx 6.2.1 and Furo 2022.12.07 -->
+        <title>main_window module - TaskMasterPro (Client) 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=78b00d6c1c58d3a3a528294b4b48b3cd73ed1dca" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?digest=b06a69e053e48ba9be2ccb854e8e46df070bc0e6" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-half" viewBox="0 0 24 24">
+    <title>Auto light/dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-shadow">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M13 12h5" />
+      <path d="M13 15h4" />
+      <path d="M13 18h1" />
+      <path d="M13 9h4" />
+      <path d="M13 6h1" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="index.html"><div class="brand">TaskMasterPro (Client) 1.0.0 documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
+  
+  
+  <span class="sidebar-brand-text">TaskMasterPro (Client) 1.0.0 documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current has-children"><a class="reference internal" href="modules.html">src_client</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="color_icon.html">color_icon module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config.html">config module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="connection_window.html">connection_window module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="create_task.html">create_task module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="create_user.html">create_user module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="login.html">login module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="main.html">main module</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">main_window module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="navbar.html">navbar module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stylesheets.html">stylesheets module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tab_widgets.html">tab_widgets module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="titlebar.html">titlebar module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_profile.html">user_profile module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="view_task.html">view_task module</a></li>
+</ul>
+</li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main">
+          <section id="module-main_window">
+<span id="main-window-module"></span><h1>main_window module<a class="headerlink" href="#module-main_window" title="Permalink to this heading">#</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="main_window.ClockThread">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">main_window.</span></span><span class="sig-name descname"><span class="pre">ClockThread</span></span><a class="reference internal" href="_modules/main_window.html#ClockThread"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#main_window.ClockThread" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">QObject</span></code></p>
+<p>This class is used as a worker for a thread.
+As the name suggests, it acts as a clock for anything in the application.
+We can calculate the task’s time left in real time thanks to this timer, and also, we are initiating connection
+test every 5 seconds.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="main_window.ClockThread.count">
+<span class="sig-name descname"><span class="pre">count</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#main_window.ClockThread.count" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="main_window.ClockThread.fetchRequests">
+<span class="sig-name descname"><span class="pre">fetchRequests</span></span><a class="headerlink" href="#main_window.ClockThread.fetchRequests" title="Permalink to this definition">#</a></dt>
+<dd><p>int = …, arguments: Sequence = …) -&gt; PYQT_SIGNAL</p>
+<p>types is normally a sequence of individual types.  Each type is either a
+type object or a string that is the name of a C++ type.  Alternatively
+each type could itself be a sequence of types each describing a different
+overloaded signal.
+name is the optional C++ name of the signal.  If it is not specified then
+the name of the class attribute that is bound to the signal is used.
+revision is the optional revision of the signal that is exported to QML.
+If it is not specified then 0 is used.
+arguments is the optional sequence of the names of the signal’s arguments.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pyqtSignal(<a href="#id1"><span class="problematic" id="id2">*</span></a>types, name</p>
+</dd>
+<dt class="field-even">Type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str = …, revision</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="main_window.ClockThread.finished">
+<span class="sig-name descname"><span class="pre">finished</span></span><a class="headerlink" href="#main_window.ClockThread.finished" title="Permalink to this definition">#</a></dt>
+<dd><p>int = …, arguments: Sequence = …) -&gt; PYQT_SIGNAL</p>
+<p>types is normally a sequence of individual types.  Each type is either a
+type object or a string that is the name of a C++ type.  Alternatively
+each type could itself be a sequence of types each describing a different
+overloaded signal.
+name is the optional C++ name of the signal.  If it is not specified then
+the name of the class attribute that is bound to the signal is used.
+revision is the optional revision of the signal that is exported to QML.
+If it is not specified then 0 is used.
+arguments is the optional sequence of the names of the signal’s arguments.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pyqtSignal(<a href="#id3"><span class="problematic" id="id4">*</span></a>types, name</p>
+</dd>
+<dt class="field-even">Type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str = …, revision</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="main_window.ClockThread.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/main_window.html#ClockThread.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#main_window.ClockThread.run" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="main_window.ClockThread.testConnection">
+<span class="sig-name descname"><span class="pre">testConnection</span></span><a class="headerlink" href="#main_window.ClockThread.testConnection" title="Permalink to this definition">#</a></dt>
+<dd><p>int = …, arguments: Sequence = …) -&gt; PYQT_SIGNAL</p>
+<p>types is normally a sequence of individual types.  Each type is either a
+type object or a string that is the name of a C++ type.  Alternatively
+each type could itself be a sequence of types each describing a different
+overloaded signal.
+name is the optional C++ name of the signal.  If it is not specified then
+the name of the class attribute that is bound to the signal is used.
+revision is the optional revision of the signal that is exported to QML.
+If it is not specified then 0 is used.
+arguments is the optional sequence of the names of the signal’s arguments.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pyqtSignal(<a href="#id5"><span class="problematic" id="id6">*</span></a>types, name</p>
+</dd>
+<dt class="field-even">Type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str = …, revision</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="main_window.ClockThread.update">
+<span class="sig-name descname"><span class="pre">update</span></span><a class="headerlink" href="#main_window.ClockThread.update" title="Permalink to this definition">#</a></dt>
+<dd><p>int = …, arguments: Sequence = …) -&gt; PYQT_SIGNAL</p>
+<p>types is normally a sequence of individual types.  Each type is either a
+type object or a string that is the name of a C++ type.  Alternatively
+each type could itself be a sequence of types each describing a different
+overloaded signal.
+name is the optional C++ name of the signal.  If it is not specified then
+the name of the class attribute that is bound to the signal is used.
+revision is the optional revision of the signal that is exported to QML.
+If it is not specified then 0 is used.
+arguments is the optional sequence of the names of the signal’s arguments.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pyqtSignal(<a href="#id7"><span class="problematic" id="id8">*</span></a>types, name</p>
+</dd>
+<dt class="field-even">Type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str = …, revision</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="main_window.Friend">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">main_window.</span></span><span class="sig-name descname"><span class="pre">Friend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">username</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">email</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">first_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">last_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">request_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/main_window.html#Friend"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#main_window.Friend" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="main_window.MainWindow">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">main_window.</span></span><span class="sig-name descname"><span class="pre">MainWindow</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">connection</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lw</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/main_window.html#MainWindow"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#main_window.MainWindow" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">LinuxFramelessWindow</span></code></p>
+<p>Main window of the application.
+Most of the methods and attributes defined are fundamental for the application.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="main_window.MainWindow.add_task">
+<span class="sig-name descname"><span class="pre">add_task</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">task</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/main_window.html#MainWindow.add_task"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#main_window.MainWindow.add_task" title="Permalink to this definition">#</a></dt>
+<dd><p>Add task to the calendar and to the task list.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="main_window.MainWindow.attempt_connection">
+<span class="sig-name descname"><span class="pre">attempt_connection</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/main_window.html#MainWindow.attempt_connection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#main_window.MainWindow.attempt_connection" title="Permalink to this definition">#</a></dt>
+<dd><p>This method is called upon when an error is raised from the sendMessageWorker thread, and it will basically
+attempt to reconnect to the server.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="main_window.MainWindow.clockThreadInit">
+<span class="sig-name descname"><span class="pre">clockThreadInit</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/main_window.html#MainWindow.clockThreadInit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#main_window.MainWindow.clockThreadInit" title="Permalink to this definition">#</a></dt>
+<dd><p>Creating the application’s clock thread object.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="main_window.MainWindow.closeEvent">
+<span class="sig-name descname"><span class="pre">closeEvent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/main_window.html#MainWindow.closeEvent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#main_window.MainWindow.closeEvent" title="Permalink to this definition">#</a></dt>
+<dd><p>Handling of the closing of the application’s main window.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="main_window.MainWindow.create_task">
+<span class="sig-name descname"><span class="pre">create_task</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/main_window.html#MainWindow.create_task"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#main_window.MainWindow.create_task" title="Permalink to this definition">#</a></dt>
+<dd><dl class="simple">
+<dt>Send the request to the server to create a task with argument:</dt><dd><ul class="simple">
+<li><p>data &gt; dict object, containing the relevant information for the task we wish to create.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="main_window.MainWindow.create_task_form">
+<span class="sig-name descname"><span class="pre">create_task_form</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">date</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/main_window.html#MainWindow.create_task_form"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#main_window.MainWindow.create_task_form" title="Permalink to this definition">#</a></dt>
+<dd><p>Display the create task form dialog. With optional argument:
+- date &gt; datetime object, default date for the create task form.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="main_window.MainWindow.create_task_response">
+<span class="sig-name descname"><span class="pre">create_task_response</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">e</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/main_window.html#MainWindow.create_task_response"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#main_window.MainWindow.create_task_response" title="Permalink to this definition">#</a></dt>
+<dd><p>Handle the server response from the task creation request.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="main_window.MainWindow.create_user">
+<span class="sig-name descname"><span class="pre">create_user</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">func</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/main_window.html#MainWindow.create_user"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#main_window.MainWindow.create_user" title="Permalink to this definition">#</a></dt>
+<dd><dl class="simple">
+<dt>Send the request to the server to create a user account with argument:</dt><dd><ul class="simple">
+<li><p>data &gt; dict object, containing the relevant information for the user account we wish to create.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="main_window.MainWindow.delete_task">
+<span class="sig-name descname"><span class="pre">delete_task</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pk</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/main_window.html#MainWindow.delete_task"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#main_window.MainWindow.delete_task" title="Permalink to this definition">#</a></dt>
+<dd><dl class="simple">
+<dt>Send the request to the server to delete a task with argument:</dt><dd><ul class="simple">
+<li><p>pk &gt; int ID of the task.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="main_window.MainWindow.delete_task_response">
+<span class="sig-name descname"><span class="pre">delete_task_response</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">e</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/main_window.html#MainWindow.delete_task_response"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#main_window.MainWindow.delete_task_response" title="Permalink to this definition">#</a></dt>
+<dd><p>Handling the server response from deleting a task.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="main_window.MainWindow.delete_tasks">
+<span class="sig-name descname"><span class="pre">delete_tasks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pk_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/main_window.html#MainWindow.delete_tasks"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#main_window.MainWindow.delete_tasks" title="Permalink to this definition">#</a></dt>
+<dd><dl class="simple">
+<dt>Send the request to the server to delete multiple tasks with argument:</dt><dd><ul class="simple">
+<li><p>pk_list &gt; list IDs of the tasks.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="main_window.MainWindow.delete_tasks_response">
+<span class="sig-name descname"><span class="pre">delete_tasks_response</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">e</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/main_window.html#MainWindow.delete_tasks_response"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#main_window.MainWindow.delete_tasks_response" title="Permalink to this definition">#</a></dt>
+<dd><p>Handling the server response from deleting multiple tasks.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="main_window.MainWindow.edit_task">
+<span class="sig-name descname"><span class="pre">edit_task</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">response</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/main_window.html#MainWindow.edit_task"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#main_window.MainWindow.edit_task" title="Permalink to this definition">#</a></dt>
+<dd><p>Creating the task edit dialog, handling the server’s response containing all the task’s information.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="main_window.MainWindow.fetchRequests">
+<span class="sig-name descname"><span class="pre">fetchRequests</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/main_window.html#MainWindow.fetchRequests"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#main_window.MainWindow.fetchRequests" title="Permalink to this definition">#</a></dt>
+<dd><p>Sending the server a fetch request in order to test to see if there is a difference between the client’s data
+and the server.
+This will additionally allow the client to instantly notify the user if a friend request was received.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="main_window.MainWindow.fetchRequestsResponse">
+<span class="sig-name descname"><span class="pre">fetchRequestsResponse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">response</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/main_window.html#MainWindow.fetchRequestsResponse"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#main_window.MainWindow.fetchRequestsResponse" title="Permalink to this definition">#</a></dt>
+<dd><p>Handling the fetch request response from the server.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="main_window.MainWindow.init_edit_task_window">
+<span class="sig-name descname"><span class="pre">init_edit_task_window</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">task_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/main_window.html#MainWindow.init_edit_task_window"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#main_window.MainWindow.init_edit_task_window" title="Permalink to this definition">#</a></dt>
+<dd><p>Before creating the task edit dialog, we send a request to the server to
+obtain all the information details from the task thanks to the task_id argument.
+args :
+task_id &gt; INT task_id contains the ID value of the task.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="main_window.MainWindow.init_send">
+<span class="sig-name descname"><span class="pre">init_send</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_function</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_original_socket</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/main_window.html#MainWindow.init_send"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#main_window.MainWindow.init_send" title="Permalink to this definition">#</a></dt>
+<dd><p>INITIATING THE MESSAGE SENDING THREAD TO THE SERVER.
+Arguments:
+message -&gt; Bytes,JSON message containing the data that we wish to send to the server (url+data+auth+etc…)
+return_function -&gt; reference to the return function into which we will provide the server’s response.
+user_original_socket -&gt; Do we wish to create a new connection socket for this message, or not.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="main_window.MainWindow.init_view_task_window">
+<span class="sig-name descname"><span class="pre">init_view_task_window</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">task_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/main_window.html#MainWindow.init_view_task_window"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#main_window.MainWindow.init_view_task_window" title="Permalink to this definition">#</a></dt>
+<dd><p>Before creating the task view dialog (containing all the task’s information), we send a request to the server to
+obtain all the information details from the task using the task_id argument.
+args :
+task_id &gt; INT task_id contains the ID of the task.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="main_window.MainWindow.loadSession">
+<span class="sig-name descname"><span class="pre">loadSession</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/main_window.html#MainWindow.loadSession"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#main_window.MainWindow.loadSession" title="Permalink to this definition">#</a></dt>
+<dd><dl class="simple">
+<dt>Loading the user session, handling the authentication process and fetching all the user’s data, including:</dt><dd><ul class="simple">
+<li><p>User’s profile.</p></li>
+<li><p>User’s authentication token.</p></li>
+<li><p>User’s tasks.</p></li>
+<li><p>User’s friends.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="main_window.MainWindow.logout">
+<span class="sig-name descname"><span class="pre">logout</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/main_window.html#MainWindow.logout"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#main_window.MainWindow.logout" title="Permalink to this definition">#</a></dt>
+<dd><p>This method is used to handle the logout, and clearing all user data.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="main_window.MainWindow.refresh_tasks">
+<span class="sig-name descname"><span class="pre">refresh_tasks</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/main_window.html#MainWindow.refresh_tasks"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#main_window.MainWindow.refresh_tasks" title="Permalink to this definition">#</a></dt>
+<dd><p>Refreshing client’s active user’s tasks.
+Sending a request to the server to get all the active user’s tasks and then setting them to the calendar and task list table.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="main_window.MainWindow.remove_tasks">
+<span class="sig-name descname"><span class="pre">remove_tasks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">task_ids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/main_window.html#MainWindow.remove_tasks"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#main_window.MainWindow.remove_tasks" title="Permalink to this definition">#</a></dt>
+<dd><p>Remove tasks from task list, and from the calendar from a list of task IDs.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="main_window.MainWindow.setDarkMode">
+<span class="sig-name descname"><span class="pre">setDarkMode</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/main_window.html#MainWindow.setDarkMode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#main_window.MainWindow.setDarkMode" title="Permalink to this definition">#</a></dt>
+<dd><p>Setting dark theme to the application.
+Changing style sheet and changing icon colors.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="main_window.MainWindow.setLightMode">
+<span class="sig-name descname"><span class="pre">setLightMode</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/main_window.html#MainWindow.setLightMode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#main_window.MainWindow.setLightMode" title="Permalink to this definition">#</a></dt>
+<dd><p>Setting light theme to the application.
+Changing style sheet and changing icon colors.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="main_window.MainWindow.set_friends">
+<span class="sig-name descname"><span class="pre">set_friends</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">response</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/main_window.html#MainWindow.set_friends"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#main_window.MainWindow.set_friends" title="Permalink to this definition">#</a></dt>
+<dd><p>Sets friends to the server’s response of the user’s friend list.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="main_window.MainWindow.set_task_completed">
+<span class="sig-name descname"><span class="pre">set_task_completed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pk</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_completed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/main_window.html#MainWindow.set_task_completed"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#main_window.MainWindow.set_task_completed" title="Permalink to this definition">#</a></dt>
+<dd><dl class="simple">
+<dt>Send the request to the server to set a task to completed status or to incomplete status with arguments:</dt><dd><ul class="simple">
+<li><p>pk &gt; int ID of the task we want to change the completion status of.</p></li>
+<li><p>is_completed &gt; bool completion status of the task.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="main_window.MainWindow.set_task_completed_response">
+<span class="sig-name descname"><span class="pre">set_task_completed_response</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">e</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/main_window.html#MainWindow.set_task_completed_response"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#main_window.MainWindow.set_task_completed_response" title="Permalink to this definition">#</a></dt>
+<dd><p>Handling server response from the completion status change of the task.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="main_window.MainWindow.set_tasks">
+<span class="sig-name descname"><span class="pre">set_tasks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">response</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/main_window.html#MainWindow.set_tasks"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#main_window.MainWindow.set_tasks" title="Permalink to this definition">#</a></dt>
+<dd><p>Remove all tasks (if any), and set them to the server’s response of the user’s list of tasks.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="main_window.MainWindow.silent">
+<span class="sig-name descname"><span class="pre">silent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">e</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/main_window.html#MainWindow.silent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#main_window.MainWindow.silent" title="Permalink to this definition">#</a></dt>
+<dd><p>This method is used to dispose of any unneeded response from the server</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="main_window.MainWindow.testConnection">
+<span class="sig-name descname"><span class="pre">testConnection</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/main_window.html#MainWindow.testConnection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#main_window.MainWindow.testConnection" title="Permalink to this definition">#</a></dt>
+<dd><p>Sending the server a “test” request identified by the json message : {“t”: 1} which is essentially only used
+to keep testing the status of the connection. If the connection to the server is abruptly lost,
+the application will be aware of this, and instantly attempt to reconnect to the server and keep retrying
+until it succeeds.
+Trivia : This behaviour was inspired from the desktop application of discord.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="main_window.MainWindow.toggleDarkmode">
+<span class="sig-name descname"><span class="pre">toggleDarkmode</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/main_window.html#MainWindow.toggleDarkmode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#main_window.MainWindow.toggleDarkmode" title="Permalink to this definition">#</a></dt>
+<dd><p>Simple switch function to toggle dark mode if it is not currently set, or vise versa.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="main_window.MainWindow.unfriend">
+<span class="sig-name descname"><span class="pre">unfriend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/main_window.html#MainWindow.unfriend"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#main_window.MainWindow.unfriend" title="Permalink to this definition">#</a></dt>
+<dd><p>Sending a request to the server to unfriend a user with argument:
+request_id &gt; INT ID of the friendship request.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="main_window.MainWindow.unfriend_response">
+<span class="sig-name descname"><span class="pre">unfriend_response</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">response</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/main_window.html#MainWindow.unfriend_response"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#main_window.MainWindow.unfriend_response" title="Permalink to this definition">#</a></dt>
+<dd><p>Handling the unfriend response from the server.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="main_window.MainWindow.update_friends">
+<span class="sig-name descname"><span class="pre">update_friends</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/main_window.html#MainWindow.update_friends"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#main_window.MainWindow.update_friends" title="Permalink to this definition">#</a></dt>
+<dd><p>Refreshing client’s active user’s friends.
+Sending a request to the server to get all the active user’s friends and then setting them to the friend list table.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="main_window.MainWindow.update_tasks">
+<span class="sig-name descname"><span class="pre">update_tasks</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/main_window.html#MainWindow.update_tasks"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#main_window.MainWindow.update_tasks" title="Permalink to this definition">#</a></dt>
+<dd><p>Force the tasks to update in the calendar and in the task list.
+Update consists of :
+real time -&gt; task time left display.
+real time -&gt; task current status.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="main_window.MainWindow.view_account_profile">
+<span class="sig-name descname"><span class="pre">view_account_profile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/main_window.html#MainWindow.view_account_profile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#main_window.MainWindow.view_account_profile" title="Permalink to this definition">#</a></dt>
+<dd><p>Display the active user’s profile.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="main_window.MainWindow.view_task">
+<span class="sig-name descname"><span class="pre">view_task</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">response</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/main_window.html#MainWindow.view_task"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#main_window.MainWindow.view_task" title="Permalink to this definition">#</a></dt>
+<dd><p>Creating the task view dialog, handling the server’s response containing all the task’s information.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="main_window.SendMessageWorker">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">main_window.</span></span><span class="sig-name descname"><span class="pre">SendMessageWorker</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">connection</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_original_socket</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/main_window.html#SendMessageWorker"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#main_window.SendMessageWorker" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">QObject</span></code></p>
+<p>This class is used as a worker for a thread.
+It essentially handles the message sending through the socket in the server, given that this action is blocking
+(Waiting for the response) we use a thread to handle this.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="main_window.SendMessageWorker.error">
+<span class="sig-name descname"><span class="pre">error</span></span><a class="headerlink" href="#main_window.SendMessageWorker.error" title="Permalink to this definition">#</a></dt>
+<dd><p>int = …, arguments: Sequence = …) -&gt; PYQT_SIGNAL</p>
+<p>types is normally a sequence of individual types.  Each type is either a
+type object or a string that is the name of a C++ type.  Alternatively
+each type could itself be a sequence of types each describing a different
+overloaded signal.
+name is the optional C++ name of the signal.  If it is not specified then
+the name of the class attribute that is bound to the signal is used.
+revision is the optional revision of the signal that is exported to QML.
+If it is not specified then 0 is used.
+arguments is the optional sequence of the names of the signal’s arguments.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pyqtSignal(<a href="#id9"><span class="problematic" id="id10">*</span></a>types, name</p>
+</dd>
+<dt class="field-even">Type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str = …, revision</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="main_window.SendMessageWorker.finished">
+<span class="sig-name descname"><span class="pre">finished</span></span><a class="headerlink" href="#main_window.SendMessageWorker.finished" title="Permalink to this definition">#</a></dt>
+<dd><p>int = …, arguments: Sequence = …) -&gt; PYQT_SIGNAL</p>
+<p>types is normally a sequence of individual types.  Each type is either a
+type object or a string that is the name of a C++ type.  Alternatively
+each type could itself be a sequence of types each describing a different
+overloaded signal.
+name is the optional C++ name of the signal.  If it is not specified then
+the name of the class attribute that is bound to the signal is used.
+revision is the optional revision of the signal that is exported to QML.
+If it is not specified then 0 is used.
+arguments is the optional sequence of the names of the signal’s arguments.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pyqtSignal(<a href="#id11"><span class="problematic" id="id12">*</span></a>types, name</p>
+</dd>
+<dt class="field-even">Type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str = …, revision</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="main_window.SendMessageWorker.message">
+<span class="sig-name descname"><span class="pre">message</span></span><a class="headerlink" href="#main_window.SendMessageWorker.message" title="Permalink to this definition">#</a></dt>
+<dd><p>int = …, arguments: Sequence = …) -&gt; PYQT_SIGNAL</p>
+<p>types is normally a sequence of individual types.  Each type is either a
+type object or a string that is the name of a C++ type.  Alternatively
+each type could itself be a sequence of types each describing a different
+overloaded signal.
+name is the optional C++ name of the signal.  If it is not specified then
+the name of the class attribute that is bound to the signal is used.
+revision is the optional revision of the signal that is exported to QML.
+If it is not specified then 0 is used.
+arguments is the optional sequence of the names of the signal’s arguments.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pyqtSignal(<a href="#id13"><span class="problematic" id="id14">*</span></a>types, name</p>
+</dd>
+<dt class="field-even">Type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str = …, revision</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="main_window.SendMessageWorker.raise_socket_error">
+<span class="sig-name descname"><span class="pre">raise_socket_error</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/main_window.html#SendMessageWorker.raise_socket_error"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#main_window.SendMessageWorker.raise_socket_error" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="main_window.SendMessageWorker.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/main_window.html#SendMessageWorker.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#main_window.SendMessageWorker.run" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="main_window.Task">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">main_window.</span></span><span class="sig-name descname"><span class="pre">Task</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pk_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tag</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deadline</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_owner</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">public</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_completed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/main_window.html#Task"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#main_window.Task" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>This class is used to create a Task object containing all the task’s information.
+It also includes a few methods to allow us to easily determine the task’s status and the time left before the deadline is reached.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="main_window.Task.time_left">
+<span class="sig-name descname"><span class="pre">time_left</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/main_window.html#Task.time_left"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#main_window.Task.time_left" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="main_window.Task.update_status">
+<span class="sig-name descname"><span class="pre">update_status</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/main_window.html#Task.update_status"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#main_window.Task.update_status" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="main_window.User">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">main_window.</span></span><span class="sig-name descname"><span class="pre">User</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">username</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">email</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">first_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">last_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">profile_picture_url</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">token</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/main_window.html#User"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#main_window.User" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>The current user for the application is defined with this class.
+It contains the auth_token that is necessary to maintain a valid authentication with the server.</p>
+</dd></dl>
+
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="navbar.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">navbar module</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="main.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">main module</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2023, Raphael,Mehdi,Elmir,Elias,Emir,Khalil,Shpend
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">main_window module</a><ul>
+<li><a class="reference internal" href="#main_window.ClockThread"><code class="docutils literal notranslate"><span class="pre">ClockThread</span></code></a><ul>
+<li><a class="reference internal" href="#main_window.ClockThread.count"><code class="docutils literal notranslate"><span class="pre">ClockThread.count</span></code></a></li>
+<li><a class="reference internal" href="#main_window.ClockThread.fetchRequests"><code class="docutils literal notranslate"><span class="pre">ClockThread.fetchRequests</span></code></a></li>
+<li><a class="reference internal" href="#main_window.ClockThread.finished"><code class="docutils literal notranslate"><span class="pre">ClockThread.finished</span></code></a></li>
+<li><a class="reference internal" href="#main_window.ClockThread.run"><code class="docutils literal notranslate"><span class="pre">ClockThread.run()</span></code></a></li>
+<li><a class="reference internal" href="#main_window.ClockThread.testConnection"><code class="docutils literal notranslate"><span class="pre">ClockThread.testConnection</span></code></a></li>
+<li><a class="reference internal" href="#main_window.ClockThread.update"><code class="docutils literal notranslate"><span class="pre">ClockThread.update</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#main_window.Friend"><code class="docutils literal notranslate"><span class="pre">Friend</span></code></a></li>
+<li><a class="reference internal" href="#main_window.MainWindow"><code class="docutils literal notranslate"><span class="pre">MainWindow</span></code></a><ul>
+<li><a class="reference internal" href="#main_window.MainWindow.add_task"><code class="docutils literal notranslate"><span class="pre">MainWindow.add_task()</span></code></a></li>
+<li><a class="reference internal" href="#main_window.MainWindow.attempt_connection"><code class="docutils literal notranslate"><span class="pre">MainWindow.attempt_connection()</span></code></a></li>
+<li><a class="reference internal" href="#main_window.MainWindow.clockThreadInit"><code class="docutils literal notranslate"><span class="pre">MainWindow.clockThreadInit()</span></code></a></li>
+<li><a class="reference internal" href="#main_window.MainWindow.closeEvent"><code class="docutils literal notranslate"><span class="pre">MainWindow.closeEvent()</span></code></a></li>
+<li><a class="reference internal" href="#main_window.MainWindow.create_task"><code class="docutils literal notranslate"><span class="pre">MainWindow.create_task()</span></code></a></li>
+<li><a class="reference internal" href="#main_window.MainWindow.create_task_form"><code class="docutils literal notranslate"><span class="pre">MainWindow.create_task_form()</span></code></a></li>
+<li><a class="reference internal" href="#main_window.MainWindow.create_task_response"><code class="docutils literal notranslate"><span class="pre">MainWindow.create_task_response()</span></code></a></li>
+<li><a class="reference internal" href="#main_window.MainWindow.create_user"><code class="docutils literal notranslate"><span class="pre">MainWindow.create_user()</span></code></a></li>
+<li><a class="reference internal" href="#main_window.MainWindow.delete_task"><code class="docutils literal notranslate"><span class="pre">MainWindow.delete_task()</span></code></a></li>
+<li><a class="reference internal" href="#main_window.MainWindow.delete_task_response"><code class="docutils literal notranslate"><span class="pre">MainWindow.delete_task_response()</span></code></a></li>
+<li><a class="reference internal" href="#main_window.MainWindow.delete_tasks"><code class="docutils literal notranslate"><span class="pre">MainWindow.delete_tasks()</span></code></a></li>
+<li><a class="reference internal" href="#main_window.MainWindow.delete_tasks_response"><code class="docutils literal notranslate"><span class="pre">MainWindow.delete_tasks_response()</span></code></a></li>
+<li><a class="reference internal" href="#main_window.MainWindow.edit_task"><code class="docutils literal notranslate"><span class="pre">MainWindow.edit_task()</span></code></a></li>
+<li><a class="reference internal" href="#main_window.MainWindow.fetchRequests"><code class="docutils literal notranslate"><span class="pre">MainWindow.fetchRequests()</span></code></a></li>
+<li><a class="reference internal" href="#main_window.MainWindow.fetchRequestsResponse"><code class="docutils literal notranslate"><span class="pre">MainWindow.fetchRequestsResponse()</span></code></a></li>
+<li><a class="reference internal" href="#main_window.MainWindow.init_edit_task_window"><code class="docutils literal notranslate"><span class="pre">MainWindow.init_edit_task_window()</span></code></a></li>
+<li><a class="reference internal" href="#main_window.MainWindow.init_send"><code class="docutils literal notranslate"><span class="pre">MainWindow.init_send()</span></code></a></li>
+<li><a class="reference internal" href="#main_window.MainWindow.init_view_task_window"><code class="docutils literal notranslate"><span class="pre">MainWindow.init_view_task_window()</span></code></a></li>
+<li><a class="reference internal" href="#main_window.MainWindow.loadSession"><code class="docutils literal notranslate"><span class="pre">MainWindow.loadSession()</span></code></a></li>
+<li><a class="reference internal" href="#main_window.MainWindow.logout"><code class="docutils literal notranslate"><span class="pre">MainWindow.logout()</span></code></a></li>
+<li><a class="reference internal" href="#main_window.MainWindow.refresh_tasks"><code class="docutils literal notranslate"><span class="pre">MainWindow.refresh_tasks()</span></code></a></li>
+<li><a class="reference internal" href="#main_window.MainWindow.remove_tasks"><code class="docutils literal notranslate"><span class="pre">MainWindow.remove_tasks()</span></code></a></li>
+<li><a class="reference internal" href="#main_window.MainWindow.setDarkMode"><code class="docutils literal notranslate"><span class="pre">MainWindow.setDarkMode()</span></code></a></li>
+<li><a class="reference internal" href="#main_window.MainWindow.setLightMode"><code class="docutils literal notranslate"><span class="pre">MainWindow.setLightMode()</span></code></a></li>
+<li><a class="reference internal" href="#main_window.MainWindow.set_friends"><code class="docutils literal notranslate"><span class="pre">MainWindow.set_friends()</span></code></a></li>
+<li><a class="reference internal" href="#main_window.MainWindow.set_task_completed"><code class="docutils literal notranslate"><span class="pre">MainWindow.set_task_completed()</span></code></a></li>
+<li><a class="reference internal" href="#main_window.MainWindow.set_task_completed_response"><code class="docutils literal notranslate"><span class="pre">MainWindow.set_task_completed_response()</span></code></a></li>
+<li><a class="reference internal" href="#main_window.MainWindow.set_tasks"><code class="docutils literal notranslate"><span class="pre">MainWindow.set_tasks()</span></code></a></li>
+<li><a class="reference internal" href="#main_window.MainWindow.silent"><code class="docutils literal notranslate"><span class="pre">MainWindow.silent()</span></code></a></li>
+<li><a class="reference internal" href="#main_window.MainWindow.testConnection"><code class="docutils literal notranslate"><span class="pre">MainWindow.testConnection()</span></code></a></li>
+<li><a class="reference internal" href="#main_window.MainWindow.toggleDarkmode"><code class="docutils literal notranslate"><span class="pre">MainWindow.toggleDarkmode()</span></code></a></li>
+<li><a class="reference internal" href="#main_window.MainWindow.unfriend"><code class="docutils literal notranslate"><span class="pre">MainWindow.unfriend()</span></code></a></li>
+<li><a class="reference internal" href="#main_window.MainWindow.unfriend_response"><code class="docutils literal notranslate"><span class="pre">MainWindow.unfriend_response()</span></code></a></li>
+<li><a class="reference internal" href="#main_window.MainWindow.update_friends"><code class="docutils literal notranslate"><span class="pre">MainWindow.update_friends()</span></code></a></li>
+<li><a class="reference internal" href="#main_window.MainWindow.update_tasks"><code class="docutils literal notranslate"><span class="pre">MainWindow.update_tasks()</span></code></a></li>
+<li><a class="reference internal" href="#main_window.MainWindow.view_account_profile"><code class="docutils literal notranslate"><span class="pre">MainWindow.view_account_profile()</span></code></a></li>
+<li><a class="reference internal" href="#main_window.MainWindow.view_task"><code class="docutils literal notranslate"><span class="pre">MainWindow.view_task()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#main_window.SendMessageWorker"><code class="docutils literal notranslate"><span class="pre">SendMessageWorker</span></code></a><ul>
+<li><a class="reference internal" href="#main_window.SendMessageWorker.error"><code class="docutils literal notranslate"><span class="pre">SendMessageWorker.error</span></code></a></li>
+<li><a class="reference internal" href="#main_window.SendMessageWorker.finished"><code class="docutils literal notranslate"><span class="pre">SendMessageWorker.finished</span></code></a></li>
+<li><a class="reference internal" href="#main_window.SendMessageWorker.message"><code class="docutils literal notranslate"><span class="pre">SendMessageWorker.message</span></code></a></li>
+<li><a class="reference internal" href="#main_window.SendMessageWorker.raise_socket_error"><code class="docutils literal notranslate"><span class="pre">SendMessageWorker.raise_socket_error()</span></code></a></li>
+<li><a class="reference internal" href="#main_window.SendMessageWorker.run"><code class="docutils literal notranslate"><span class="pre">SendMessageWorker.run()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#main_window.Task"><code class="docutils literal notranslate"><span class="pre">Task</span></code></a><ul>
+<li><a class="reference internal" href="#main_window.Task.time_left"><code class="docutils literal notranslate"><span class="pre">Task.time_left()</span></code></a></li>
+<li><a class="reference internal" href="#main_window.Task.update_status"><code class="docutils literal notranslate"><span class="pre">Task.update_status()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#main_window.User"><code class="docutils literal notranslate"><span class="pre">User</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/scripts/furo.js"></script>
+    </body>
+</html>
