@@ -103,7 +103,7 @@ python main.py
 ```
 
 # Our team :
-<pre><img align="center" style="height:35px;width:35px;border-radius:50%;" src="https://avatars.githubusercontent.com/u/95073137?s=100" <p><b> • Raph-Romeo </b>  Head of Front end development & app packaging </p><a href="mailto:raphael.romeo@uha.fr">Raphael ROMEO</a><br></pre>
+<pre><img align="center" style="height:35px;width:35px;border-radius:50%;" src="https://avatars.githubusercontent.com/u/95073137?s=100" <p><b> • Raph-Romeo </b>  Head of Front end development & app packaging (Conda and executable) </p><a href="mailto:raphael.romeo@uha.fr">Raphael ROMEO</a><br></pre>
 
 <pre><img align="center" style="height:35px;width:35px;border-radius:50%;" src="https://avatars.githubusercontent.com/u/92865322?s=100" <p><b> • Emir6868 </b>  Tester & bug fixer & app stability </p><a href="mailto:emir.eraslan@uha.fr">Emir ERASLAN</a><br></pre>
 
