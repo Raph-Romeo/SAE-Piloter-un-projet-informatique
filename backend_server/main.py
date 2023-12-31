@@ -5,6 +5,9 @@ import mysql.connector
 
 
 class Request:
+    """
+    Object Request is used to format the client's request to be managed more easily.
+    """
     def __init__(self, request, client):
         self.client = client
         if "t" in request.keys():
@@ -31,18 +34,27 @@ class Request:
 
 
 class User:
+    """
+    Object User is used to handle the connection after a request was passed to the server.
+    """
     def __init__(self, is_authenticated: bool, data: dict = None):
         self.is_authenticated = is_authenticated
         self.data = data
 
 
 class View:
+    """
+    Object View is used to manage the different URL paths, and which view function it points to from views.py.
+    """
     def __init__(self, view, protected: bool = False):
         self.view = view
         self.protected = protected
 
 
 class Client:
+    """
+    Object Client is used to handle a socket connection to the server.
+    """
     def __init__(self, serv: object, connection: object, addr: str, secret_key):
         print(f"NEW CONNECTION : {addr[0]}:{addr[1]}")
         self.server = serv
@@ -54,6 +66,9 @@ class Client:
         self.client_thread.start()
 
     def close(self) -> None:
+        """
+        Properly close connection when socket is closed or when connection is lost.
+        """
         #print(f"CONNECTION CLOSED : {self.addr[0]}:{self.addr[1]}")
         self.connection.close()
         self.connected = False
@@ -64,6 +79,9 @@ class Client:
         return
 
     def handle(self) -> None:
+        """
+        Thread function used to listen to the client's requests in a loop without blocking main thread.
+        """
         while self.connected:
             try:
                 data = self.connection.recv(1024)
@@ -89,6 +107,9 @@ class Client:
         return
 
     def verify_token(self, request):
+        """
+        SECURITY | Method used to verify if the client request's token is valid
+        """
         try:
             if request.token is not None:
                 fernet = Fernet(self.secret_key)
@@ -104,12 +125,19 @@ class Client:
         return False
 
     def generate_token(self, username, password) -> bytes:
+        """
+        When authentication was made with the client, using the username and password, a token is generated.
+        The current datetime is added, and the whole string is salted using the server's secret key.
+        """
         fernet = Fernet(self.secret_key)
         token = f"{username},{password},{datetime.datetime.now()}"
         token = fernet.encrypt(token.encode())
         return token
 
     def check_username(self, username):
+        """
+        Check if username STRING argument already exists in the mysql database in the User table.
+        """
         cursor = self.database_connection.cursor()
         query = "SELECT * FROM User WHERE username = %s"
         cursor.execute(query, (username,))
@@ -118,6 +146,9 @@ class Client:
         return result
 
     def check_email(self, email):
+        """
+        Check if Email STRING argument already exists in the mysql database in the User table.
+        """
         cursor = self.database_connection.cursor()
         query = "SELECT * FROM User WHERE email = %s"
         cursor.execute(query, (email,))
@@ -126,6 +157,10 @@ class Client:
         return result
 
     def check_username_and_password(self, username, password):
+        """
+        Check if username STRING argument and password (MD5) STRING argument are valid in the mysql database in the
+        User table.
+        """
         cursor = self.database_connection.cursor()
         query = "SELECT * FROM User WHERE username = %s AND password = %s"
         cursor.execute(query, (username, password))
@@ -135,6 +170,10 @@ class Client:
 
 
 class Server:
+    """
+    Main class for the server.
+    Server class initiates the server using python sockets module.
+    """
     def __init__(self):
 
         # server parameters
@@ -172,11 +211,17 @@ class Server:
         }
 
     def close(self) -> None:
+        """
+        Properly shuts down the server and all threads.
+        """
         self.forceStop = True
         self.socket.close()
         return
 
     def start(self) -> bool:
+        """
+        Start the server socket.
+        """
         try:
             self.number_of_attempts += 1
             self.socket.bind(("0.0.0.0", self.port))
@@ -193,15 +238,25 @@ class Server:
             return True
 
     def listen(self):
+        """
+        Listening for client connections ( THREAD LOOP )
+        """
         self.socket.listen()
         while not self.forceStop:
             conn, addr = self.socket.accept()
             self.clients.append(Client(self, conn, addr, self.secret_key))
 
     def remove(self, client):
+        """
+        Remove a client from the list of clients (self.clients:list)
+        """
         self.clients.remove(client)
 
     def request(self, request: object) -> bytes:
+        """
+        Handle a request from the client.
+        Verify URL existence -> Execute Views function associated to request's URL.
+        """
         token_check = request.client.verify_token(request)
         if token_check:
             user = User(is_authenticated=True, data=token_check)
@@ -225,6 +280,9 @@ class Server:
 
 
 if __name__ == "__main__":
+    """
+    CREATE SERVER AND START SERVER
+    """
     server = Server()
     sys.exit(server.start())
 

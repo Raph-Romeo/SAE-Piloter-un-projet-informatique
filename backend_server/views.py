@@ -3,6 +3,9 @@ import datetime
 
 
 def login(request) -> bytes:
+    """
+    Handle authentication request.
+    """
     if request.method == "POST":
         try:
             username = request.data["username"]
@@ -26,6 +29,9 @@ def login(request) -> bytes:
 
 
 def get_user(request, pk: int):
+    """
+    Get user from database, from argument PK -> user id.
+    """
     cursor = request.client.database_connection.cursor()
     query = "SELECT * FROM User WHERE id = %s"
     cursor.execute(query, (pk,))
@@ -37,6 +43,9 @@ def get_user(request, pk: int):
         return {"u": f"deleted_user_{pk}", "e": "null", "fn": "null", "ln": "null"}
 
 def get_user_from_username(request, username: str):
+    """
+    Get user from database, from argument username -> string username.
+    """
     cursor = request.client.database_connection.cursor()
     query = "SELECT * FROM User WHERE username = %s"
     cursor.execute(query, (username,))
@@ -49,6 +58,9 @@ def get_user_from_username(request, username: str):
 
 
 def tasks(request) -> bytes:
+    """
+    GET tasks associated to user. [PROTECTED VIEW]
+    """
     if request.method == "GET":
         user_id = request.user.data[0]
         cursor = request.client.database_connection.cursor()
@@ -73,6 +85,10 @@ def tasks(request) -> bytes:
 
 
 def set_completed(request) -> bytes:
+    """
+    POST > set task to completed status. [PROTECTED VIEW]
+    POST data must contain is_completed key BOOL, and task_id key INT
+    """
     if request.method == "POST":
         user_id = request.user.data[0]
         try:
@@ -98,6 +114,10 @@ def set_completed(request) -> bytes:
 
 
 def delete_task(request) -> bytes:
+    """
+    POST > Delete task. [PROTECTED VIEW]
+    POST data must contain task_id key INT
+    """
     if request.method == "POST":
         user_id = request.user.data[0]
         try:
@@ -125,6 +145,10 @@ def delete_task(request) -> bytes:
 
 
 def delete_tasks(request) -> bytes:
+    """
+    POST > Delete tasks. [PROTECTED VIEW]
+    POST data must contain task_ids key List
+    """
     if request.method == "POST":
         user_id = request.user.data[0]
         try:
@@ -157,6 +181,18 @@ def delete_tasks(request) -> bytes:
 
 
 def create_task(request) -> bytes:
+    """
+    POST > Create task. [PROTECTED VIEW]
+    POST data must contain :
+    - name String
+    - tag String
+    - description String
+    - start_date String
+    - deadline String
+    - user String
+    - public BOOL
+    - importance Int
+    """
     if request.method == "POST":
         user_id = request.user.data[0]  # User id that creates the task
         try:
@@ -195,6 +231,15 @@ def create_task(request) -> bytes:
         return json.dumps({"status": 200, "message": "Ok", "data": {"is_created": True, "task": {"id": task_id, "N": name, "T": tag, "SD": start_date, "ow": {"u": user, "e": "null"}, "io": is_owner, "pu": public, "IC": False, "DL": deadline}}}).encode()
 
 def create_user(request) -> bytes:
+    """
+    POST > Create User.
+    POST data must contain :
+    - username String
+    - password String (MD5)
+    - email String
+    - first_name String
+    - last_name String
+    """
     if request.method == "POST":
         try:
             username = request.data["username"]
@@ -224,6 +269,10 @@ def create_user(request) -> bytes:
         return json.dumps({"status": 200, "message": "Ok", "data": {"is_created": True}}).encode()
 
 def task_details(request) -> bytes:
+    """
+    POST > task_details > Get all the details from tasks. [PROTECTED]
+    POST data must contain task_ids List
+    """
     if request.method == "POST":
         user_id = request.user.data[0]
         try:
@@ -260,6 +309,9 @@ def task_details(request) -> bytes:
         return json.dumps(message).encode()
 
 def fetch_requests(request) -> bytes:
+    """
+    GET number of friends and friend requests from user. [PROTECTED]
+    """
     if request.method == "GET":
         user_id = request.user.data[0]
         try:
@@ -282,6 +334,9 @@ def fetch_requests(request) -> bytes:
             return json.dumps({"status": 400, "message": "Could get data from database"}).encode()
 
 def friends(request) -> bytes:
+    """
+    GET all friends from user. [PROTECTED]
+    """
     if request.method == "GET":
         user_id = request.user.data[0]
         try:
@@ -305,6 +360,13 @@ def friends(request) -> bytes:
             return json.dumps({"status": 400, "message": "Could get data from database"}).encode()
 
 def friend_request(request) -> bytes:
+    """
+    GET all friend requests from user. [PROTECTED]
+
+    POST create friend request to user with username [PROTECTED]
+    contains keys :
+    - username String
+    """
     if request.method == "GET":
         user_id = request.user.data[0]
         try:
@@ -377,6 +439,11 @@ def friend_request(request) -> bytes:
             return json.dumps({"status": 404, "message": "No user was found with matching username"}).encode()
 
 def cancel_friend_request(request) -> bytes:
+    """
+    POST Cancel friend request [PROTECTED]
+    Takes keys:
+     - request_id > friendships ID int
+    """
     if request.method == "POST":
         user_id = request.user.data[0]
         request_id = request.data["request_id"]
@@ -399,6 +466,11 @@ def cancel_friend_request(request) -> bytes:
             return json.dumps({"status": 404, "message": "Friend request is no longer available"}).encode()
 
 def accept_friend_request(request) -> bytes:
+    """
+    POST accept friend request [PROTECTED]
+    Takes keys:
+       - request_id > friendships ID int
+    """
     if request.method == "POST":
         user_id = request.user.data[0]
         request_id = request.data["request_id"]
@@ -422,6 +494,11 @@ def accept_friend_request(request) -> bytes:
 
 
 def deny_friend_request(request) -> bytes:
+    """
+    POST deny friend request [PROTECTED]
+    Takes keys:
+        - request_id > friendships ID int
+    """
     if request.method == "POST":
         user_id = request.user.data[0]
         request_id = request.data["request_id"]
@@ -444,6 +521,11 @@ def deny_friend_request(request) -> bytes:
             return json.dumps({"status": 404, "message": "Friend request is no longer available"}).encode()
 
 def remove_friend(request) -> bytes:
+    """
+    POST remove friend [PROTECTED]
+    Takes keys:
+    - request_id > friendships ID int
+    """
     if request.method == "POST":
         user_id = request.user.data[0]
         request_id = request.data["request_id"]
