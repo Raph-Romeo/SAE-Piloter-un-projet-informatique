@@ -1,9 +1,0 @@
-src_server
-==========
-
-.. toctree::
-   :maxdepth: 4
-
-   main
-   settings
-   views
