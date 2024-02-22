@@ -15,7 +15,7 @@
 ### Application interface :
 ![Interface](https://drive.google.com/uc?export=view&id=1MnXkOjeMjImPtmtS9Rsas6ufPljG0mYk)
 ### Optional Dark Mode :
-![Interface](https://lh3.googleusercontent.com/drive-viewer/AEYmBYSChSCnwuRCFlXBqvDGDJvDlNO2_ZNAkx3N1Fk_1K0f1kUPkRXGuv_yZyKRm7pEMVuVRhjSyyJeYu2DxHCGOgxPNAgxyA=s1600)
+![Interface](https://drive.google.com/uc?export=view&id=17P90C8aL8sxWlEvceyrVdhqj7knXbDGz)
 
 ## Features
 - **User Accounts** : Create and manage user accounts with the option to add friends.
