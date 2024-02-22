@@ -13,7 +13,7 @@
 </p>
 
 ### Application interface :
-![Interface](https://lh3.googleusercontent.com/drive-viewer/AEYmBYSgEWbBtPvw1YL7Qo75fUsKezMTuiPpnrkmyxrbt4hUKMpLnCv-soKzpjy4rXclw5idyHf6X3yGLu3uHU7rlnizqamXNA=s1600)
+![Interface](https://drive.google.com/uc?export=view&id=1MnXkOjeMjImPtmtS9Rsas6ufPljG0mYk)
 ### Optional Dark Mode :
 ![Interface](https://lh3.googleusercontent.com/drive-viewer/AEYmBYSChSCnwuRCFlXBqvDGDJvDlNO2_ZNAkx3N1Fk_1K0f1kUPkRXGuv_yZyKRm7pEMVuVRhjSyyJeYu2DxHCGOgxPNAgxyA=s1600)
 
